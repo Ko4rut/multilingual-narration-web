@@ -1,0 +1,36 @@
+:root {
+  color-scheme: light dark;
+  --background: light-dark(#f4f7fb, #090c12);
+  --surface: light-dark(#ffffff, #191d2c);
+  --sidebar: light-dark(#edf2f7, #11141f);
+  --foreground: light-dark(#172438, #f0f2f8);
+  --muted: light-dark(#526278, #9aa8be);
+  --border: light-dark(#d2dce8, #30384d);
+  --accent: light-dark(#087c63, #0fc69c);
+  --on-accent: light-dark(#ffffff, #063c32);
+  --blue: light-dark(#087db2, #10a7e3);
+  --hover: light-dark(#e2ebf3, #1a2230);
+  --selected: light-dark(#d8e6f1, #222e40);
+  --positive-bg: light-dark(#d9f3e9, #103b36);
+  --warning: light-dark(#8c5c08, #edb443);
+  --warning-bg: light-dark(#fff0cf, #3a3022);
+  --heat-0: light-dark(#e0f0ec, #17363a);
+  --heat-1: light-dark(#b0dbcf, #13544f);
+  --heat-2: light-dark(#75bda8, #12766e);
+  --heat-3: light-dark(#33977e, #109d8d);
+  --heat-4: light-dark(#08765f, #13bdab);
+  --font-body: Arial, Helvetica, sans-serif;
+  --font-heading: Georgia, 'Times New Roman', serif;
+  --type-micro: .5625rem;
+  --type-caption: .625rem;
+  --type-small: .6875rem;
+  --type-label: .75rem;
+  --type-body: .875rem;
+  --type-large: 1rem;
+  --type-metric: 1.5rem;
+  --type-title: 1.8125rem;
+  --type-auth-title: 3.25rem;
+}
+
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }

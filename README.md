@@ -17,7 +17,9 @@ npm ci
 npm run dev
 ```
 
-Mở http://localhost:3000; trang gốc chuyển tới `/dashboard`. Hiện không cần biến môi trường, backend hoặc database.
+Mở http://localhost:3000; trang gốc chuyển tới `/login`. Đăng nhập mock bằng `admin@mans.vn` / `admin123`. Hiện không cần backend hoặc database.
+
+Xem [hướng dẫn routing, auth, theme, typography và i18n](docs/frontend-setup.md).
 
 ```bash
 npm run lint       # ESLint
@@ -28,14 +30,13 @@ npm start          # Chạy bản build
 
 ## Phạm vi hiện tại
 
-- Giao di?n ??ng nh?p theo thi?t k? t?i `/login`, k?m `/register` v? `/forgot-password`. C? validation HTML, n?t ?n/hi?n m?t kh?u v? th?ng b?o ch?a k?t n?i API khi g?i form; kh?ng l?u ho?c g?i m?t kh?u. Dashboard demo v?n truy c?p tr?c ti?p t?i `/dashboard`.
 - Khung admin responsive, sidebar đánh dấu route đang chọn.
 - Dashboard: thống kê, thời lượng nghe, POI phổ biến, heatmap, lượt ghé theo giờ.
 - Bộ lọc 7/30/90 ngày lưu trên URL, ví dụ `/dashboard?period=7`. Giá trị không hợp lệ dùng mặc định 30 ngày.
 - Loading, error boundary, trang 404, metadata và favicon riêng.
 - Các route `/pois`, `/poi-content`, `/audio`, `/users`, `/roles`, `/languages`, `/settings` có màn hình chờ triển khai.
 
-**Toàn bộ số liệu là mock, không phải realtime.** Bộ lọc cập nhật dữ liệu minh họa; số POI, tỷ lệ hoàn thành, thời lượng trung bình và tỷ lệ thay đổi đang cố định. Chưa có CRUD, upload, đăng nhập hoặc phân quyền. Cần bổ sung xác thực và kiểm tra quyền ở server/API trước khi quản lý dữ liệu thật.
+**Toàn bộ số liệu là mock, không phải realtime.** Bộ lọc cập nhật dữ liệu minh họa; số POI, tỷ lệ hoàn thành, thời lượng trung bình và tỷ lệ thay đổi đang cố định. Đã có đăng nhập mock, cookie phiên và bảo vệ các route admin. Chưa có CRUD, upload hoặc phân quyền thật. Thay auth mock bằng backend xác thực trước khi quản lý dữ liệu thật.
 
 ## Cấu trúc source
 
@@ -44,7 +45,7 @@ src/
 ├── app/
 │   ├── layout.tsx           # Layout gốc và metadata
 │   ├── globals.css          # Theme, layout, responsive
-│   ├── page.tsx             # Redirect đến dashboard
+│   ├── page.tsx             # Redirect đến login
 │   ├── icon.svg
 │   ├── not-found.tsx
 │   └── (admin)/             # Route group không xuất hiện trong URL
@@ -119,4 +120,4 @@ Thay lời gọi mock trong `src/features/dashboard/services/dashboard.service.t
 
 `src/features/auth/hooks/useAnimatedBackground.ts` điều khiển quầng sáng và đường cong bằng `requestAnimationFrame`, cập nhật CSS variables trực tiếp để không render lại form. Nền tự trôi nhẹ, có parallax theo chuột trên thiết bị hỗ trợ hover; màn hình cảm ứng chỉ dùng chuyển động tự động.
 
-Chỉnh biên độ và tốc độ trong hook, chỉnh màu/kích thước các lớp tại `AuthForm.module.css`. Hiệu ứng dừng khi tab bị ẩn, tắt theo `prefers-reduced-motion` và dọn animation/listener khi unmount. Áp dụng chung cho login, register và forgot-password.
+Chỉnh biên độ và tốc độ trong hook, chỉnh màu/kích thước các lớp tại `AuthForm.module.css`. Hiệu ứng dừng khi tab bị ẩn, tắt theo `prefers-reduced-motion` và dọn animation/listener khi unmount. Áp dụng chung cho login và forgot-password.
