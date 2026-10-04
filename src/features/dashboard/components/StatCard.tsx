@@ -1,8 +1,35 @@
 "use client";
-import { usePreferences } from "@/features/preferences/hooks/usePreferences";
-import type { DashboardData } from "../types";
 
-export function StatCard({ stat }: { stat: DashboardData["stats"][number] }) {
-  const { t } = usePreferences();
-  return <section className="card stat-card"><div><h2>{t(stat.label)}</h2><span className={`change ${stat.positive ? "positive" : "negative"}`}>{stat.change}</span></div><strong>{stat.value}</strong></section>;
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/Card";
+import { useStatCard } from "../hooks/useStatCard";
+import type { StatCardProps } from "../types";
+
+export function StatCard({ stat }: StatCardProps) {
+  const { label, value, change, changeClassName } = useStatCard(stat);
+
+  return (
+    <Card className="stat-card min-w-0 gap-4 py-5">
+      <CardHeader className="gap-3 px-4">
+        <CardTitle>
+          <h2 className="text-[length:var(--type-small)] font-normal leading-relaxed text-muted-foreground">
+            {label}
+          </h2>
+        </CardTitle>
+        <Badge variant="secondary" className={changeClassName}>
+          {change}
+        </Badge>
+      </CardHeader>
+      <CardContent className="px-4">
+        <strong className="text-[length:var(--type-metric)]">
+          {value}
+        </strong>
+      </CardContent>
+    </Card>
+  );
 }

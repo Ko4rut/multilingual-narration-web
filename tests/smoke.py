@@ -1,5 +1,6 @@
 """Run with a local dev server and Python playwright + Chrome installed."""
 from playwright.sync_api import sync_playwright, expect
+from pathlib import Path
 
 with sync_playwright() as p:
     browser = p.chromium.launch(channel="chrome", headless=True)
@@ -42,12 +43,52 @@ with sync_playwright() as p:
     expect(page.locator("html")).to_have_attribute("lang", "vi")
     expect(page.locator("html")).to_have_attribute("data-theme", "light")
     page.get_by_label("Ngôn ngữ", exact=True).select_option("en")
-    page.get_by_label("Reporting period", exact=True).select_option("7")
+    page.get_by_role("combobox", name="Reporting period", exact=True).click()
+    page.get_by_role("option", name="Last 7 Days", exact=True).click()
     expect(page).to_have_url(f"{base}/dashboard?period=7")
+    first_metric = page.locator('.stat-card strong').first.inner_text()
+    period = page.get_by_role("combobox", name="Reporting period", exact=True)
+    expect(period).to_contain_text("Last 7 Days")
+    period.focus()
+    period.press("Enter")
+    page.get_by_role("option", name="Last 7 Days", exact=True).press("End")
+    page.get_by_role("option", name="Last 90 Days", exact=True).press("Enter")
+    expect(page).to_have_url(f"{base}/dashboard?period=90")
+    expect(page.locator('.stat-card strong').first).not_to_have_text(first_metric)
+    page.reload()
+    expect(period).to_contain_text("Last 90 Days")
+    page.goto(f"{base}/dashboard?period=invalid")
+    expect(period).to_contain_text("Last 30 Days")
+    progress = page.get_by_role("progressbar").first
+    expect(progress).to_have_attribute("aria-valuenow", "100")
+    for scheme in ["dark", "light"]:
+        page.get_by_label("Theme", exact=True).select_option(scheme)
+        for width in [1440, 768, 390, 320]:
+            page.set_viewport_size({"width": width, "height": 900})
+            assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+            period.click()
+            expect(page.get_by_role("option", name="Last 30 Days", exact=True)).to_be_visible()
+            if width in [1440, 390]:
+                Path("coverage").mkdir(exist_ok=True)
+                page.screenshot(path=f"coverage/dashboard-{scheme}-{width}.png", full_page=True, animations="disabled")
+            page.keyboard.press("Escape")
+    page.get_by_label("Language", exact=True).select_option("vi")
+    expect(page.get_by_role("combobox", name="Kỳ báo cáo", exact=True)).to_contain_text("30 ngày qua")
+    page.get_by_label("Ngôn ngữ", exact=True).select_option("en")
     point = page.locator('svg circle[role="button"]').first
     point.focus()
     expect(page.locator(".chart-readout").first).to_contain_text("Interval 1")
+    point.press("Space")
+    expect(point.locator("xpath=preceding-sibling::circle")).to_have_attribute("r", "6")
+    next_point = page.locator('svg circle[role="button"]').nth(1)
+    next_point.press("Enter")
+    expect(page.locator(".chart-readout").first).to_contain_text("Interval 2")
+    bar = page.locator(".bar").first
+    bar.click()
+    expect(page.locator(".chart-readout").last).to_have_text(bar.get_attribute("aria-label"))
     page.get_by_role("button", name="Replay animation").click()
+    expect(page.locator(".chart-readout").first).to_have_text("Total listening time in minutes")
+    expect(page.locator(".chart-readout").last).to_have_text("Hourly visitor volume distribution")
     page.emulate_media(reduced_motion="reduce")
     assert page.locator(".trend-line").evaluate("el => getComputedStyle(el).animationName") == "none"
     page.set_viewport_size({"width": 390, "height": 844})

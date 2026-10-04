@@ -2,6 +2,15 @@
 
 Status: complete.
 
+## Latest completed work: dashboard shadcn/ui migration
+
+- Added official New York Card, Button, Badge, Select and Progress sources in `src/components/ui`, `components.json`, and `src/lib/utils.ts`. Card keeps its existing uppercase filename for Git/Windows compatibility.
+- Dashboard uses these primitives; `DashboardPanel` handles translated panel headings, and dashboard interactions are separated into hooks with props in `types.ts`.
+- Semantic shadcn colors map to MANS tokens. Existing mock data, SVG/CSS charts, locale and theme preferences remain active.
+- Lint and production build (including TypeScript) passed. Updated `tests/smoke.py` passed: keyboard/click period selection, URL persistence and fallback, progress accessibility, light/dark views at 320/390/768/1440px, Vietnamese labels and existing auth/preferences/chart checks. Final panel grid adjustment also passed browser checks.
+- Screenshots in ignored `coverage/dashboard-*.png`; desktop dark and mobile light reviewed. `git diff --check` passed.
+- Dev server: http://localhost:3000, exec session 69311. No pending implementation work. README documents setup and adding components.
+
 ## Completed objective
 
 - Employee login only; public registration route and links removed.

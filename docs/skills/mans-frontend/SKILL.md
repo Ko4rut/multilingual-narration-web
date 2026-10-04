@@ -16,6 +16,11 @@ Paths below are relative to the repository root. Apply these rules to new and ch
 
 ## Module responsibilities
 
+- Use function declarations for components and JSX render callbacks; do not use arrow functions to render UI.
+- Do not use ternary operators. Write explicit conditions with braces and named intermediate values.
+- Keep JSX readable: separate elements and long prop lists across lines. Split composed screens into focused components rather than compressing markup onto one line.
+- Keep state, handlers, data calculations and display-data preparation in feature hooks (or pure utilities when React is not needed). Components consume props/hooks and render UI; hooks must not return JSX.
+
 Organize domain code in `src/features/<feature>/`:
 
 - `components/`: render markup from props and hooks. Bind event handlers supplied by hooks; do not embed authentication, request orchestration, storage, validation workflows or effects in a rendering component. Simple event-to-value bindings are fine.
