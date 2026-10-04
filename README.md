@@ -1,5 +1,31 @@
 # MANS Admin
 
+## Dashboard components (shadcn/ui)
+
+Dashboard uses the official shadcn/ui New York components: Card, Button, Badge,
+Select (Radix), and Progress. Source lives in `src/components/ui`; `Card.tsx`
+retains the existing filename casing. Configuration is in `components.json`,
+and `cn()` is in `src/lib/utils.ts`.
+
+Semantic tokens in `src/styles/tokens.css` map the components to the MANS brand,
+light/dark themes and existing preferences. Dashboard composition and translations
+remain in `src/features/dashboard`; interactions live in its `hooks` folder.
+`DashboardOverview` composes focused components (`StatsGrid`, `PopularPois`,
+`VisitorHeatmap`, `TrendChart`, `VisitsChart`). Hooks prepare chart coordinates,
+labels, progress values and event handlers; components only render UI. Use
+function declarations and named render callbacks, explicit conditions, and
+multiline JSX. ESLint rejects ternaries in the dashboard feature and arrow
+functions in its components.
+SVG/CSS charts and mock data remain in place. The reporting period supports
+keyboard navigation and persists in the URL.
+
+To add another component: `npx shadcn@latest add <component>`. Review generated
+styles against the project's tokens; do not overwrite `globals.css` with a
+default theme. See [shadcn/ui documentation](https://ui.shadcn.com/docs).
+
+Run `npm run lint`, `npm run build`, and (with the dev server running)
+`python -X utf8 tests/smoke.py` to verify the dashboard and existing flows.
+
 Source nền cho web quản trị điểm tham quan (POI), nội dung thuyết minh, audio và thống kê. Dark theme theo mẫu dashboard, tổ chức code theo feature.
 
 ## Công nghệ
@@ -71,7 +97,7 @@ src/
     │   ├── components/      # DashboardOverview, PeriodFilter
     │   ├── mocks/           # Factory dữ liệu minh họa
     │   ├── services/        # Adapter dữ liệu, thay bằng API tại đây
-    │   └── types.ts         # DashboardData, Period, parsePeriod
+    │   └── types.ts         # DashboardData, Period, props
     ├── pois/
     ├── poi-content/
     ├── audio/

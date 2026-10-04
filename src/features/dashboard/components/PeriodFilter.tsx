@@ -1,14 +1,43 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
-import type { Period } from "../types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { usePeriodFilter } from "../hooks/usePeriodFilter";
+import type { PeriodFilterProps } from "../types";
 
-import { usePreferences } from "@/features/preferences/hooks/usePreferences";
+export function PeriodFilter({ period }: PeriodFilterProps) {
+  const { t, pending, statusMessage, changePeriod } = usePeriodFilter();
 
-export function PeriodFilter({ period }: { period: Period }) {
-  const { t } = usePreferences();
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
-  return <label className="period-filter"><span className="sr-only">{t("Reporting period")}</span><select aria-label={t("Reporting period")} value={period} disabled={pending} onChange={(event) => { const value = event.target.value; startTransition(() => router.replace(`/dashboard?period=${value}`, { scroll: false })); }}><option value="7">{t("Last 7 Days")}</option><option value="30">{t("Last 30 Days")}</option><option value="90">{t("Last 90 Days")}</option></select><span role="status" className="sr-only">{pending ? t("Updating dashboard") : ""}</span></label>;
+  return (
+    <div className="period-filter">
+      <Select value={period} disabled={pending} onValueChange={changePeriod}>
+        <SelectTrigger
+          aria-label={t("Reporting period")}
+          aria-busy={pending}
+          className="min-w-36 bg-surface"
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent position="popper" align="end">
+          <SelectItem value="7">
+            {t("Last 7 Days")}
+          </SelectItem>
+          <SelectItem value="30">
+            {t("Last 30 Days")}
+          </SelectItem>
+          <SelectItem value="90">
+            {t("Last 90 Days")}
+          </SelectItem>
+        </SelectContent>
+      </Select>
+      <span role="status" className="sr-only">
+        {statusMessage}
+      </span>
+    </div>
+  );
 }
