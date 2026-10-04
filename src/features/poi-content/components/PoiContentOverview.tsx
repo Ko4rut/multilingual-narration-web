@@ -17,11 +17,7 @@ export function PoiContentOverview() {
     setLanguageFilter,
     statusFilter,
     setStatusFilter,
-    currentPage,
-    setCurrentPage,
-    pageSize,
-    totalItems,
-    totalPages,
+    pagination,
   } = usePoiContent();
 
   return (
@@ -44,13 +40,7 @@ export function PoiContentOverview() {
       <PoiContentTable contents={contents} />
 
       {/* Pagination */}
-      <PoiContentPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        pageSize={pageSize}
-        onPageChange={setCurrentPage}
-      />
+      <PoiContentPagination {...pagination} />
     </div>
   );
 }
