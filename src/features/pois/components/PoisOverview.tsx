@@ -18,11 +18,7 @@ export function PoisOverview() {
     setRegionFilter,
     statusFilter,
     setStatusFilter,
-    currentPage,
-    setCurrentPage,
-    pageSize,
-    totalItems,
-    totalPages,
+    pagination,
     selectedIds,
     isAllSelected,
     toggleSelectAll,
@@ -89,13 +85,7 @@ export function PoisOverview() {
       />
 
       {/* Pagination */}
-      <PoisPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-        pageSize={pageSize}
-        onPageChange={setCurrentPage}
-      />
+      <PoisPagination {...pagination} />
     </div>
   );
 }

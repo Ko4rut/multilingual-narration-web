@@ -3,65 +3,30 @@ import { usePreferences } from "@/features/preferences/hooks/usePreferences";
 
 interface PoisPaginationProps {
   currentPage: number;
-  totalPages: number;
   totalItems: number;
-  pageSize: number;
+  startItem: number;
+  endItem: number;
+  pageNumbers: (number | string)[];
+  canPrev: boolean;
+  canNext: boolean;
+  onPrevPage: () => void;
+  onNextPage: () => void;
   onPageChange: (page: number) => void;
 }
 
 export function PoisPagination({
   currentPage,
-  totalPages,
   totalItems,
-  pageSize,
+  startItem,
+  endItem,
+  pageNumbers,
+  canPrev,
+  canNext,
+  onPrevPage,
+  onNextPage,
   onPageChange,
 }: PoisPaginationProps) {
   const { t, locale } = usePreferences();
-
-  // Calculate start item number clearly
-  let startItem = (currentPage - 1) * pageSize + 1;
-  if (totalItems === 0) {
-    startItem = 0;
-  }
-
-  const endItem = Math.min(currentPage * pageSize, totalItems);
-
-  // Generate page numbers with ellipsis without complex nested logic
-  const getPageNumbers = () => {
-    const pages: (number | string)[] = [];
-
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-      return pages;
-    }
-
-    if (currentPage <= 3) {
-      pages.push(1, 2, 3, "...", totalPages);
-      return pages;
-    }
-
-    if (currentPage >= totalPages - 2) {
-      pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
-      return pages;
-    }
-
-    pages.push(1, "...", currentPage, "...", totalPages);
-    return pages;
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      onPageChange(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      onPageChange(currentPage + 1);
-    }
-  };
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-5 text-sm">
@@ -76,8 +41,8 @@ export function PoisPagination({
         {/* Previous Button */}
         <button
           type="button"
-          onClick={handlePrevPage}
-          disabled={currentPage === 1}
+          onClick={onPrevPage}
+          disabled={!canPrev}
           className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-[var(--hover)] disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
           aria-label="Previous page"
         >
@@ -87,7 +52,7 @@ export function PoisPagination({
         </button>
 
         {/* Page Numbers */}
-        {getPageNumbers().map((page, idx) => {
+        {pageNumbers.map((page, idx) => {
           if (page === "...") {
             return (
               <span key={`dots-${idx}`} className="px-2 py-1 text-xs text-muted">
@@ -119,8 +84,8 @@ export function PoisPagination({
         {/* Next Button */}
         <button
           type="button"
-          onClick={handleNextPage}
-          disabled={currentPage === totalPages}
+          onClick={onNextPage}
+          disabled={!canNext}
           className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-[var(--hover)] disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
           aria-label="Next page"
         >
