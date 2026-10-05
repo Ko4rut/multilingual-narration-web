@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { usePois } from "../hooks/usePois";
 import { PoisHeader } from "./PoisHeader";
 import { PoisFilterBar } from "./PoisFilterBar";
 import { PoisTable } from "./PoisTable";
 import { PoisPagination } from "./PoisPagination";
-import type { PointOfInterest } from "../types";
 
 export function PoisOverview() {
   const {
@@ -23,30 +22,12 @@ export function PoisOverview() {
     isAllSelected,
     toggleSelectAll,
     toggleSelectOne,
+    toastMessage,
+    handleAddClick,
+    handleEditClick,
+    handleMoreActions,
+    handleAdvancedFilter,
   } = usePois();
-
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
-  const handleAddClick = () => {
-    showToast("Tính năng '+ Add POI' đang chờ kết nối API / Form.");
-  };
-
-  const handleEditClick = (poi: PointOfInterest) => {
-    showToast(`Chỉnh sửa địa điểm: ${poi.poi_name} (chờ cập nhật)`);
-  };
-
-  const handleMoreActions = (poi: PointOfInterest) => {
-    showToast(`Tùy chọn khác cho: ${poi.poi_name}`);
-  };
-
-  const handleAdvancedFilter = () => {
-    showToast("Bộ lọc nâng cao (Advanced Filters) đang sẵn sàng mở rộng.");
-  };
 
   return (
     <div className="w-full">

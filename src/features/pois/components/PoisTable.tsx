@@ -1,7 +1,9 @@
 import React from "react";
 import { usePreferences } from "@/features/preferences/hooks/usePreferences";
 import type { PointOfInterest } from "../types";
+import { formatCoordinates } from "../utils";
 import { PoisStatusBadge } from "./PoisStatusBadge";
+import { PoiLanguageBadges } from "./PoiLanguageBadges";
 
 interface PoisTableProps {
   pois: PointOfInterest[];
@@ -23,24 +25,6 @@ export function PoisTable({
   onMoreActions,
 }: PoisTableProps) {
   const { t, locale } = usePreferences();
-
-  // Format coordinates cleanly using clear if-else logic
-  const formatCoordinates = (lat: number, lng: number) => {
-    let latDirection = "N";
-    if (lat < 0) {
-      latDirection = "S";
-    }
-
-    let lngDirection = "E";
-    if (lng < 0) {
-      lngDirection = "W";
-    }
-
-    const latText = `${Math.abs(lat).toFixed(4)}° ${latDirection}`;
-    const lngText = `${Math.abs(lng).toFixed(4)}° ${lngDirection}`;
-
-    return `${latText}, ${lngText}`;
-  };
 
   return (
     <div className="w-full bg-surface border border-border rounded-xl overflow-hidden shadow-sm">
@@ -82,8 +66,6 @@ export function PoisTable({
 
             {pois.map((poi) => {
               const isSelected = selectedIds.includes(poi.id);
-              const displayLangs = poi.languages.slice(0, 5);
-              const remainingLangsCount = poi.languages.length - 5;
 
               let rowClass = "transition-colors hover:bg-[var(--hover)]/60";
               if (isSelected) {
@@ -139,24 +121,7 @@ export function PoisTable({
 
                   {/* Languages */}
                   <td className="py-4 px-4">
-                    <div className="flex flex-wrap items-center gap-1.5 max-w-[170px]">
-                      {displayLangs.map((lang) => (
-                        <span
-                          key={lang}
-                          className="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-semibold tracking-wider uppercase rounded bg-[var(--hover)] border border-border text-muted"
-                        >
-                          {lang}
-                        </span>
-                      ))}
-                      {remainingLangsCount > 0 && (
-                        <span
-                          className="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold rounded bg-accent/15 border border-accent/30 text-accent"
-                          title={poi.languages.slice(5).join(", ")}
-                        >
-                          +{remainingLangsCount}
-                        </span>
-                      )}
-                    </div>
+                    <PoiLanguageBadges languages={poi.languages} />
                   </td>
 
                   {/* Daily Plays */}

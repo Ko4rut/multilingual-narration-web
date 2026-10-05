@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { MOCK_POIS, MOCK_REGIONS } from "../mocks/pois.mock";
+import type { PointOfInterest } from "../types";
 
 export function usePois() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -9,6 +10,7 @@ export function usePois() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const pageSize = 6;
 
   // Filter POIs based on active criteria
@@ -137,6 +139,28 @@ export function usePois() {
     setCurrentPage(1);
   };
 
+  // Action notifications / handlers
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleAddClick = () => {
+    showToast("Tính năng '+ Add POI' đang chờ kết nối API / Form.");
+  };
+
+  const handleEditClick = (poi: PointOfInterest) => {
+    showToast(`Chỉnh sửa địa điểm: ${poi.poi_name} (chờ cập nhật)`);
+  };
+
+  const handleMoreActions = (poi: PointOfInterest) => {
+    showToast(`Tùy chọn khác cho: ${poi.poi_name}`);
+  };
+
+  const handleAdvancedFilter = () => {
+    showToast("Bộ lọc nâng cao (Advanced Filters) đang sẵn sàng mở rộng.");
+  };
+
   return {
     pois: paginatedPois,
     allPois: filteredPois,
@@ -176,5 +200,10 @@ export function usePois() {
     toggleSelectOne,
     isSelected,
     resetFilters,
+    toastMessage,
+    handleAddClick,
+    handleEditClick,
+    handleMoreActions,
+    handleAdvancedFilter,
   };
 }
