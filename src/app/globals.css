@@ -2,7 +2,10 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
-
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
