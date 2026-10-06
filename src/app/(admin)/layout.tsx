@@ -1,7 +1,8 @@
-import { Sidebar } from "@/components/layout/Sidebar";
+import MainLayout from "@/components/layout/MainLayout";
 import { requireSession } from "@/features/auth/session";
+import type { MainLayoutProps } from "@/types/layout";
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: MainLayoutProps) {
   await requireSession();
-  return <div className="admin-shell"><a className="skip-link" href="#main-content">Skip to content</a><Sidebar /><main id="main-content" className="main-content">{children}</main></div>;
+  return <MainLayout>{children}</MainLayout>;
 }
