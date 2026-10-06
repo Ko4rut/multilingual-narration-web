@@ -1,14 +1,27 @@
+import {
+  AudioLines,
+  Files,
+  Languages,
+  LayoutDashboard,
+  MapPin,
+  Settings,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
+
 export const navigation = [
-  { label: "Overview", items: [{ href: "/dashboard", label: "Dashboard", icon: "grid" }] },
+  { label: "Overview", items: [
+    { href: "/dashboard", label: "Dashboard", glyph: LayoutDashboard }
+  ] },
   { label: "Content", items: [
-    { href: "/pois", label: "POI Management", icon: "pin" },
-    { href: "/poi-content", label: "POIs Content Management", icon: "file" },
-    { href: "/audio", label: "Audio Management", icon: "audio" },
+    { href: "/pois", label: "POI Management", glyph: MapPin },
+    { href: "/poi-content", label: "POIs Content Management", glyph: Files },
+    { href: "/audio", label: "Audio Management", glyph: AudioLines },
   ] },
   { label: "System", items: [
-    { href: "/users", label: "User Management", icon: "users" },
-    { href: "/roles", label: "Role-Based Access", icon: "shield" },
-    { href: "/languages", label: "Language Management", icon: "language" },
+    { href: "/users", label: "User Management", glyph: Users },
+    { href: "/roles", label: "Access Control", glyph: ShieldCheck },
+    { href: "/languages", label: "Language Management", glyph: Languages },
   ] },
-  { label: "Settings", items: [{ href: "/settings", label: "General Settings", icon: "settings" }] },
+  { label: "Settings", items: [{ href: "/settings", label: "General Settings", glyph: Settings }] },
 ] as const;

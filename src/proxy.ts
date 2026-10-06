@@ -9,5 +9,15 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/pois/:path*", "/poi-content/:path*", "/audio/:path*", "/users/:path*", "/roles/:path*", "/languages/:path*", "/settings/:path*"],
+  matcher: [
+    "/dashboard/:path*", 
+    "/pois/:path*", 
+    "/poi-content/:path*", 
+    "/audio/:path*", 
+    "/users/:path*", 
+    "/roles/:path*", 
+    "/languages/:path*", 
+    "/settings/:path*", 
+    "/profile/:path*"
+  ],
 };

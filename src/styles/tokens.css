@@ -21,6 +21,13 @@
   --secondary-foreground: var(--foreground);
   --muted-foreground: var(--muted);
   --accent-foreground: var(--on-accent);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: var(--on-accent);
+  --sidebar-accent: var(--selected);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--accent);
   --destructive: light-dark(#b42318, #ff938a);
   --input: var(--border);
   --ring: var(--accent);
