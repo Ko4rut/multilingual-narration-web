@@ -1,5 +1,5 @@
 "use client";
-import { usePreferences } from "../hooks/usePreferences";
+import { usePreferences } from "../hooks/use-preferences";
 import type { Locale } from "@/i18n/types";
 import type { Theme } from "../types";
 

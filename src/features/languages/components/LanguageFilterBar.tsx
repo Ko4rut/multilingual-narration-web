@@ -1,7 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { useLanguageFilterBar } from "../hooks/useLanguageFilterBar";
+import { useLanguageFilterBar } from "../hooks/use-language-filter-bar";
 import type { LanguageFilterBarProps } from "../types";
 
 export function LanguageFilterBar({ 

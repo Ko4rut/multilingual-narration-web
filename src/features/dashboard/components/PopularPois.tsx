@@ -1,7 +1,7 @@
 "use client";
 
 import { Progress } from "@/components/ui/progress";
-import { usePopularPois } from "../hooks/usePopularPois";
+import { usePopularPois } from "../hooks/use-popular-pois";
 import type { PopularPoisProps } from "../types";
 import { DashboardPanel } from "./DashboardPanel";
 

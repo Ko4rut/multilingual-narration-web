@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { usePeriodFilter } from "../hooks/usePeriodFilter";
+import { usePeriodFilter } from "../hooks/use-period-filter";
 import type { PeriodFilterProps } from "../types";
 
 export function PeriodFilter({ period }: PeriodFilterProps) {

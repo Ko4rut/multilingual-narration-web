@@ -2,13 +2,38 @@
 
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import Link from "next/link";
+import type { ControllerRenderProps } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import styles from "./AuthForm.module.css";
-import { useAuthForm } from "../hooks/useAuthForm";
-import type { AuthFormProps } from "../types";
+import { useAuthForm } from "../hooks/use-auth-form";
+import type { AuthFormProps, AuthFormValues } from "../types/auth.types";
 
 export function AuthForm({ mode }: AuthFormProps) {
-  const { t, copy, email, showPassword, pending, error, notice, handleEmailChange,
-    togglePassword, formAction, onSubmit } = useAuthForm(mode);
+  const {
+    t,
+    copy,
+    form,
+    showPassword,
+    pending,
+    error,
+    notice,
+    togglePassword,
+    onSubmit,
+  } = useAuthForm(mode);
   let passwordType = "password";
   let passwordToggleLabel = t("Show password");
   let PasswordVisibilityGlyph = Eye;
@@ -24,6 +49,71 @@ export function AuthForm({ mode }: AuthFormProps) {
     submitLabel = t("Signing in…");
   }
 
+  function renderEmailField({ field, }: { field: ControllerRenderProps<AuthFormValues, "email">; }) {
+    return (
+      <FormItem className={styles.formItem}>
+        <InputGroup className={styles.field}>
+          <InputGroupAddon className={styles.fieldIcon}>
+            <Mail aria-hidden="true" />
+            <FormLabel className="sr-only">Email</FormLabel>
+          </InputGroupAddon>
+          <FormControl>
+            <InputGroupInput
+              type="email"
+              placeholder="Email"
+              autoComplete="email"
+              required
+              {...field}
+            />
+          </FormControl>
+        </InputGroup>
+        <FormMessage />
+      </FormItem>
+    );
+  }
+
+  function renderPasswordField({
+    field,
+  }: {
+    field: ControllerRenderProps<AuthFormValues, "password">;
+  }) {
+    return (
+      <FormItem className={styles.formItem}>
+        <InputGroup className={styles.field}>
+          <InputGroupAddon className={styles.fieldIcon}>
+            <LockKeyhole aria-hidden="true" />
+            <FormLabel className="sr-only">{t("Password")}</FormLabel>
+          </InputGroupAddon>
+          <FormControl>
+            <InputGroupInput
+              type={passwordType}
+              placeholder={t("Password")}
+              autoComplete="current-password"
+              required
+              {...field}
+            />
+          </FormControl>
+          <InputGroupAddon
+            align="inline-end"
+            className={styles.fieldAction}
+          >
+            <InputGroupButton
+              className={styles.toggle}
+              type="button"
+              size="icon-sm"
+              aria-label={passwordToggleLabel}
+              aria-pressed={showPassword}
+              onClick={togglePassword}
+            >
+              <PasswordVisibilityGlyph aria-hidden="true" />
+            </InputGroupButton>
+          </InputGroupAddon>
+        </InputGroup>
+        <FormMessage />
+      </FormItem>
+    );
+  }
+
   return (
     <section className={styles.panel} aria-labelledby="auth-title">
       <header className={styles.heading}>
@@ -31,37 +121,52 @@ export function AuthForm({ mode }: AuthFormProps) {
         <p>{t(copy.subtitle)}</p>
       </header>
 
-      <form action={formAction} onSubmit={onSubmit} className={styles.form}>
-        <label className={styles.field}>
-          <Mail aria-hidden="true" />
-          <span className="sr-only">Email</span>
-          <input name="email" type="email" placeholder="Email" autoComplete="email" value={email} onChange={handleEmailChange} required />
-        </label>
+      <Form {...form}>
+        <form onSubmit={onSubmit} className={styles.form}>
+          <FormField
+            control={form.control}
+            name="email"
+            render={renderEmailField}
+          />
 
-        {mode !== "reset" && (
-          <label className={styles.field}>
-            <LockKeyhole aria-hidden="true" />
-            <span className="sr-only">{t("Password")}</span>
-            <input name="password" type={passwordType} placeholder={t("Password")} autoComplete="current-password" required />
-            <button className={styles.toggle} type="button" aria-label={passwordToggleLabel} aria-pressed={showPassword} onClick={togglePassword}>
-              <PasswordVisibilityGlyph aria-hidden="true" />
-            </button>
-          </label>
-        )}
+          {mode !== "reset" && (
+            <FormField
+              control={form.control}
+              name="password"
+              render={renderPasswordField}
+            />
+          )}
 
-        {mode === "login" && <Link className={styles.forgot} href="/forgot-password">{t("Forgot password?")}</Link>}
-        <button type="submit" disabled={pending} className={styles.submit}>{submitLabel}</button>
+          {mode === "login" && (
+            <Link className={styles.forgot} href="/forgot-password">
+              {t("Forgot password?")}
+            </Link>
+          )}
+          <Button type="submit" disabled={pending} className={styles.submit}>
+            {submitLabel}
+          </Button>
 
-        {mode === "login" && <p className={styles.footer}>Demo: admin@mans.vn / admin123</p>}
-        {error && <p className={styles.notice} role="alert">{t(error)}</p>}
-        {notice && (
-          <div className={styles.notice} role="status">
-            <p>{t(notice)}</p>
-          </div>
-        )}
-      </form>
+          {mode === "login" && (
+            <p className={styles.footer}>Demo: admin@mans.vn / admin123</p>
+          )}
+          {error && (
+            <p className={styles.notice} role="alert">
+              {t(error)}
+            </p>
+          )}
+          {notice && (
+            <div className={styles.notice} role="status">
+              <p>{t(notice)}</p>
+            </div>
+          )}
+        </form>
+      </Form>
 
-      {mode === "reset" && <p className={styles.footer}><Link href="/login">{t("Sign In")}</Link></p>}
+      {mode === "reset" && (
+        <p className={styles.footer}>
+          <Link href="/login">{t("Sign In")}</Link>
+        </p>
+      )}
     </section>
   );
 }

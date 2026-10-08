@@ -2,7 +2,7 @@
 
 import { FileText, Edit2, Trash2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useLanguageGrid } from "../hooks/useLanguageGrid";
+import { useLanguageGrid } from "../hooks/use-language-grid";
 import type { LanguageGridProps } from "../types";
 
 export function LanguageGrid({ 

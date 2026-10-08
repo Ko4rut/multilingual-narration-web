@@ -14,6 +14,7 @@
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-accent: var(--accent);
+  --color-success: var(--success);
   --color-info: var(--blue);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -55,6 +56,8 @@ button, a, select { -webkit-tap-highlight-color: transparent; }
 h1, h2, p { margin: 0; }
 .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 .main-content { padding: 34px 30px; width: 100%; max-width: 1600px; margin-inline: auto; min-width: 0; }
+.scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hidden::-webkit-scrollbar { display: none; }
 .mobile-sidebar-trigger { display: none; }
 .sidebar-preferences { padding: 0 8px 6px; }
 .sidebar-preferences .preference-controls { margin: 0; gap: 8px; flex-wrap: nowrap; }

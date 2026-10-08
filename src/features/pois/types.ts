@@ -45,3 +45,14 @@ export interface PoiFilterState {
   page: number;
   pageSize: number;
 }
+
+export interface PoisHeaderProps {
+  onAddClick: () => void;
+}
+
+export interface CreatePoiSheetProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  regions: readonly Region[];
+  onSubmit: (formData: FormData) => void;
+}

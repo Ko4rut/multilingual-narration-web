@@ -6,7 +6,7 @@ import { MobileSidebarTrigger, Sidebar } from "./Sidebar";
 export default function MainLayout({ children }: MainLayoutProps) {
   // Cung cấp trạng thái đóng/mở Sidebar cho tất cả component nằm bên trong.
   return (
-    <SidebarProvider>
+    <SidebarProvider className="h-svh overflow-hidden">
       {/* Cho phép người dùng bàn phím bỏ qua Sidebar và đi thẳng tới nội dung chính. */}
       <a className="skip-link" href="#main-content"> Skip to content </a>
 
@@ -14,7 +14,10 @@ export default function MainLayout({ children }: MainLayoutProps) {
       <Sidebar />
 
       {/* Vùng nội dung chính; id này là đích đến của liên kết "Skip to content". */}
-      <main id="main-content" className="main-content">
+      <main
+        id="main-content"
+        className="main-content scrollbar-hidden flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto"
+      >
         {/* Nút đóng/mở Sidebar trên màn hình nhỏ. */}
         <MobileSidebarTrigger />
 

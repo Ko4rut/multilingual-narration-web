@@ -7,8 +7,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/Card";
-import { useDashboardPanel } from "../hooks/useDashboardPanel";
+} from "@/components/ui/card";
+import { useDashboardPanel } from "../hooks/use-dashboard-panel";
 import type {
   DashboardPanelActionProps,
   DashboardPanelProps,

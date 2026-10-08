@@ -1,6 +1,6 @@
 "use client";
 
-import { useVisitsChart } from "../hooks/useVisitsChart";
+import { useVisitsChart } from "../hooks/use-visits-chart";
 import type { ChartProps } from "../types";
 
 export function VisitsChart({ values }: ChartProps) {

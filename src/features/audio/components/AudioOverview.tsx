@@ -3,18 +3,25 @@
 import { Calendar, Plus } from "lucide-react";
 import type { AudioOverviewProps } from "../types";
 import { Button } from "@/components/ui/button";
-import { PageHeader } from "@/components/shared/PageHeader";
+import {
+  PageLayout,
+  PageLayoutContent,
+  PageLayoutHeader,
+} from "@/components/shared/PageLayout";
 import { AudioFilterBar } from "./AudioFilterBar";
 import { AudioTable } from "./AudioTable";
-import { usePreferences } from "@/features/preferences/hooks/usePreferences";
+import { usePreferences } from "@/features/preferences/hooks/use-preferences";
 
-export function AudioOverview({ q, source, field, page }: AudioOverviewProps) {  const { t } = usePreferences();
+export function AudioOverview({ q, source, field, page }: AudioOverviewProps) {
+  const { t } = usePreferences();
 
   return (
-    <>
-      <PageHeader
+    <PageLayout>
+      <PageLayoutHeader
         title={t("Audio Management")}
-        description={t("Manage audio narration files, upload recordings and generate TTS audio")}
+        description={t(
+          "Manage audio narration files, upload recordings and generate TTS audio",
+        )}
       >
         <div className="flex items-center gap-3">
           <Button type="button" variant="outline">
@@ -26,10 +33,16 @@ export function AudioOverview({ q, source, field, page }: AudioOverviewProps) { 
             {t("Upload Audio")}
           </Button>
         </div>
-      </PageHeader>
-      
-      <AudioFilterBar initialQ={q} initialSource={source} initialField={field} />
-      <AudioTable q={q} source={source} field={field} currentPage={page} />
-    </>
+      </PageLayoutHeader>
+
+      <PageLayoutContent>
+        <AudioFilterBar
+          initialQ={q}
+          initialSource={source}
+          initialField={field}
+        />
+        <AudioTable q={q} source={source} field={field} currentPage={page} />
+      </PageLayoutContent>
+    </PageLayout>
   );
 }

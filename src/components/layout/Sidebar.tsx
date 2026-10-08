@@ -28,8 +28,8 @@ import {
 } from "@/components/ui/sidebar";
 import { navigation } from "@/constants/navigation";
 import { logout } from "@/features/auth/actions";
-import { usePreferences } from "@/features/preferences/hooks/usePreferences";
-import { useSidebarNavigation } from "@/hooks/useSidebarNavigation";
+import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { useSidebarNavigation } from "@/hooks/use-sidebar-navigation";
 import type { SidebarNavigationItemProps } from "@/types/sidebar";
 
 /** Hiển thị một liên kết điều hướng và đánh dấu liên kết của trang hiện tại. */

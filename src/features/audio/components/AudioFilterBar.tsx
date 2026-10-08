@@ -2,7 +2,7 @@
 
 import { Search, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAudioFilterBar } from "../hooks/useAudioFilterBar";
+import { useAudioFilterBar } from "../hooks/use-audio-filter-bar";
 import type { AudioFilterBarProps } from "../types";
 
 export function AudioFilterBar(props: AudioFilterBarProps) { 

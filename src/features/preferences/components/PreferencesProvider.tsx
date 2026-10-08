@@ -1,6 +1,6 @@
 "use client";
 import { PreferencesContext } from "../context";
-import { usePreferenceState } from "../hooks/usePreferenceState";
+import { usePreferenceState } from "../hooks/use-preference-state";
 import type { PreferencesProviderProps } from "../types";
 
 export function PreferencesProvider({ children, ...initial }: PreferencesProviderProps) {

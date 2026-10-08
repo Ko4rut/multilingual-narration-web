@@ -1,7 +1,7 @@
 "use client";
 
 import { Volume2 } from "lucide-react";
-import { usePreferences } from "@/features/preferences/hooks/usePreferences";
+import { usePreferences } from "@/features/preferences/hooks/use-preferences";
 
 export function AudioSystemSettings() {
   const { t } = usePreferences();

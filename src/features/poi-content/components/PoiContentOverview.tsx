@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { usePoiContent } from "../hooks/usePoiContent";
+import { usePoiContent } from "../hooks/use-poi-content";
 import { PoiContentHeader } from "./PoiContentHeader";
 import { PoiContentFilterBar } from "./PoiContentFilterBar";
 import { PoiContentTable } from "./PoiContentTable";

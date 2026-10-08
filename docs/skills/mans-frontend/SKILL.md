@@ -24,7 +24,7 @@ Paths below are relative to the repository root. Apply these rules to new and ch
 Organize domain code in `src/features/<feature>/`:
 
 - `components/`: render markup from props and hooks. Bind event handlers supplied by hooks; do not embed authentication, request orchestration, storage, validation workflows or effects in a rendering component. Simple event-to-value bindings are fine.
-- `hooks/`: client state, effects, event handlers, form coordination and interaction logic. Hooks call services or server actions; they do not contain JSX or server secrets.
+- `hooks/`: client state, effects, event handlers, form coordination and interaction logic. Hook filenames use kebab-case in the form `use-<domain-action>.ts`, while exported hook functions remain camelCase. Hooks call services or server actions; they do not contain JSX or server secrets.
 - `types.ts` or `types/`: props, domain models, action states and shared contracts. Import types with `import type`; avoid declaring domain/props types inside component files.
 - `services/`: data access adapters and non-UI operations. Keep server authentication and authorization at each protected data/action boundary, even when routes are guarded.
 - `actions.ts`: Next.js server actions for mutations, server-side validation and session changes. A client hook does not replace server credential verification.
@@ -36,8 +36,8 @@ Create only folders that contain useful code. Keep `src/app` pages/layouts thin:
 ## Product, i18n and styles
 
 - Employee accounts are provisioned by the application. Do not add public registration unless explicitly requested.
-- Login has no locale/theme picker. Default to browser language (supported: Vietnamese and English, otherwise English) and system color scheme. Explicit preferences chosen inside the application override system defaults and persist across reloads and future visits, including login/logout.
-- Do not save automatically detected defaults as explicit preferences. Until the user chooses an override, follow browser/system changes. Render system colors with CSS before hydration to avoid a flash of the wrong theme; use the request language for server rendering and centralize client detection in the preferences hook.
+- Login has no locale/theme picker. Default to English and the system color scheme. Explicit preferences chosen inside the application override these defaults and persist across reloads and future visits, including login/logout.
+- Do not save defaults as explicit preferences. Until the user chooses an override, keep English as the locale and follow system color changes. Render English on the server and system colors with CSS before hydration to avoid a flash of the wrong locale or theme.
 - Read translations through `usePreferences()` / `t(...)`, add Vietnamese messages centrally, and use the selected locale for number/date formatting. Do not scatter translated text or duplicate locale detection in components.
 - Use semantic CSS variables from `src/styles/tokens.css` and the utilities exposed by `src/app/globals.css`. Extend tokens centrally when necessary; do not introduce arbitrary repeated colors, font families or typography values in new UI. Check both light/dark themes and reduced-motion behavior for animation changes.
 

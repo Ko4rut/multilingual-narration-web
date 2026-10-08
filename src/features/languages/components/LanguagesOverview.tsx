@@ -2,10 +2,14 @@
 
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PageHeader } from "@/components/shared/PageHeader";
+import {
+  PageLayout,
+  PageLayoutContent,
+  PageLayoutHeader,
+} from "@/components/shared/PageLayout";
 import { LanguageFilterBar } from "./LanguageFilterBar";
 import { LanguageGrid } from "./LanguageGrid";
-import { useLanguageOverview } from "../hooks/useLanguageOverview";
+import { useLanguageOverview } from "../hooks/use-language-overview";
 import type { LanguageOverviewProps } from "../types";
 
 export function LanguageOverview({ q }: LanguageOverviewProps) {
@@ -18,8 +22,8 @@ export function LanguageOverview({ q }: LanguageOverviewProps) {
   } = useLanguageOverview();
 
   return (
-    <>
-      <PageHeader
+    <PageLayout>
+      <PageLayoutHeader
         title={t("Language Management")}
         description={t("Manage supported languages for narration content")}
       >
@@ -29,19 +33,21 @@ export function LanguageOverview({ q }: LanguageOverviewProps) {
             {t("Add Language")}
           </Button>
         </div>
-      </PageHeader>
+      </PageLayoutHeader>
 
-      <LanguageFilterBar 
-        initialQ={q} 
-        totalCount={totalCount} 
-        activeCount={activeCount} 
-      />
-      
-      <LanguageGrid 
-        q={q} 
-        languages={languages} 
-        onToggleStatus={handleToggleStatus} 
-      />
-    </>
+      <PageLayoutContent>
+        <LanguageFilterBar
+          initialQ={q}
+          totalCount={totalCount}
+          activeCount={activeCount}
+        />
+
+        <LanguageGrid
+          q={q}
+          languages={languages}
+          onToggleStatus={handleToggleStatus}
+        />
+      </PageLayoutContent>
+    </PageLayout>
   );
 }

@@ -6,8 +6,8 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/Card";
-import { useStatCard } from "../hooks/useStatCard";
+} from "@/components/ui/card";
+import { useStatCard } from "../hooks/use-stat-card";
 import type { StatCardProps } from "../types";
 
 export function StatCard({ stat }: StatCardProps) {
