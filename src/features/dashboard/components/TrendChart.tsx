@@ -1,6 +1,6 @@
 "use client";
 
-import { useTrendChart } from "../hooks/useTrendChart";
+import { useTrendChart } from "../hooks/use-trend-chart";
 import type { ChartProps } from "../types";
 
 export function TrendChart({ values }: ChartProps) {

@@ -1,9 +1,7 @@
-import React from "react";
-import { usePreferences } from "@/features/preferences/hooks/usePreferences";
-
-interface PoisHeaderProps {
-  onAddClick?: () => void;
-}
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import type { PoisHeaderProps } from "../types";
 
 export function PoisHeader({ onAddClick }: PoisHeaderProps) {
   const { t } = usePreferences();
@@ -17,24 +15,15 @@ export function PoisHeader({ onAddClick }: PoisHeaderProps) {
         </p>
       </div>
       <div>
-        <button
+        <Button
           type="button"
           onClick={onAddClick}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-[var(--on-accent)] font-medium text-sm hover:opacity-90 active:scale-95 transition-all shadow-sm cursor-pointer"
+          className="cursor-pointer"
           title={t("Add POI")}
         >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2.5}
-            aria-hidden="true"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
+          <Plus aria-hidden="true" />
           <span>{t("Add POI")}</span>
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import React from "react";
-import { usePreferences } from "@/features/preferences/hooks/usePreferences";
+import { usePreferences } from "@/features/preferences/hooks/use-preferences";
 import type { Region } from "../types";
 
 interface PoisFilterBarProps {

@@ -3,7 +3,7 @@
 import { Music, ChevronLeft, ChevronRight, PlayCircle, Download, Trash2, Search } from "lucide-react";
 import { AudioStatusBadge } from "./AudioStatusBadge";
 import { Button } from "@/components/ui/button";
-import { useAudioTable } from "../hooks/useAudioTable";
+import { useAudioTable } from "../hooks/use-audio-table";
 import type { AudioTableProps } from "../types";
 
 export function AudioTable({ q, source, field, currentPage }: AudioTableProps) {

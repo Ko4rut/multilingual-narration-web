@@ -1,7 +1,7 @@
 "use client";
 
 import { Monitor } from "lucide-react";
-import { usePreferences } from "@/features/preferences/hooks/usePreferences";
+import { usePreferences } from "@/features/preferences/hooks/use-preferences";
 import type { ApplicationDefaultsProps } from "../types";
 
 export function ApplicationDefaults({

@@ -22,11 +22,11 @@ This is a demo account, not production authentication. Replace the string compar
 
 ## Components and charts
 
-- `src/components/ui/Card.tsx`: shared presentation shell.
+- `src/components/ui/card.tsx`: shared shadcn/ui presentation shell.
 - `src/features/dashboard/components/StatCard.tsx`: dashboard-specific statistics.
-- `src/features/dashboard/components/DashboardCharts.tsx`: interactive line/bar charts with keyboard support.
+- `TrendChart.tsx`, `VisitsChart.tsx` and `VisitorHeatmap.tsx`: focused interactive dashboard visualizations with keyboard support.
 - Animation uses CSS, replays after changing reporting period or clicking Replay, and honors `prefers-reduced-motion`.
-- No shadcn/Recharts dependency added. Adopt chart primitives when richer chart types, axes, legends or zoom are needed.
+- Shared controls use shadcn/ui; dashboard charts remain custom SVG/CSS and can adopt richer chart primitives when axes, legends or zoom are needed.
 
 ## Theme and typography
 
@@ -45,14 +45,14 @@ CSS modules can use `color: var(--foreground)` and `font-family: var(--font-head
 
 `src/i18n/messages.ts` contains Vietnamese translations; English source messages serve as fallback. In client components, use `const { t, locale } = usePreferences()` and `t("Sign In")`. Format numbers with `Intl.NumberFormat(locale)` or `toLocaleString(locale)`.
 
-Theme and locale controls appear only inside the application sidebar. With no saved override, locale follows the browser (Vietnamese/English, otherwise English) and colors follow the system using CSS light-dark() before hydration. Explicit choices persist in cookies for one year and override system defaults on future visits, including login and logout. Automatically detected defaults are not saved as overrides. URL paths stay unchanged; this is an internal dictionary setup, not next-intl or locale-prefixed routing. Extend the dictionary as features are added.
+Theme and locale controls appear only inside the application sidebar. With no saved override, locale defaults to English and colors follow the system using CSS light-dark() before hydration. Explicit choices persist in cookies for one year and override the defaults on future visits, including login and logout. Defaults are not saved as overrides. URL paths stay unchanged; this is an internal dictionary setup, not next-intl or locale-prefixed routing. Extend the dictionary as features are added.
 
 ## Validation
 
-Run `npm run lint`, `npm run typecheck`, and `npm run build`. For browser smoke tests, start the dev server on port 3000, install Python Playwright (`python -m pip install playwright`) and Chrome, then run `python -X utf8 tests/smoke.py`. Tests cover protected routes, valid/invalid login, session tampering, logout, preference persistence, chart controls, reduced motion, and mobile overflow.
+Run `npm run lint`, `npm run typecheck`, and `npm run build`. Auth changes should additionally exercise rejected and accepted login, protected route redirects and logout in a browser. UI changes should be checked in both themes and at mobile/desktop widths.
 
 ## Feature architecture
 
-Authentication UI lives in `features/auth/components`, form behavior in `hooks/useAuthForm.ts`, contracts in `types.ts`, static copy in `constants.ts`, and demo credentials in `mocks/auth.mock.ts`. Server actions still validate credentials and manage sessions. Shared preference behavior lives in `features/preferences/hooks`, separate from its rendering components and types.
+Authentication UI lives in `features/auth/components`, form behavior in `hooks/use-auth-form.ts`, contracts in `types/auth.types.ts`, static copy in `constants/auth.constants.ts`, and demo credentials in `mocks/auth.mock.ts`. Server actions still validate credentials and manage sessions. Shared preference behavior lives in `features/preferences/hooks`, separate from its rendering components and types.
 
 Required project conventions: [MANS frontend skill](skills/mans-frontend/SKILL.md). Read `docs/agent-handoff.md` when resuming unfinished work.

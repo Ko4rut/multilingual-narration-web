@@ -1,11 +1,12 @@
 "use client";
 
 import React from "react";
-import { usePois } from "../hooks/usePois";
+import { usePois } from "../hooks/use-pois";
 import { PoisHeader } from "./PoisHeader";
 import { PoisFilterBar } from "./PoisFilterBar";
 import { PoisTable } from "./PoisTable";
 import { PoisPagination } from "./PoisPagination";
+import { CreatePoiSheet } from "./CreatePoiSheet";
 
 export function PoisOverview() {
   const {
@@ -23,7 +24,10 @@ export function PoisOverview() {
     toggleSelectAll,
     toggleSelectOne,
     toastMessage,
+    isCreateSheetOpen,
+    setCreateSheetOpen,
     handleAddClick,
+    handleCreatePoi,
     handleEditClick,
     handleMoreActions,
     handleAdvancedFilter,
@@ -41,6 +45,13 @@ export function PoisOverview() {
 
       {/* Header */}
       <PoisHeader onAddClick={handleAddClick} />
+
+      <CreatePoiSheet
+        open={isCreateSheetOpen}
+        onOpenChange={setCreateSheetOpen}
+        regions={regions}
+        onSubmit={handleCreatePoi}
+      />
 
       {/* Filters Toolbar */}
       <PoisFilterBar

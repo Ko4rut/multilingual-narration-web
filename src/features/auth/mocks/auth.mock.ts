@@ -1,4 +1,4 @@
-import type { MockCredentials } from "../types";
+import type { MockCredentials } from "../types/auth.types";
 
 // Employee account supplied by the application; no self-service registration.
 export const mockCredentials: MockCredentials = {

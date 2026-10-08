@@ -1,6 +1,6 @@
 "use client";
 
-import { useVisitorHeatmap } from "../hooks/useVisitorHeatmap";
+import { useVisitorHeatmap } from "../hooks/use-visitor-heatmap";
 import type { VisitorHeatmapProps } from "../types";
 import { DashboardPanel } from "./DashboardPanel";
 

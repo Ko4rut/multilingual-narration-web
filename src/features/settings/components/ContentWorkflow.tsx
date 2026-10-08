@@ -1,7 +1,7 @@
 "use client";
 
 import { GitBranch } from "lucide-react";
-import { usePreferences } from "@/features/preferences/hooks/usePreferences";
+import { usePreferences } from "@/features/preferences/hooks/use-preferences";
 import type { ContentWorkflowProps } from "../types";
 
 export function ContentWorkflow({ 

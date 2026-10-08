@@ -1,6 +1,6 @@
 "use client";
 
-import { useAnimatedBackground } from "../hooks/useAnimatedBackground";
+import { useAnimatedBackground } from "../hooks/use-animated-background";
 import styles from "./AuthForm.module.css";
 
 export function AnimatedBackground() {
