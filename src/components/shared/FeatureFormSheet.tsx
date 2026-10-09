@@ -21,13 +21,13 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { FORM_COMBOBOX_DEFAULT_PLACEHOLDER } from "@/constants/components";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type {
   FeatureFormSheetProps,
   FormComboboxOption,
   FormComboboxProps,
   FormFieldProps,
-} from "@/types/components";
+} from "@/types/shared/feature-form.types";
 
 /**
  * Sheet dùng chung cho các form tạo mới, chỉnh sửa và xem chi tiết dữ liệu.
@@ -71,6 +71,7 @@ export function FeatureFormSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full gap-0 overflow-hidden sm:max-w-lg">
+        {/* Tiêu đề và mô tả thay đổi theo chế độ của form. */}
         <SheetHeader className="border-b">
           <SheetTitle>
             {modeLabel} {entityLabel}
@@ -80,13 +81,16 @@ export function FeatureFormSheet({
           </SheetDescription>
         </SheetHeader>
 
+        {/* Form giữ vùng field có thể cuộn và footer hành động cố định. */}
         <form
           onSubmit={handleSubmit}
           className="flex min-h-0 flex-1 flex-col"
         >
+          {/* Nội dung field được feature truyền vào qua children. */}
           <div className="flex-1 space-y-4 overflow-y-auto p-4">
             {children}
           </div>
+          {/* Các hành động đóng, chỉnh sửa hoặc gửi form theo mode. */}
           <SheetFooter className="border-t">
             <div className="flex w-full justify-end gap-2">
               <Button type="button" variant="outline" onClick={handleClose}>
@@ -118,6 +122,7 @@ export function FormField({
 }: FormFieldProps) {
   return (
     <div className="space-y-1.5">
+      {/* Nhãn field và dấu bắt buộc. */}
       <Label className="text-xs" htmlFor={htmlFor}>
         {label}
         {required && (
@@ -126,7 +131,9 @@ export function FormField({
           </span>
         )}
       </Label>
+      {/* Control nhập liệu do feature cung cấp. */}
       {children}
+      {/* Hướng dẫn bổ sung tùy chọn cho field. */}
       {hint && <p className="text-[10px] text-muted-foreground">{hint}</p>}
     </div>
   );
@@ -176,6 +183,7 @@ export function FormCombobox({
       disabled={disabled}
       required={required}
     >
+      {/* Trigger hiển thị lựa chọn hiện tại hoặc placeholder. */}
       <ComboboxTrigger
         id={id}
         disabled={disabled}
@@ -186,6 +194,7 @@ export function FormCombobox({
           {renderValue}
         </ComboboxValue>
       </ComboboxTrigger>
+      {/* Danh sách các lựa chọn được chuẩn hóa từ options. */}
       <ComboboxContent>
         <ComboboxList>{options.map(renderOption)}</ComboboxList>
       </ComboboxContent>

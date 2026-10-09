@@ -16,7 +16,7 @@ Status: complete.
 - Employee login only; public registration route and links removed.
 - Login has no preference controls. Fresh visits use English and follow the system color scheme. Explicit preferences chosen inside the application persist across reloads, logout and future visits.
 - Auth rendering, hooks, types, constants, server actions and mock data are separated under `src/features/auth`.
-- Shared preferences are organized under `src/features/preferences`; colors and typography stay in `src/styles/tokens.css`, translations in `src/i18n`.
+- Shared preferences are organized under `src/features/settings`; colors and typography stay in `src/styles/tokens.css`, translations in `src/i18n`.
 - `AGENTS.md` requires `docs/skills/mans-frontend/SKILL.md`, including module responsibilities and unfinished-work handoff rules.
 
 ## Verification

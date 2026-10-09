@@ -6,10 +6,16 @@ Thư mục `src/types` chứa contract dùng chung cho shared layer.
 
 ```text
 types/
-├── components.ts # Props của shared composed components
-├── data-table.ts # Contract DataTable và hook liên quan
-├── layout.ts     # Props của application layout
-└── sidebar.ts    # Contract navigation/sidebar
+├── layout/
+│   ├── main-layout.types.ts # Contract của layout quản trị
+│   └── sidebar.types.ts     # Điều hướng và tài khoản trong sidebar
+└── shared/
+    ├── data-table.types.ts          # DataTable và hook liên quan
+    ├── feature-form.types.ts        # Form sheet, field và combobox
+    ├── module-placeholder.types.ts  # Placeholder cho module
+    ├── more-menu.types.ts           # Các hành động của MoreMenu
+    ├── page-layout.types.ts         # PageLayout và các vùng nội dung
+    └── status-badge.types.ts        # Tone và props của StatusBadge
 ```
 
 ## Quy ước

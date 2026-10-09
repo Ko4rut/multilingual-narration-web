@@ -2,7 +2,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { vi } from "@/i18n/messages";
 import type { Locale } from "@/i18n/types";
-import type { PreferenceState, PreferencesContextValue, Theme } from "../types";
+import type { PreferenceState, PreferencesContextValue, Theme } from "../types/settings.types";
 import { savePreference } from "../utils/preferences";
 
 function subscribeTheme(notify: () => void) {

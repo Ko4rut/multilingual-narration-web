@@ -1,4 +1,4 @@
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type { LanguageGridProps } from "../types";
 
 export function useLanguageGrid({ q, languages }: Omit<LanguageGridProps, "onToggleStatus">) {

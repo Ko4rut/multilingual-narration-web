@@ -5,7 +5,7 @@ import type {
   DataTableColumn,
   DataTableFilter,
   UseDataTableOptions,
-} from "@/types/data-table";
+} from "@/types/shared/data-table.types";
 
 const ALL_FILTERS = "__all__";
 

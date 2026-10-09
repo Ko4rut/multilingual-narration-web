@@ -28,9 +28,10 @@ import {
 } from "@/components/ui/sidebar";
 import { navigation } from "@/constants/navigation";
 import { logout } from "@/features/auth/actions";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { useSidebarNavigation } from "@/hooks/use-sidebar-navigation";
-import type { SidebarNavigationItemProps } from "@/types/sidebar";
+import { mockCurrentUser } from "@/mocks/current-user.mock";
+import type { SidebarNavigationItemProps } from "@/types/layout/sidebar.types";
 
 /** Hiển thị một liên kết điều hướng và đánh dấu liên kết của trang hiện tại. */
 function NavigationItem({ item, isActive, onNavigate }: SidebarNavigationItemProps) {
@@ -122,14 +123,20 @@ export function Sidebar() {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild >
-                <SidebarMenuButton size="lg" tooltip={t("Demo workspace")} className="data-[state=open]:bg-sidebar-accent">
-                  <Avatar>
-                    <AvatarFallback className="bg-sidebar-accent text-[10px] font-semibold text-sidebar-accent-foreground"> AD </AvatarFallback>
-                    <AvatarBadge className="bg-primary ring-sidebar" />
+                <SidebarMenuButton size="lg" tooltip={mockCurrentUser.fullName} className="data-[state=open]:bg-sidebar-accent">
+                  <Avatar className="overflow-visible">
+                    <AvatarFallback className="bg-sidebar-accent text-[10px] font-semibold text-sidebar-accent-foreground">
+                      {mockCurrentUser.initials}
+                    </AvatarFallback>
+                    <AvatarBadge aria-hidden="true" className="bg-success ring-sidebar"/>
                   </Avatar>
                   <div className="min-w-0 flex-1 text-left">
-                    <strong className="block truncate text-xs font-medium text-sidebar-accent-foreground"> {t("Demo workspace")} </strong>
-                    <small className="block truncate text-[9px] text-sidebar-foreground/60"> {t("Sample data")} </small>
+                    <strong className="block truncate text-xs font-medium text-sidebar-accent-foreground">
+                      {mockCurrentUser.fullName}
+                    </strong>
+                    <small className="block truncate text-[9px] text-sidebar-foreground/60">
+                      {mockCurrentUser.email}
+                    </small>
                   </div>
                   <ChevronsUpDown className="ml-auto size-3.5 text-sidebar-foreground/60" />
                 </SidebarMenuButton>

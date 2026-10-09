@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SettingsOverview } from "@/features/settings/components/SettingsOverview";
 import { parseSettingsTab } from "@/features/settings/utils/parsers";
-import type { SettingsPageProps } from "@/features/settings/types";
+import type { SettingsPageProps } from "@/features/settings/types/settings.types";
 
 export const metadata: Metadata = {
   title: "Settings | MANS Admin",

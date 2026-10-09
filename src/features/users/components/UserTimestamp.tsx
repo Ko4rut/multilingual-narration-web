@@ -1,4 +1,4 @@
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type { UserTimestampProps } from "../types/user.types";
 
 export function UserTimestamp({ value }: UserTimestampProps) {

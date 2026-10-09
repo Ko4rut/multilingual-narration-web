@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { MOCK_LANGUAGES } from "../mocks/languageData";
 import type { LanguageItem } from "../types";
 

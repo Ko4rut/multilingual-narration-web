@@ -7,7 +7,7 @@ import {
   PageLayoutHeader,
 } from "@/components/shared/PageLayout";
 import { useGeneralSettings } from "../hooks/use-general-settings";
-import type { SettingsOverviewProps } from "../types";
+import type { SettingsOverviewProps } from "../types/settings.types";
 
 import { ApplicationDefaults } from "./ApplicationDefaults";
 import { GeofenceConfig } from "./GeofenceConfig";

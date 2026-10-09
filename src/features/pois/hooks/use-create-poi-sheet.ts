@@ -2,8 +2,8 @@
 
 import { useMemo } from "react";
 
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
-import type { FormComboboxOption } from "@/types/components";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
+import type { FormComboboxOption } from "@/types/shared/feature-form.types";
 import type { Region } from "../types";
 
 export function useCreatePoiSheet(regions: readonly Region[]) {

@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import type { KeyboardEvent } from "react";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { TREND_GRID_LINES } from "../constants";
 
 export function useTrendChart(values: number[]) {

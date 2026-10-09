@@ -1,4 +1,4 @@
-import type { FeatureFormMode } from "@/types/components";
+import type { FeatureFormMode } from "@/types/shared/feature-form.types";
 import type { USER_ROLE, USER_STATUS } from "../constants/user.constants";
 
 export type ManagerUserStatus =

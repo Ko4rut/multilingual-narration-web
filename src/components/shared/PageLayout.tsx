@@ -1,6 +1,6 @@
 "use client";
 
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type {
@@ -9,8 +9,9 @@ import type {
   PageLayoutOverviewProps,
   PageLayoutProps,
   PageLayoutStatProps,
-} from "@/types/components";
+} from "@/types/shared/page-layout.types";
 
+/** Khung bố cục dọc chuẩn cho các trang trong khu vực quản trị. */
 function PageLayout({ className, ...props }: PageLayoutProps) {
   return (
     <section
@@ -24,6 +25,7 @@ function PageLayout({ className, ...props }: PageLayoutProps) {
   );
 }
 
+/** Header trang gồm tiêu đề, mô tả tùy chọn và vùng hành động bên phải. */
 function PageLayoutHeader({
   title,
   description,
@@ -42,6 +44,7 @@ function PageLayoutHeader({
       )}
       {...props}
     >
+      {/* Khối nhận diện trang với tiêu đề và mô tả. */}
       <div className="flex min-w-0 flex-col gap-2">
         <h1>{t(title)}</h1>
         {description && (
@@ -50,6 +53,7 @@ function PageLayoutHeader({
           </p>
         )}
       </div>
+      {/* Vùng hành động tùy chọn như nút tạo mới hoặc export. */}
       {children && (
         <div className="flex shrink-0 flex-wrap items-center gap-3">
           {children}
@@ -59,6 +63,7 @@ function PageLayoutHeader({
   );
 }
 
+/** Vùng nội dung chính bảo đảm chiều rộng co giãn an toàn trong layout. */
 function PageLayoutContent({
   children,
   className,
@@ -75,6 +80,7 @@ function PageLayoutContent({
   );
 }
 
+/** Lưới responsive chứa các thẻ thống kê tổng quan của trang. */
 function PageLayoutOverview({
   className,
   ...props
@@ -91,6 +97,7 @@ function PageLayoutOverview({
   );
 }
 
+/** Thẻ thống kê hiển thị nhãn, giá trị, mô tả và biểu tượng tùy chọn. */
 function PageLayoutStat({
   label,
   value,
@@ -109,6 +116,7 @@ function PageLayoutStat({
       {...props}
     >
       <CardContent className="flex min-h-24 items-center justify-between gap-4 p-4">
+        {/* Nội dung văn bản của chỉ số thống kê. */}
         <div className="flex min-w-0 flex-col gap-1.5">
           <p className="text-[10px] font-medium tracking-[0.14em] text-muted-foreground uppercase">
             {t(label)}
@@ -122,6 +130,7 @@ function PageLayoutStat({
             </p>
           )}
         </div>
+        {/* Biểu tượng minh họa tùy chọn của chỉ số. */}
         {icon && (
           <div
             className={cn(

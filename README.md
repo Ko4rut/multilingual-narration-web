@@ -106,7 +106,13 @@ src/
 │   ├── dashboard/              # Dashboard, hooks, mock, service, utils
 │   ├── pois/                   # Danh sách và thao tác POI mock
 │   ├── poi-content/            # Danh sách nội dung POI mock
-│   ├── preferences/            # Theme và locale dùng chung
+│   ├── settings/
+│   │   ├── components/         # Giao diện cài đặt và preferences provider
+│   │   ├── constants/          # Giá trị mặc định của cài đặt
+│   │   ├── hooks/              # State, handler, theme và locale preferences
+│   │   ├── types/              # Contract dùng chung của settings
+│   │   ├── utils/              # Parser cho tab và preferences
+│   │   └── context.ts          # Context theme và locale
 │   ├── users/
 │   │   ├── components/         # Bảng, badge, overview và form sheet
 │   │   ├── constants/          # Trạng thái, role ID và option metadata
@@ -115,8 +121,12 @@ src/
 │   │   └── types/              # Model và props của feature users
 │   └── ...                     # Các module quản trị đang phát triển
 ├── i18n/                       # Từ điển và kiểu locale
+├── mocks/                      # Dữ liệu demo dùng chung, gồm người dùng hiện tại
 ├── styles/
 │   └── tokens.css              # Token màu sắc, typography, radius
+├── types/
+│   ├── layout/                 # Contract của layout và sidebar
+│   └── shared/                 # Contract của shared components và hooks
 └── proxy.ts                    # Bảo vệ route admin
 ```
 

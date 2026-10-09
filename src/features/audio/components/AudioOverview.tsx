@@ -10,7 +10,7 @@ import {
 } from "@/components/shared/PageLayout";
 import { AudioFilterBar } from "./AudioFilterBar";
 import { AudioTable } from "./AudioTable";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 
 export function AudioOverview({ q, source, field, page }: AudioOverviewProps) {
   const { t } = usePreferences();

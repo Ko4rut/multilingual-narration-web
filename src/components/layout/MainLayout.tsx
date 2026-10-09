@@ -1,5 +1,5 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
-import type { MainLayoutProps } from "@/types/layout";
+import type { MainLayoutProps } from "@/types/layout/main-layout.types";
 import { MobileSidebarTrigger, Sidebar } from "./Sidebar";
 
 /* Dựng shell dùng chung cho toàn bộ khu vực quản trị.*/
@@ -14,13 +14,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
       <Sidebar />
 
       {/* Vùng nội dung chính; id này là đích đến của liên kết "Skip to content". */}
-      <main
-        id="main-content"
-        className="main-content scrollbar-hidden flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto"
-      >
+      <main id="main-content" className="main-content scrollbar-hidden flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
         {/* Nút đóng/mở Sidebar trên màn hình nhỏ. */}
         <MobileSidebarTrigger />
-
         {/* Hiển thị nội dung của route đang được truy cập. */}
         {children}
       </main>

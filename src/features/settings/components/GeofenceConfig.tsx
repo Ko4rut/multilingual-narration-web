@@ -1,8 +1,8 @@
 "use client";
 
 import { Navigation } from "lucide-react";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
-import type { GeofenceConfigProps } from "../types";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
+import type { GeofenceConfigProps } from "../types/settings.types";
 
 export function GeofenceConfig({ 
   triggerRadius,

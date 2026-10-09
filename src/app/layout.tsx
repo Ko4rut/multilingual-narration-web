@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "@/styles/tokens.css";
 import "./globals.css";
 import { cookies } from "next/headers";
-import { PreferencesProvider } from "@/features/preferences/components/PreferencesProvider";
-import { parseLocale, parseTheme } from "@/features/preferences/utils/preferences";
+import { PreferencesProvider } from "@/features/settings/components/PreferencesProvider";
+import { parseLocale, parseTheme } from "@/features/settings/utils/preferences";
 
 export const metadata: Metadata = {
   title: { default: "MANS Admin", template: "%s | MANS Admin" },
