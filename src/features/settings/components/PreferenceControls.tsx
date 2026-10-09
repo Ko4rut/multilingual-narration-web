@@ -1,7 +1,7 @@
 "use client";
 import { usePreferences } from "../hooks/use-preferences";
 import type { Locale } from "@/i18n/types";
-import type { Theme } from "../types";
+import type { Theme } from "../types/settings.types";
 
 export function PreferenceControls() {
   const { locale, theme, t, setLocale, setTheme } = usePreferences();

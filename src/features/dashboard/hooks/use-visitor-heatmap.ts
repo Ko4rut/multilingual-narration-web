@@ -1,6 +1,6 @@
 "use client";
 
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { HEAT_LEVELS, HEATMAP_HOURS, WEEKDAYS } from "../constants";
 
 export function useVisitorHeatmap(values: number[][]) {

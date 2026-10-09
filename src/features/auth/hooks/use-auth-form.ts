@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { login } from "../actions";
 import { authContent } from "../constants/auth.constants";
 import type { AuthFormValues, AuthMode } from "../types/auth.types";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 
 export function useAuthForm(mode: AuthMode) {
   const { t } = usePreferences();

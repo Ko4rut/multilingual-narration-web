@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 
 export function useVisitsChart(values: number[]) {
   const { t, locale } = usePreferences();

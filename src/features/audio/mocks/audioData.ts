@@ -1,4 +1,6 @@
-const baseFiles = [
+import type { AudioFile, AudioSourceType } from "../types";
+
+const baseFiles: AudioFile[] = [
   { id: "1", name: "ben_thanh_vi_narration_v2...", size: "4.2 MB", poi: "Ben Thanh Market", langCode: "VI", lang: "Vietnamese", type: "Recorded", duration: "3:45", checksum: "a1b2c3d4", date: "Jan 12, 2026" },
   { id: "2", name: "notre_dame_en_brief.wav", size: "6.8 MB", poi: "Notre-Dame Cathedral", langCode: "EN", lang: "English", type: "TTS", duration: "2:15", checksum: "e5f67890", date: "Jan 10, 2026" },
   { id: "3", name: "war_remnants_zh_history.m...", size: "5.1 MB", poi: "War Remnants Museum", langCode: "ZH", lang: "Chinese", type: "Recorded", duration: "4:12", checksum: "bc9ef83a", date: "Jan 08, 2026" },
@@ -21,8 +23,8 @@ const baseFiles = [
   { id: "20", name: "suoi_tien_en_park.wav", size: "9.5 MB", poi: "Suoi Tien Theme Park", langCode: "EN", lang: "English", type: "Recorded", duration: "7:30", checksum: "5g6h7i8j", date: "Dec 10, 2025" }
 ];
 
-function generateMoreData() {
-  const results = [];
+function generateMoreData(): AudioFile[] {
+  const results: AudioFile[] = [];
   const langs = [
     { code: "VI", name: "Vietnamese" },
     { code: "EN", name: "English" },
@@ -37,7 +39,7 @@ function generateMoreData() {
     const min = (i % 5) + 1;
     const sec = (i * 7) % 60;
     
-    let type = "Recorded";
+    let type: AudioSourceType = "Recorded";
     if (i % 3 === 0) {
       type = "TTS";
     }

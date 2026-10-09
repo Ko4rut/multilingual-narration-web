@@ -1,5 +1,5 @@
-import { DEFAULT_SETTINGS_TAB, SETTINGS_TABS } from "../constants";
-import type { SettingsTab } from "../types";
+import { DEFAULT_SETTINGS_TAB, SETTINGS_TABS } from "../constants/settings.constants";
+import type { SettingsTab } from "../types/settings.types";
 
 export function parseSettingsTab(value: string | string[] | undefined): SettingsTab {
   let val: string | undefined;

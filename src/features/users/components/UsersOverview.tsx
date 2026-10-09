@@ -1,7 +1,6 @@
 "use client";
 
 import { Clock3, ShieldCheck, UserCheck, UserPlus, UsersRound } from "lucide-react";
-
 import {
   PageLayout,
   PageLayoutContent,
@@ -10,7 +9,7 @@ import {
   PageLayoutStat,
 } from "@/components/shared/PageLayout";
 import { Button } from "@/components/ui/button";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { useUsers } from "../hooks/use-users";
 import { UserFormSheet } from "./UserFormSheet";
 import { UsersTable } from "./UsersTable";
@@ -38,16 +37,15 @@ export function UsersOverview() {
 
   return (
     <PageLayout>
-      <PageLayoutHeader
-        title={t("User Management")}
-        description={t("Manage administrator accounts, roles and access status.")}
-      >
+      {/* --- PageHeader --- */}
+      <PageLayoutHeader title={t("User Management")} description={t("Manage administrator accounts, roles and access status.")}>
         <Button type="button" onClick={openCreateSheet}>
           <UserPlus aria-hidden="true" />
           {t("Add User")}
         </Button>
       </PageLayoutHeader>
 
+      {/* --- PageOvervview --- */}
       <PageLayoutOverview aria-label={t("User overview")}>
         <PageLayoutStat
           label="Total Users"
@@ -78,6 +76,7 @@ export function UsersOverview() {
         />
       </PageLayoutOverview>
 
+      {/* --- PageContent --- */}
       <PageLayoutContent>
         <UsersTable
           users={users}
@@ -86,6 +85,7 @@ export function UsersOverview() {
         />
       </PageLayoutContent>
 
+      {/* --- Sheet --- */}
       <UserFormSheet
         key={sheetKey}
         open={isSheetOpen}

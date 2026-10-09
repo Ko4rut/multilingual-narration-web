@@ -36,6 +36,7 @@ export type AudioTableProps = {
   currentPage: number;
 };
 
+/** Thuộc tính của badge ánh xạ nguồn audio sang giao diện dùng chung. */
 export type AudioStatusBadgeProps = {
   type: AudioSourceType;
 };

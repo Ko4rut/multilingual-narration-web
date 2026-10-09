@@ -53,6 +53,6 @@ Run `npm run lint`, `npm run typecheck`, and `npm run build`. Auth changes shoul
 
 ## Feature architecture
 
-Authentication UI lives in `features/auth/components`, form behavior in `hooks/use-auth-form.ts`, contracts in `types/auth.types.ts`, static copy in `constants/auth.constants.ts`, and demo credentials in `mocks/auth.mock.ts`. Server actions still validate credentials and manage sessions. Shared preference behavior lives in `features/preferences/hooks`, separate from its rendering components and types.
+Authentication UI lives in `features/auth/components`, form behavior in `hooks/use-auth-form.ts`, contracts in `types/auth.types.ts`, static copy in `constants/auth.constants.ts`, and demo credentials in `mocks/auth.mock.ts`. Server actions still validate credentials and manage sessions. Shared preference behavior lives in `features/settings/hooks`, separate from its rendering components and types.
 
 Required project conventions: [MANS frontend skill](skills/mans-frontend/SKILL.md). Read `docs/agent-handoff.md` when resuming unfinished work.

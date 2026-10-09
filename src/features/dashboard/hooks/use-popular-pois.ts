@@ -1,6 +1,6 @@
 "use client";
 
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type { PopularPoi } from "../types";
 
 export function usePopularPois(pois: PopularPoi[]) {

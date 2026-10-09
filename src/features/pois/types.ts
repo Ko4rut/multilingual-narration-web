@@ -1,5 +1,10 @@
 export type PoiStatus = "active" | "inactive" | "maintenance";
 
+/** Thuộc tính của badge ánh xạ trạng thái POI sang giao diện dùng chung. */
+export interface PoisStatusBadgeProps {
+  status: PoiStatus;
+}
+
 export interface Region {
   id: string;
   name: string;

@@ -15,7 +15,11 @@
   --color-border: var(--border);
   --color-accent: var(--accent);
   --color-success: var(--success);
+  --color-success-emphasis: var(--success-emphasis);
+  --color-success-foreground: var(--on-success);
   --color-info: var(--blue);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -27,6 +31,7 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-emphasis: var(--destructive-emphasis);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --radius-sm: calc(var(--radius) - 4px);

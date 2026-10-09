@@ -8,6 +8,8 @@
   --border: light-dark(#d2dce8, #28313d);
   --accent: light-dark(#087c63, #edf2f7);
   --success: light-dark(#087c63, #33c7a5);
+  --success-emphasis: light-dark(#066451, #6ee7c7);
+  --on-success: light-dark(#ffffff, #081712);
   --on-accent: light-dark(#ffffff, #10151c);
   --blue: light-dark(#087db2, #74a5e5);
   --hover: light-dark(#e2ebf3, #171e27);
@@ -30,6 +32,7 @@
   --sidebar-border: var(--border);
   --sidebar-ring: var(--accent);
   --destructive: light-dark(#b42318, #ef5b65);
+  --destructive-emphasis: light-dark(#9f2118, #ff858d);
   --input: var(--border);
   --ring: var(--accent);
   --radius: .625rem;

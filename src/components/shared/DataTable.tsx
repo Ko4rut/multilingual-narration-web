@@ -36,7 +36,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { useDataTable } from "@/hooks/use-data-table";
 import { cn } from "@/lib/utils";
 import type {
@@ -49,7 +49,7 @@ import type {
   DataTableSearchProps,
   DataTableToolbarActionsProps,
   DataTableToolbarProps,
-} from "@/types/data-table";
+} from "@/types/shared/data-table.types";
 
 interface ResolvedColumn {
   id: string;
@@ -94,6 +94,7 @@ interface DataTableContextValue {
 
 const DataTableContext = createContext<DataTableContextValue | null>(null);
 
+/** Đọc trạng thái bảng dùng chung và bảo đảm component con nằm trong DataTable. */
 function useDataTableContext() {
   const context = useContext(DataTableContext);
   if (!context) {
@@ -137,6 +138,7 @@ function getCellContent(row: unknown, column: ResolvedColumn) {
   return <span className="text-muted-foreground">—</span>;
 }
 
+/** Cung cấp dữ liệu, cấu hình cột, bộ lọc và trạng thái phân trang cho toàn bộ bảng. */
 function DataTable<TData>({
   data,
   columns,
@@ -185,6 +187,7 @@ function DataTable<TData>({
 
   return (
     <DataTableContext.Provider value={context}>
+      {/* Khung gốc để các thành phần compound của bảng dùng chung context. */}
       <section
         data-slot="data-table"
         className={cn("flex min-w-0 flex-col gap-4", className)}
@@ -196,6 +199,7 @@ function DataTable<TData>({
   );
 }
 
+/** Khu vực đầu bảng chứa tìm kiếm, bộ lọc và các hành động nghiệp vụ. */
 function DataTableToolbar({
   className,
   ...props
@@ -212,6 +216,7 @@ function DataTableToolbar({
   );
 }
 
+/** Khung bề mặt gom toolbar, nội dung bảng và phân trang thành một panel. */
 function DataTablePanel({ className, ...props }: DataTablePanelProps) {
   return (
     <div
@@ -225,6 +230,7 @@ function DataTablePanel({ className, ...props }: DataTablePanelProps) {
   );
 }
 
+/** Nhóm các nút hành động nằm bên phải toolbar. */
 function DataTableToolbarActions({
   className,
   ...props
@@ -238,6 +244,7 @@ function DataTableToolbarActions({
   );
 }
 
+/** Ô tìm kiếm đồng bộ trực tiếp với trạng thái lọc của DataTable. */
 function DataTableSearch({
   className,
   placeholder = "Search...",
@@ -251,10 +258,12 @@ function DataTableSearch({
       data-slot="data-table-search"
       className="relative w-full lg:max-w-md"
     >
+      {/* Biểu tượng nhận diện chức năng tìm kiếm. */}
       <SearchIcon
         aria-hidden="true"
         className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
       />
+      {/* Trường nhập từ khóa được điều khiển bởi context của bảng. */}
       <Input
         {...props}
         type="search"
@@ -266,6 +275,7 @@ function DataTableSearch({
         aria-label={props["aria-label"] ?? t(placeholder)}
         className={cn("pr-9 pl-9", className)}
       />
+      {/* Nút xóa nhanh chỉ xuất hiện khi đang có từ khóa. */}
       {table.searchQuery.length > 0 && (
         <Button
           type="button"
@@ -284,6 +294,7 @@ function DataTableSearch({
   );
 }
 
+/** Bộ lọc lựa chọn cho một cấu hình filter được đăng ký trong DataTable. */
 function DataTableFilter({ filterId, className }: DataTableFilterProps) {
   const { t } = usePreferences();
   const table = useDataTableContext();
@@ -305,6 +316,7 @@ function DataTableFilter({ filterId, className }: DataTableFilterProps) {
         table.setFilterValue(filter.id, value);
       }}
     >
+      {/* Nút mở bộ lọc và hiển thị giá trị hiện tại. */}
       <SelectTrigger
         data-slot="data-table-filter"
         aria-label={t(filter.label)}
@@ -312,6 +324,7 @@ function DataTableFilter({ filterId, className }: DataTableFilterProps) {
       >
         <SelectValue placeholder={t(filter.label)} />
       </SelectTrigger>
+      {/* Danh sách gồm lựa chọn tất cả và các tùy chọn của bộ lọc. */}
       <SelectContent>
         <SelectItem value={table.allFiltersValue}>
           {t(filter.allLabel ?? `All ${filter.label}`)}
@@ -328,6 +341,7 @@ function DataTableFilter({ filterId, className }: DataTableFilterProps) {
   );
 }
 
+/** Tự động dựng toàn bộ bộ lọc đã khai báo trong cấu hình bảng. */
 function DataTableFilters({
   className,
   ...props
@@ -347,6 +361,7 @@ function DataTableFilters({
   );
 }
 
+/** Hiển thị header, các hàng dữ liệu của trang hiện tại và empty state. */
 function DataTableContent({
   emptyMessage = "No results.",
   className,
@@ -359,6 +374,7 @@ function DataTableContent({
       data-slot="data-table-content"
       className={cn("min-w-full", className)}
     >
+      {/* Header được dựng từ cấu hình cột. */}
       <TableHeader className="bg-card">
         <TableRow className="hover:bg-transparent">
           {table.columns.map(function renderHeader(column) {
@@ -376,7 +392,9 @@ function DataTableContent({
           })}
         </TableRow>
       </TableHeader>
+      {/* Body chứa empty state hoặc các hàng dữ liệu đã phân trang. */}
       <TableBody>
+        {/* Trạng thái rỗng sau khi tìm kiếm hoặc lọc. */}
         {table.paginatedData.length === 0 && (
           <TableRow className="hover:bg-transparent">
             <TableCell
@@ -387,6 +405,7 @@ function DataTableContent({
             </TableCell>
           </TableRow>
         )}
+        {/* Các hàng dữ liệu của trang hiện tại. */}
         {table.paginatedData.map(function renderRow(row, rowIndex) {
           return (
             <TableRow
@@ -413,6 +432,7 @@ function DataTableContent({
   );
 }
 
+/** Hiển thị thống kê kết quả, chọn kích thước trang và điều hướng giữa các trang. */
 function DataTablePagination({
   itemLabel = "items",
   pageSizeOptions = [10, 20, 50],
@@ -443,6 +463,7 @@ function DataTablePagination({
       )}
       {...props}
     >
+      {/* Tóm tắt phạm vi bản ghi đang hiển thị. */}
       <p className="text-xs text-muted-foreground" aria-live="polite">
         {t("Showing")} {table.startItem.toLocaleString(locale)}–
         {table.endItem.toLocaleString(locale)} {t("of")} {" "}
@@ -450,6 +471,7 @@ function DataTablePagination({
       </p>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        {/* Bộ chọn số hàng trên mỗi trang khi có nhiều hơn một tùy chọn. */}
         {showPageSizeSelector && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>{t("Rows per page")}</span>
@@ -479,6 +501,7 @@ function DataTablePagination({
           </div>
         )}
 
+        {/* Điều hướng trang trước, số trang và trang kế tiếp. */}
         <Pagination className="mx-0 w-auto justify-start sm:justify-end">
           <PaginationContent>
             <PaginationItem>

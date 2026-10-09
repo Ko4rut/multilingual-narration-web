@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type { AudioFilterBarProps } from "../types";
 
 export function useAudioFilterBar({ initialQ, initialSource, initialField }: AudioFilterBarProps) {

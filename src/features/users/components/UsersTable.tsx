@@ -11,8 +11,11 @@ import {
   DataTableToolbarActions,
 } from "@/components/shared/DataTable";
 import { MoreMenu } from "@/components/shared/MoreMenu";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
-import type { DataTableColumn, DataTableFilter } from "@/types/data-table";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
+import type {
+  DataTableColumn,
+  DataTableFilter,
+} from "@/types/shared/data-table.types";
 import {
   USER_ROLE_OPTIONS,
   USER_STATUS_OPTIONS,

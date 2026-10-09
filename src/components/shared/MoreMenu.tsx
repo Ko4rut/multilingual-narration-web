@@ -10,8 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
-import type { MoreMenuProps } from "@/types/components";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
+import type { MoreMenuProps } from "@/types/shared/more-menu.types";
 
 /**
  * Menu thao tác nhanh cho một bản ghi.
@@ -27,6 +27,7 @@ export function MoreMenu({
 
   return (
     <DropdownMenu>
+      {/* Nút ba chấm dùng để mở menu hành động. */}
       <DropdownMenuTrigger asChild>
         <Button
           type="button"
@@ -37,6 +38,7 @@ export function MoreMenu({
           <Ellipsis aria-hidden="true" />
         </Button>
       </DropdownMenuTrigger>
+      {/* Danh sách chỉ render những hành động có callback tương ứng. */}
       <DropdownMenuContent align="end" className="w-36">
         {onView && (
           <DropdownMenuItem
@@ -65,6 +67,7 @@ export function MoreMenu({
             {t("Copy ID")}
           </DropdownMenuItem>
         )}
+        {/* Phân tách hành động xóa có tính phá hủy khỏi các hành động thường. */}
         {onDelete && <DropdownMenuSeparator />}
         {onDelete && (
           <DropdownMenuItem variant="destructive" onClick={onDelete}>

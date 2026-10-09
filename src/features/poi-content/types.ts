@@ -5,6 +5,11 @@ export type ContentStatus =
   | "draft"
   | "rejected";
 
+/** Thuộc tính của badge ánh xạ trạng thái nội dung sang giao diện dùng chung. */
+export interface PoiContentStatusBadgeProps {
+  status: ContentStatus;
+}
+
 export interface LanguageOption {
   id: string;
   code: string;

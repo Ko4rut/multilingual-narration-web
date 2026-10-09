@@ -1,6 +1,6 @@
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { MOCK_AUDIO_FILES } from "../mocks/audioData";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { AUDIO_ITEMS_PER_PAGE } from "../constants";
 import type { AudioTableProps } from "../types";
 

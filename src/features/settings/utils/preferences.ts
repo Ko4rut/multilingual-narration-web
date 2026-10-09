@@ -1,5 +1,5 @@
 import type { Locale } from "@/i18n/types";
-import type { Theme } from "../types";
+import type { Theme } from "../types/settings.types";
 
 export function parseLocale(value?: string): Locale | undefined {
   return value === "vi" || value === "en" ? value : undefined;

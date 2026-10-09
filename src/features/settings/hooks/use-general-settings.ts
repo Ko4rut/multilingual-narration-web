@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type { Locale } from "@/i18n/types";
-import type { Theme } from "@/features/preferences/types"; 
-import type { SettingsOverviewProps } from "../types";
+import type { Theme } from "@/features/settings/types/settings.types";
+import type { SettingsOverviewProps } from "../types/settings.types";
 
 export function useGeneralSettings(props: SettingsOverviewProps) {
   const { t, theme, locale, setTheme, setLocale } = usePreferences();

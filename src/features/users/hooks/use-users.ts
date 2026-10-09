@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import type { FeatureFormMode } from "@/types/components";
+import type { FeatureFormMode } from "@/types/shared/feature-form.types";
 import { USER_ROLE, USER_STATUS } from "../constants/user.constants";
 import { MOCK_MANAGER_USERS } from "../mocks/users.mock";
 import type {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { MOCK_POIS, MOCK_REGIONS } from "../mocks/pois.mock";
 import type { PointOfInterest, PoiStatus, Region } from "../types";
 import { usePoisFilter } from "./use-pois-filter";

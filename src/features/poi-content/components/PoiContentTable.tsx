@@ -1,5 +1,5 @@
 import React from "react";
-import { usePreferences } from "@/features/preferences/hooks/use-preferences";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type { PoiContentItem } from "../types";
 import { PoiContentStatusBadge } from "./PoiContentStatusBadge";
 
