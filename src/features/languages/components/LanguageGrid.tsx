@@ -1,9 +1,14 @@
 "use client";
 
-import { FileText, Edit2, Trash2, Search } from "lucide-react";
+import { Edit2, Trash2, Search } from "lucide-react";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
+import {
+  LANGUAGE_STATUS,
+  LANGUAGE_STATUS_LABELS,
+} from "../constants/language.constants";
 import { useLanguageGrid } from "../hooks/use-language-grid";
-import type { LanguageGridProps } from "../types";
+import type { LanguageGridProps } from "../types/language.types";
 
 export function LanguageGrid({ 
   q, 
@@ -29,19 +34,14 @@ export function LanguageGrid({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       {filteredLanguages.map(function renderCard(lang) {
-        
         let toggleBg = "bg-muted";
         let toggleDotPosition = "translate-x-0.5";
-        let statusColor = "text-muted";
-        let dotColor = "bg-muted";
-        let statusText = t("Inactive");
+        let statusTone: "success" | "neutral" = "neutral";
 
-        if (lang.isActive) {
+        if (lang.language_status === LANGUAGE_STATUS.SUPPORTED) {
           toggleBg = "bg-accent";
           toggleDotPosition = "translate-x-4";
-          statusColor = "text-accent";
-          dotColor = "bg-accent";
-          statusText = t("Active");
+          statusTone = "success";
         }
 
         return (
@@ -49,11 +49,17 @@ export function LanguageGrid({
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-6 rounded bg-background border border-border flex items-center justify-center text-lg overflow-hidden">
-                  {lang.flag}
+                  <span className="font-mono text-[10px] font-semibold uppercase">
+                    {lang.language_code}
+                  </span>
                 </div>
                 <div>
-                  <h3 className="font-bold text-foreground leading-tight">{lang.name}</h3>
-                  <p className="text-muted text-xs font-medium mt-0.5">{lang.code}</p>
+                  <h3 className="font-bold text-foreground leading-tight">
+                    {t(lang.language_name)}
+                  </h3>
+                  <p className="text-muted text-xs font-medium mt-0.5">
+                    {lang.id}
+                  </p>
                 </div>
               </div>
               
@@ -66,19 +72,11 @@ export function LanguageGrid({
               </button>
             </div>
 
-            <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4 text-accent" />
-              <p className="text-sm">
-                <strong className="text-foreground">{lang.narrations}</strong> 
-                <span className="text-muted ml-1">{t("narrations published")}</span>
-              </p>
-            </div>
-
             <div className="flex items-center justify-between pt-2 border-t border-border/50">
-              <div className="flex items-center gap-1.5">
-                <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
-                <span className={`text-sm font-medium ${statusColor}`}>{statusText}</span>
-              </div>
+              <StatusBadge
+                label={t(LANGUAGE_STATUS_LABELS[lang.language_status])}
+                tone={statusTone}
+              />
               
               <div className="flex items-center gap-1">
                 <Button variant="ghost" size="icon-sm" className="text-muted " title={t("Edit")}>

@@ -1,6 +1,6 @@
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
-import { USER_STATUS } from "../constants/user.constants";
+import { USER_STATUS, USER_STATUS_LABELS } from "../constants/user.constants";
 import type { UserStatusBadgeProps } from "../types/user.types";
 
 export function UserStatusBadge({ status }: UserStatusBadgeProps) {
@@ -8,11 +8,11 @@ export function UserStatusBadge({ status }: UserStatusBadgeProps) {
 
   if (status === USER_STATUS.ACTIVE) {
     return (
-      <StatusBadge tone="success" label={t("Active")} />
+      <StatusBadge tone="success" label={t(USER_STATUS_LABELS[status])} />
     );
   }
 
   return (
-    <StatusBadge tone="destructive" label={t("Inactive")} />
+    <StatusBadge tone="destructive" label={t(USER_STATUS_LABELS[status])} />
   );
 }

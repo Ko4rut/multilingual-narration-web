@@ -1,5 +1,5 @@
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
-import type { LanguageGridProps } from "../types";
+import type { LanguageGridProps } from "../types/language.types";
 
 export function useLanguageGrid({ q, languages }: Omit<LanguageGridProps, "onToggleStatus">) {
   const { t } = usePreferences();
@@ -11,8 +11,8 @@ export function useLanguageGrid({ q, languages }: Omit<LanguageGridProps, "onTog
     const lowerQ = q.toLowerCase();
     
     return (
-      lang.name.toLowerCase().includes(lowerQ) || 
-      lang.code.toLowerCase().includes(lowerQ)
+      lang.language_name.toLowerCase().includes(lowerQ) ||
+      lang.language_code.toLowerCase().includes(lowerQ)
     );
   });
 

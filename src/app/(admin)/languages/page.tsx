@@ -5,7 +5,7 @@ import {
   parseLanguageStatus, 
   parseLanguagePage 
 } from "@/features/languages/utils/parsers";
-import type { LanguagePageProps } from "@/features/languages/types";
+import type { LanguagePageProps } from "@/features/languages/types/language.types";
 
 export const metadata: Metadata = {
   title: "Language Management | MANS Admin",

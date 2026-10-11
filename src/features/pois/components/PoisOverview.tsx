@@ -1,83 +1,77 @@
 "use client";
 
-import React from "react";
+import { Plus } from "lucide-react";
+import {
+  PageLayout,
+  PageLayoutContent,
+  PageLayoutHeader,
+} from "@/components/shared/PageLayout";
+import { Button } from "@/components/ui/button";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { usePois } from "../hooks/use-pois";
-import { PoisHeader } from "./PoisHeader";
-import { PoisFilterBar } from "./PoisFilterBar";
+import { PoiFormSheet } from "./PoiFormSheet";
 import { PoisTable } from "./PoisTable";
-import { PoisPagination } from "./PoisPagination";
-import { CreatePoiSheet } from "./CreatePoiSheet";
 
 export function PoisOverview() {
+  const { t } = usePreferences();
   const {
     pois,
-    regions,
-    searchQuery,
-    setSearchQuery,
-    regionFilter,
-    setRegionFilter,
-    statusFilter,
-    setStatusFilter,
-    pagination,
-    selectedIds,
-    isAllSelected,
-    toggleSelectAll,
-    toggleSelectOne,
-    toastMessage,
-    isCreateSheetOpen,
-    setCreateSheetOpen,
-    handleAddClick,
-    handleCreatePoi,
-    handleEditClick,
-    handleMoreActions,
-    handleAdvancedFilter,
+    poiCategoryMappings,
+    selectedPoi,
+    selectedCategoryIds,
+    sheetMode,
+    isSheetOpen,
+    feedback,
+    canActivateSelectedPoi,
+    openCreateSheet,
+    openViewSheet,
+    openEditSheet,
+    editSelectedPoi,
+    handleSheetOpenChange,
+    handleDeletePoi,
+    handleSubmit,
   } = usePois();
+  let sheetKey = "create";
+  if (selectedPoi) {
+    sheetKey = `${sheetMode}-${selectedPoi.id}`;
+  }
 
   return (
-    <div className="w-full">
-      {/* Toast notification */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-surface text-foreground border border-accent px-4 py-3 rounded-lg shadow-lg text-sm flex items-center gap-2 animate-fade-in">
-          <span className="w-2 h-2 rounded-full bg-accent" />
-          <span>{toastMessage}</span>
-        </div>
+    <PageLayout>
+      <PageLayoutHeader
+        title="Point of Interest Management"
+        description="Manage POI location, activation and synchronization metadata."
+      >
+        <Button type="button" onClick={openCreateSheet}>
+          <Plus aria-hidden="true" />
+          {t("Add POI")}
+        </Button>
+      </PageLayoutHeader>
+      {feedback && (
+        <p className="text-xs text-muted-foreground" role="status">
+          {t(feedback)}
+        </p>
       )}
-
-      {/* Header */}
-      <PoisHeader onAddClick={handleAddClick} />
-
-      <CreatePoiSheet
-        open={isCreateSheetOpen}
-        onOpenChange={setCreateSheetOpen}
-        regions={regions}
-        onSubmit={handleCreatePoi}
+      <PageLayoutContent>
+        <PoisTable
+          pois={pois}
+          categoryMappings={poiCategoryMappings}
+          onViewPoi={openViewSheet}
+          onEditPoi={openEditSheet}
+          onDeletePoi={handleDeletePoi}
+        />
+      </PageLayoutContent>
+      <PoiFormSheet
+        key={sheetKey}
+        open={isSheetOpen}
+        mode={sheetMode}
+        poi={selectedPoi}
+        categoryIds={selectedCategoryIds}
+        canActivate={canActivateSelectedPoi}
+        onOpenChange={handleSheetOpenChange}
+        onSubmit={handleSubmit}
+        onEdit={editSelectedPoi}
       />
-
-      {/* Filters Toolbar */}
-      <PoisFilterBar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        regions={regions}
-        selectedRegion={regionFilter}
-        onRegionChange={setRegionFilter}
-        selectedStatus={statusFilter}
-        onStatusChange={setStatusFilter}
-        onAdvancedFilterClick={handleAdvancedFilter}
-      />
-
-      {/* Main Table */}
-      <PoisTable
-        pois={pois}
-        selectedIds={selectedIds}
-        isAllSelected={isAllSelected}
-        onToggleSelectAll={toggleSelectAll}
-        onToggleSelectOne={toggleSelectOne}
-        onEdit={handleEditClick}
-        onMoreActions={handleMoreActions}
-      />
-
-      {/* Pagination */}
-      <PoisPagination {...pagination} />
-    </div>
+    </PageLayout>
   );
 }
