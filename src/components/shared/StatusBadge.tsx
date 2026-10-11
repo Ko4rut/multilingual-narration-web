@@ -52,10 +52,7 @@ export function StatusBadge({
   }
 
   return (
-    <Badge
-      variant="outline"
-      className={cn(statusBadgeVariants({ tone }), className)}
-    >
+    <Badge variant="outline" className={cn(statusBadgeVariants({ tone }), className)}>
       {/* Chấm màu biểu thị tone và có thể phát hiệu ứng pulse. */}
       <span className={dotClassName} aria-hidden="true" />
       {/* Nội dung nhãn trạng thái do feature cung cấp. */}

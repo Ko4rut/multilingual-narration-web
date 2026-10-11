@@ -1,15 +1,19 @@
 "use client";
 
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
   Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
   ComboboxContent,
   ComboboxItem,
   ComboboxList,
   ComboboxTrigger,
   ComboboxValue,
+  useComboboxAnchor,
 } from "@/components/ui/combobox";
 import { Label } from "@/components/ui/label";
 import {
@@ -27,6 +31,7 @@ import type {
   FormComboboxOption,
   FormComboboxProps,
   FormFieldProps,
+  FormMultiComboboxProps,
 } from "@/types/shared/feature-form.types";
 
 /**
@@ -198,6 +203,110 @@ export function FormCombobox({
       <ComboboxContent>
         <ComboboxList>{options.map(renderOption)}</ComboboxList>
       </ComboboxContent>
+    </Combobox>
+  );
+}
+
+/** Combobox chọn nhiều giá trị và gửi mỗi lựa chọn bằng cùng một FormData key. */
+export function FormMultiCombobox({
+  id,
+  name,
+  options,
+  defaultValue = [],
+  disabled,
+  placeholder = FORM_COMBOBOX_DEFAULT_PLACEHOLDER,
+}: FormMultiComboboxProps) {
+  const { t } = usePreferences();
+  const anchor = useComboboxAnchor();
+  const translatedPlaceholder = t(placeholder);
+  const [selectedOptions, setSelectedOptions] = useState<
+    FormComboboxOption[]
+  >(function initializeSelectedOptions() {
+    return options.filter(function isInitiallySelected(option) {
+      return defaultValue.includes(option.value);
+    });
+  });
+
+  function handleValueChange(value: FormComboboxOption[]) {
+    setSelectedOptions(value);
+  }
+
+  function renderSelectedValues(value: FormComboboxOption[]) {
+    let inputPlaceholder = "";
+    if (value.length === 0) {
+      inputPlaceholder = translatedPlaceholder;
+    }
+
+    return (
+      <>
+        {value.map(function renderSelectedOption(option) {
+          return (
+            <ComboboxChip
+              key={option.value}
+              aria-label={option.label}
+              showRemove={!disabled}
+            >
+              {option.label}
+            </ComboboxChip>
+          );
+        })}
+        <ComboboxChipsInput
+          id={id}
+          disabled={disabled}
+          placeholder={inputPlaceholder}
+          aria-label={translatedPlaceholder}
+        />
+      </>
+    );
+  }
+
+  function renderOption(option: FormComboboxOption) {
+    return (
+      <ComboboxItem
+        key={option.value}
+        value={option}
+        className="text-xs"
+      >
+        {option.label}
+      </ComboboxItem>
+    );
+  }
+
+  function renderHiddenInput(option: FormComboboxOption) {
+    return (
+      <input
+        key={option.value}
+        type="hidden"
+        name={name}
+        value={option.value}
+        disabled={disabled}
+      />
+    );
+  }
+
+  return (
+    <Combobox
+      items={options}
+      multiple
+      value={selectedOptions}
+      onValueChange={handleValueChange}
+      disabled={disabled}
+    >
+      <ComboboxChips
+        ref={anchor}
+        className="min-h-8 rounded-lg px-2 py-1 text-xs"
+      >
+        <ComboboxValue>{renderSelectedValues}</ComboboxValue>
+        <ComboboxTrigger
+          disabled={disabled}
+          aria-label={translatedPlaceholder}
+          className="ml-auto shrink-0"
+        />
+      </ComboboxChips>
+      <ComboboxContent anchor={anchor}>
+        <ComboboxList>{options.map(renderOption)}</ComboboxList>
+      </ComboboxContent>
+      {selectedOptions.map(renderHiddenInput)}
     </Combobox>
   );
 }

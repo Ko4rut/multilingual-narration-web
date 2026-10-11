@@ -1,198 +1,316 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { usePreferences } from "@/features/settings/hooks/use-preferences";
-import { MOCK_POIS, MOCK_REGIONS } from "../mocks/pois.mock";
-import type { PointOfInterest, PoiStatus, Region } from "../types";
-import { usePoisFilter } from "./use-pois-filter";
-import { usePoisPagination } from "./use-pois-pagination";
-import { usePoisSelection } from "./use-pois-selection";
+import { useState } from "react";
+import type { FeatureFormMode } from "@/types/shared/feature-form.types";
+import { MOCK_AUDIO_FILES } from "@/features/audios/mocks/audioData";
+import { MOCK_POI_CONTENTS } from "@/features/poi-contents/mocks/poi-content.mock";
+import {
+  DEFAULT_MANAGEMENT_USER_ID,
+  DEFAULT_POI_IMAGE_URL,
+  POI_STATUS,
+  POI_STATUS_OPTIONS,
+} from "../constants/poi.constants";
+import { MOCK_POI_CATEGORIES } from "../mocks/poi-categories.mock";
+import { MOCK_POI_CATEGORY_MAPPINGS } from "../mocks/poi-category-mappings.mock";
+import { MOCK_POIS } from "../mocks/pois.mock";
+import { MOCK_REGIONS } from "../mocks/regions.mock";
+import type { PoiCategoryMapping } from "../types/poi-category-mapping.types";
+import type { PointOfInterest, PoiStatus } from "../types/poi.types";
+import { canActivatePoi } from "../utils/utils";
 
-function readFormText(formData: FormData, name: string) {
-  return String(formData.get(name) ?? "").trim();
+function getFormValue(formData: FormData, key: string) {
+  const value = formData.get(key);
+  if (typeof value !== "string") {
+    return "";
+  }
+  return value.trim();
+}
+
+function getUniqueFormValues(formData: FormData, key: string) {
+  const values = formData.getAll(key).flatMap(function parseFormValue(value) {
+    if (typeof value !== "string") {
+      return [];
+    }
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+      return [];
+    }
+    return [trimmedValue];
+  });
+  return [...new Set(values)];
 }
 
 function parsePoiStatus(value: string): PoiStatus {
-  if (value === "inactive" || value === "maintenance") {
-    return value;
-  }
-
-  return "active";
+  const matchedStatus = POI_STATUS_OPTIONS.find(function findStatus(option) {
+    return option.value === value;
+  });
+  return matchedStatus?.value ?? POI_STATUS.INACTIVE;
 }
 
-function parseLanguageCodes(value: string) {
-  return value
-    .split(",")
-    .map(function normalizeLanguageCode(code) {
-      return code.trim().toUpperCase();
+function createPoiId(pois: readonly PointOfInterest[]) {
+  const date = new Date();
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear()).slice(-2);
+  let sequence = pois.length + 1;
+  let id = `poi-${day}${month}${year}-${String(sequence).padStart(4, "0")}`;
+  while (
+    pois.some(function hasPoi(candidate) {
+      return candidate.id === id;
     })
-    .filter(function removeEmptyLanguageCode(code) {
-      return code.length > 0;
-    });
-}
-
-function createPoiRecord(
-  formData: FormData,
-  regions: readonly Region[],
-): PointOfInterest | null {
-  const poiName = readFormText(formData, "poi_name");
-  const qrCode = readFormText(formData, "qr_code");
-  const regionId = readFormText(formData, "region_id");
-  const poiLocation = readFormText(formData, "poi_location");
-  const region = regions.find(function findRegion(item) {
-    return item.id === regionId;
-  });
-
-  if (!poiName || !qrCode || !poiLocation || !region) {
-    return null;
+  ) {
+    sequence += 1;
+    id = `poi-${day}${month}${year}-${String(sequence).padStart(4, "0")}`;
   }
-
-  const status = parsePoiStatus(readFormText(formData, "status"));
-
-  return {
-    id: `poi-${Date.now()}`,
-    region_id: region.id,
-    region_name: region.name,
-    image_url: readFormText(formData, "image_url") || "/icon.svg",
-    qr_code: qrCode,
-    poi_priority: Number(readFormText(formData, "poi_priority")),
-    poi_name: poiName,
-    latitude: Number(readFormText(formData, "latitude")),
-    longitude: Number(readFormText(formData, "longitude")),
-    trigger_radius: Number(readFormText(formData, "trigger_radius")),
-    poi_location: poiLocation,
-    created_by: "usr-admin-01",
-    is_active: status === "active",
-    status,
-    created_at: new Date().toISOString(),
-    languages: parseLanguageCodes(readFormText(formData, "languages")),
-    daily_plays: 0,
-  };
+  return id;
 }
 
-/**
- * Main Composer Hook for POI Management.
- * Combines filtering, pagination, selection, and action handling.
- */
 export function usePois() {
-  const { t } = usePreferences();
-  const [poiRecords, setPoiRecords] = useState<PointOfInterest[]>(MOCK_POIS);
-  const [isCreateSheetOpen, setCreateSheetOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  // 1. Filter logic
-  const {
-    searchQuery,
-    setSearchQuery,
-    regionFilter,
-    setRegionFilter,
-    statusFilter,
-    setStatusFilter,
-    filteredPois,
-    resetFilters: resetFilterCriteria,
-  } = usePoisFilter(poiRecords);
-
-  // 2. Pagination logic
-  const pagination = usePoisPagination({
-    totalItems: filteredPois.length,
-    pageSize: 6,
+  const [pois, setPois] = useState<PointOfInterest[]>(function initializePois() {
+    return [...MOCK_POIS];
   });
-
-  // Current page items
-  const paginatedPois = useMemo(() => {
-    const startIndex = (pagination.currentPage - 1) * pagination.pageSize;
-    return filteredPois.slice(startIndex, startIndex + pagination.pageSize);
-  }, [filteredPois, pagination.currentPage, pagination.pageSize]);
-
-  // 3. Selection logic
-  const selection = usePoisSelection(paginatedPois);
-
-  // Filter change handlers that reset page to 1
-  const handleSearchChange = (val: string) => {
-    setSearchQuery(val);
-    pagination.resetPage();
-  };
-
-  const handleRegionChange = (val: string) => {
-    setRegionFilter(val);
-    pagination.resetPage();
-  };
-
-  const handleStatusChange = (val: string) => {
-    setStatusFilter(val);
-    pagination.resetPage();
-  };
-
-  const resetFilters = () => {
-    resetFilterCriteria();
-    pagination.resetPage();
-    selection.clearSelection();
-  };
-
-  // Toast notifications & action feedback
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
-  function handleAddClick() {
-    setCreateSheetOpen(true);
+  const [poiCategoryMappings, setPoiCategoryMappings] = useState<
+    PoiCategoryMapping[]
+  >(function initializePoiCategoryMappings() {
+    return [...MOCK_POI_CATEGORY_MAPPINGS];
+  });
+  const [sheetMode, setSheetMode] = useState<FeatureFormMode>("create");
+  const [selectedPoiId, setSelectedPoiId] = useState<string | null>(null);
+  const [isSheetOpen, setSheetOpen] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const selectedPoi =
+    pois.find(function findSelectedPoi(poi) {
+      return poi.id === selectedPoiId;
+    }) ?? null;
+  const selectedCategoryIds = poiCategoryMappings.flatMap(
+    function findSelectedCategoryIds(mapping) {
+      if (mapping.poi_id !== selectedPoiId) {
+        return [];
+      }
+      return [mapping.poi_category_id];
+    },
+  );
+  let canActivateSelectedPoi = false;
+  if (selectedPoi) {
+    canActivateSelectedPoi = canActivatePoi(
+      selectedPoi.id,
+      MOCK_POI_CONTENTS,
+      MOCK_AUDIO_FILES,
+    );
   }
 
-  function handleCreatePoi(formData: FormData) {
-    const createdPoi = createPoiRecord(formData, MOCK_REGIONS);
+  function openCreateSheet() {
+    setSelectedPoiId(null);
+    setSheetMode("create");
+    setSheetOpen(true);
+    setFeedback(null);
+  }
 
-    if (!createdPoi) {
-      showToast(t("Complete all required POI fields."));
+  function openViewSheet(poi: PointOfInterest) {
+    setSelectedPoiId(poi.id);
+    setSheetMode("view");
+    setSheetOpen(true);
+  }
+
+  function openEditSheet(poi: PointOfInterest) {
+    setSelectedPoiId(poi.id);
+    setSheetMode("edit");
+    setSheetOpen(true);
+    setFeedback(null);
+  }
+
+  function editSelectedPoi() {
+    if (!selectedPoi) {
+      return;
+    }
+    setSheetMode("edit");
+  }
+
+  function handleSheetOpenChange(open: boolean) {
+    setSheetOpen(open);
+    if (!open) {
+      setSelectedPoiId(null);
+    }
+  }
+
+  function handleDeletePoi(poi: PointOfInterest) {
+    const hasContent = MOCK_POI_CONTENTS.some(function findContent(content) {
+      return content.poi_id === poi.id;
+    });
+    if (hasContent) {
+      setFeedback("POIs with linked content cannot be deleted.");
+      return;
+    }
+    setPois(function removePoi(currentPois) {
+      return currentPois.filter(function keepPoi(candidate) {
+        return candidate.id !== poi.id;
+      });
+    });
+    setPoiCategoryMappings(function removePoiCategoryMappings(mappings) {
+      return mappings.filter(function keepMapping(mapping) {
+        return mapping.poi_id !== poi.id;
+      });
+    });
+    setFeedback("POI deleted from demo data.");
+  }
+
+  function handleSubmit(formData: FormData) {
+    const poiName = getFormValue(formData, "poi_name");
+    const regionId = getFormValue(formData, "region_id");
+    const poiLocation = getFormValue(formData, "poi_location");
+    const qrCode = getFormValue(formData, "poi_qr_code");
+    const categoryIds = getUniqueFormValues(formData, "poi_category_ids");
+    const hasRegion = MOCK_REGIONS.some(function findRegion(region) {
+      return region.id === regionId;
+    });
+    if (!poiName || !hasRegion || !poiLocation || !qrCode) {
+      setFeedback("Complete all required POI fields.");
+      return;
+    }
+    const hasUnknownCategory = categoryIds.some(function findUnknownCategory(
+      categoryId,
+    ) {
+      return !MOCK_POI_CATEGORIES.some(function findCategory(category) {
+        return category.id === categoryId;
+      });
+    });
+    if (hasUnknownCategory) {
+      setFeedback("One or more selected categories are invalid.");
+      return;
+    }
+    const hasDuplicate = pois.some(function findDuplicatePoi(poi) {
+      if (poi.id === selectedPoi?.id) {
+        return false;
+      }
+      return (
+        poi.poi_qr_code === qrCode || poi.poi_location === poiLocation
+      );
+    });
+    if (hasDuplicate) {
+      setFeedback("POI QR code and location must be unique.");
       return;
     }
 
-    setPoiRecords(function addPoi(currentPois) {
-      return [createdPoi, ...currentPois];
+    const timestamp = new Date().toISOString();
+    if (sheetMode === "create") {
+      const newPoiId = createPoiId(pois);
+      setPois(function addPoi(currentPois) {
+        const poi: PointOfInterest = {
+          id: newPoiId,
+          region_id: regionId,
+          poi_image_url:
+            getFormValue(formData, "poi_image_url") || DEFAULT_POI_IMAGE_URL,
+          image_checksum_sha256:
+            getFormValue(formData, "image_checksum_sha256") || null,
+          poi_qr_code: qrCode,
+          poi_name: poiName,
+          poi_location: poiLocation,
+          poi_status: POI_STATUS.INACTIVE,
+          latitude: Number(getFormValue(formData, "latitude")),
+          longitude: Number(getFormValue(formData, "longitude")),
+          trigger_radius_meter: Number(
+            getFormValue(formData, "trigger_radius_meter"),
+          ),
+          created_by: DEFAULT_MANAGEMENT_USER_ID,
+          last_updated_by: DEFAULT_MANAGEMENT_USER_ID,
+          created_at: timestamp,
+          last_updated_at: timestamp,
+        };
+        return [poi, ...currentPois];
+      });
+      setPoiCategoryMappings(function addPoiCategoryMappings(mappings) {
+        const newMappings = categoryIds.map(
+          function createPoiCategoryMapping(categoryId) {
+            return {
+              poi_id: newPoiId,
+              poi_category_id: categoryId,
+            };
+          },
+        );
+        return [...newMappings, ...mappings];
+      });
+      setSheetOpen(false);
+      setFeedback(
+        "POI created as inactive until its English content and audio are published.",
+      );
+      return;
+    }
+
+    if (!selectedPoi) {
+      return;
+    }
+    const requestedStatus = parsePoiStatus(
+      getFormValue(formData, "poi_status"),
+    );
+    if (
+      requestedStatus === POI_STATUS.ACTIVE &&
+      !canActivateSelectedPoi
+    ) {
+      setFeedback(
+        "This POI needs published English content with valid audio before activation.",
+      );
+      return;
+    }
+
+    setPois(function updatePois(currentPois) {
+      return currentPois.map(function updatePoi(poi) {
+        if (poi.id !== selectedPoi.id) {
+          return poi;
+        }
+        return {
+          ...poi,
+          region_id: regionId,
+          poi_image_url:
+            getFormValue(formData, "poi_image_url") || DEFAULT_POI_IMAGE_URL,
+          image_checksum_sha256:
+            getFormValue(formData, "image_checksum_sha256") || null,
+          poi_qr_code: qrCode,
+          poi_name: poiName,
+          poi_location: poiLocation,
+          poi_status: requestedStatus,
+          latitude: Number(getFormValue(formData, "latitude")),
+          longitude: Number(getFormValue(formData, "longitude")),
+          trigger_radius_meter: Number(
+            getFormValue(formData, "trigger_radius_meter"),
+          ),
+          last_updated_by: DEFAULT_MANAGEMENT_USER_ID,
+          last_updated_at: timestamp,
+        };
+      });
     });
-    setCreateSheetOpen(false);
-    resetFilterCriteria();
-    pagination.resetPage();
-    selection.clearSelection();
-    showToast(t("POI created successfully."));
+    setPoiCategoryMappings(function updatePoiCategoryMappings(mappings) {
+      const otherPoiMappings = mappings.filter(function keepMapping(mapping) {
+        return mapping.poi_id !== selectedPoi.id;
+      });
+      const updatedMappings = categoryIds.map(
+        function createPoiCategoryMapping(categoryId) {
+          return {
+            poi_id: selectedPoi.id,
+            poi_category_id: categoryId,
+          };
+        },
+      );
+      return [...otherPoiMappings, ...updatedMappings];
+    });
+    setSheetOpen(false);
+    setFeedback("POI updated in demo data.");
   }
 
-  const handleEditClick = (poi: PointOfInterest) => {
-    showToast(`Chỉnh sửa địa điểm: ${poi.poi_name} (chờ cập nhật)`);
-  };
-
-  const handleMoreActions = (poi: PointOfInterest) => {
-    showToast(`Tùy chọn khác cho: ${poi.poi_name}`);
-  };
-
-  const handleAdvancedFilter = () => {
-    showToast("Bộ lọc nâng cao (Advanced Filters) đang sẵn sàng mở rộng.");
-  };
-
   return {
-    pois: paginatedPois,
-    allPois: filteredPois,
-    regions: MOCK_REGIONS,
-    searchQuery,
-    setSearchQuery: handleSearchChange,
-    regionFilter,
-    setRegionFilter: handleRegionChange,
-    statusFilter,
-    setStatusFilter: handleStatusChange,
-    pagination,
-    selectedIds: selection.selectedIds,
-    isAllSelected: selection.isAllSelected,
-    toggleSelectAll: selection.toggleSelectAll,
-    toggleSelectOne: selection.toggleSelectOne,
-    isSelected: selection.isSelected,
-    resetFilters,
-    toastMessage,
-    isCreateSheetOpen,
-    setCreateSheetOpen,
-    handleAddClick,
-    handleCreatePoi,
-    handleEditClick,
-    handleMoreActions,
-    handleAdvancedFilter,
+    pois,
+    poiCategoryMappings,
+    selectedPoi,
+    selectedCategoryIds,
+    sheetMode,
+    isSheetOpen,
+    feedback,
+    canActivateSelectedPoi,
+    openCreateSheet,
+    openViewSheet,
+    openEditSheet,
+    editSelectedPoi,
+    handleSheetOpenChange,
+    handleDeletePoi,
+    handleSubmit,
   };
 }

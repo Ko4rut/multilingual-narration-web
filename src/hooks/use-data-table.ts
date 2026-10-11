@@ -32,6 +32,16 @@ function createInitialFilters<TData>(filters: readonly DataTableFilter<TData>[])
   }, {});
 }
 
+function matchesFilterValue(
+  rowValue: string | readonly string[],
+  selectedValue: string,
+) {
+  if (typeof rowValue === "string") {
+    return rowValue === selectedValue;
+  }
+  return rowValue.includes(selectedValue);
+}
+
 function createPageItems(
   currentPage: number,
   totalPages: number,
@@ -80,7 +90,7 @@ export function useDataTable<TData>({
         if (selectedValue === ALL_FILTERS) {
           return true;
         }
-        return filter.getValue(row) === selectedValue;
+        return matchesFilterValue(filter.getValue(row), selectedValue);
       });
 
       if (!matchesFilters) {

@@ -41,3 +41,13 @@ export type FormComboboxProps = {
   required?: boolean;
   placeholder?: string;
 };
+
+/** Thuộc tính cấu hình combobox chọn nhiều giá trị trong feature form. */
+export type FormMultiComboboxProps = {
+  id?: string;
+  name: string;
+  options: readonly FormComboboxOption[];
+  defaultValue?: readonly string[];
+  disabled?: boolean;
+  placeholder?: string;
+};

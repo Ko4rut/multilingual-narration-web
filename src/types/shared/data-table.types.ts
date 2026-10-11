@@ -22,7 +22,7 @@ export interface DataTableFilter<TData> {
   id: string;
   label: string;
   options: readonly DataTableFilterOption[];
-  getValue: (row: TData) => string;
+  getValue: (row: TData) => string | readonly string[];
   allLabel?: string;
 }
 
