@@ -16,19 +16,20 @@ import type {
   DataTableColumn,
   DataTableFilter,
 } from "@/types/shared/data-table.types";
-import {
-  USER_ROLE_OPTIONS,
-  USER_STATUS_OPTIONS,
-} from "../constants/user.constants";
+import { USER_STATUS_OPTIONS } from "../constants/user.constants";
+import { MOCK_ROLES } from "../mocks/roles.mock";
 import type { ManagerUser, UsersTableProps } from "../types/user.types";
-import { UserRoleBadge } from "./UserRoleBadge";
+import { formatUserTimestamp, getUserRoleName } from "../utils/user.utils";
 import { UserStatusBadge } from "./UserStatusBadge";
-import { UserTimestamp } from "./UserTimestamp";
 
 export function UsersTable({ users, onViewUser, onEditUser }: UsersTableProps) {
-  const { t } = usePreferences();
+  const { t, locale } = usePreferences();
+  const roleOptions = MOCK_ROLES.map(function createRoleOption(role) {
+    return { value: role.id, label: role.name };
+  });
 
   const columns: readonly DataTableColumn<ManagerUser>[] = [
+    // Column User
     {
       id: "user",
       header: t("User"),
@@ -48,14 +49,27 @@ export function UsersTable({ users, onViewUser, onEditUser }: UsersTableProps) {
         );
       },
     },
+    // Column Role
     {
       id: "role_id",
       header: t("Role"),
       accessor: "role_id",
       cell: function renderRole(user) {
-        return <UserRoleBadge roleId={user.role_id} />;
+        const roleName = getUserRoleName(user.role_id, MOCK_ROLES);
+
+        return (
+          <div className="flex min-w-44 flex-col gap-1">
+            <span className="text-sm font-medium text-foreground">
+              {t(roleName)}
+            </span>
+            <span className="font-mono text-xs text-muted-foreground">
+              {user.role_id}
+            </span>
+          </div>
+        );
       },
     },
+    // Column Account status
     {
       id: "user_status",
       header: t("Account status"),
@@ -64,22 +78,30 @@ export function UsersTable({ users, onViewUser, onEditUser }: UsersTableProps) {
         return <UserStatusBadge status={user.user_status} />;
       },
     },
+    // Column Timestamps
     {
-      id: "last_updated_at",
-      header: t("Last updated at"),
-      accessor: "last_updated_at",
-      cell: function renderLastUpdatedAt(user) {
-        return <UserTimestamp value={user.last_updated_at} />;
+      id: "timestamps",
+      header: t("Timestamps"),
+      cell: function renderTimestamps(user) {
+        return (
+          <div className="flex min-w-64 flex-col gap-1 text-xs">
+            <span>
+              {t("Created")}: {formatUserTimestamp(user.created_at, locale)}
+            </span>
+            <span>
+              {t("Updated")}: {formatUserTimestamp(user.last_updated_at, locale)}
+            </span>
+            <span>
+              {t("Last login at")}: {formatUserTimestamp(
+                user.last_login_at,
+                locale,
+              )}
+            </span>
+          </div>
+        );
       },
     },
-    {
-      id: "last_login_at",
-      header: t("Last login at"),
-      accessor: "last_login_at",
-      cell: function renderLastLoginAt(user) {
-        return <UserTimestamp value={user.last_login_at} />;
-      },
-    },
+    // Column Actions
     {
       id: "actions",
       header: <span className="sr-only">{t("Actions")}</span>,
@@ -117,7 +139,7 @@ export function UsersTable({ users, onViewUser, onEditUser }: UsersTableProps) {
       id: "role_id",
       label: "Role",
       allLabel: "All roles",
-      options: USER_ROLE_OPTIONS,
+      options: roleOptions,
       getValue: function getRoleId(user) {
         return user.role_id;
       },

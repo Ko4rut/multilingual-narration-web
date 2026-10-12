@@ -7,17 +7,15 @@ import type {
   FeatureFormMode,
   FormComboboxOption,
 } from "@/types/shared/feature-form.types";
-import {
-  USER_ROLE_OPTIONS,
-  USER_STATUS_OPTIONS,
-} from "../constants/user.constants";
+import { USER_STATUS_OPTIONS } from "../constants/user.constants";
+import { MOCK_ROLES } from "../mocks/roles.mock";
 
 export function useUserFormSheet(mode: FeatureFormMode) {
   const { t } = usePreferences();
 
   const roleOptions = useMemo<FormComboboxOption[]>(function createRoleOptions() {
-    return USER_ROLE_OPTIONS.map(function translateRoleOption(option) {
-      return { value: option.value, label: t(option.label) };
+    return MOCK_ROLES.map(function translateRoleOption(role) {
+      return { value: role.id, label: t(role.name) };
     });
   }, [t]);
 

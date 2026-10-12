@@ -14,7 +14,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-180126-0002",
-    role_id: "role-content-manager",
+    role_id: "role-content-admin",
     email: "binh.tran@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Trần Gia Bình",
@@ -25,7 +25,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-220126-0003",
-    role_id: "role-audio-editor",
+    role_id: "role-system-admin",
     email: "chi.le@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Lê Ngọc Chi",
@@ -36,7 +36,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-030226-0004",
-    role_id: "role-viewer",
+    role_id: "role-content-moderator",
     email: "dung.pham@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Phạm Hoàng Dũng",
@@ -47,7 +47,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-120226-0005",
-    role_id: "role-content-manager",
+    role_id: "role-content-admin",
     email: "giang.vo@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Võ Thu Giang",
@@ -58,7 +58,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-260226-0006",
-    role_id: "role-audio-editor",
+    role_id: "role-system-admin",
     email: "hai.do@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Đỗ Quang Hải",
@@ -69,7 +69,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-050326-0007",
-    role_id: "role-viewer",
+    role_id: "role-content-moderator",
     email: "han.bui@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Bùi Mỹ Hân",
@@ -80,7 +80,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-170326-0008",
-    role_id: "role-content-manager",
+    role_id: "role-content-admin",
     email: "khanh.ho@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Hồ Quốc Khánh",
@@ -91,7 +91,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-290326-0009",
-    role_id: "role-audio-editor",
+    role_id: "role-system-admin",
     email: "lan.dang@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Đặng Bảo Lan",
@@ -102,7 +102,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-070426-0010",
-    role_id: "role-viewer",
+    role_id: "role-content-moderator",
     email: "lam.ngo@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Ngô Đức Lâm",
@@ -124,7 +124,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-020526-0012",
-    role_id: "role-content-manager",
+    role_id: "role-content-admin",
     email: "mai.dinh@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Đinh Thanh Mai",
@@ -135,7 +135,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-140526-0013",
-    role_id: "role-audio-editor",
+    role_id: "role-system-admin",
     email: "minh.ly@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Lý Tuấn Minh",
@@ -146,7 +146,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-270526-0014",
-    role_id: "role-viewer",
+    role_id: "role-content-moderator",
     email: "my.cao@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Cao Hà My",
@@ -157,7 +157,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-080626-0015",
-    role_id: "role-content-manager",
+    role_id: "role-content-admin",
     email: "nam.vu@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Vũ Hoài Nam",
@@ -168,7 +168,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-210626-0016",
-    role_id: "role-audio-editor",
+    role_id: "role-system-admin",
     email: "ngan.trinh@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Trịnh Kim Ngân",
@@ -179,7 +179,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-040726-0017",
-    role_id: "role-viewer",
+    role_id: "role-content-moderator",
     email: "phuc.luu@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Lưu Minh Phúc",
@@ -190,7 +190,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-160726-0018",
-    role_id: "role-content-manager",
+    role_id: "role-content-admin",
     email: "quyen.phan@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Phan Thảo Quyên",
@@ -201,7 +201,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-290726-0019",
-    role_id: "role-audio-editor",
+    role_id: "role-system-admin",
     email: "son.ha@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Hà Công Sơn",
@@ -212,7 +212,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-110826-0020",
-    role_id: "role-viewer",
+    role_id: "role-content-moderator",
     email: "thao.nguyen@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Nguyễn Phương Thảo",
@@ -223,7 +223,7 @@ export const MOCK_MANAGER_USERS: readonly ManagerUser[] = [
   },
   {
     id: "user-240826-0021",
-    role_id: "role-content-manager",
+    role_id: "role-content-admin",
     email: "trang.lam@mans.vn",
     password_hash: "[REDACTED]",
     full_name: "Lâm Huyền Trang",

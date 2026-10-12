@@ -1,5 +1,6 @@
 import type { LANGUAGE_STATUS } from "../constants/language.constants";
 
+/** Tập giá trị trạng thái hợp lệ của ngôn ngữ trong feature POI content. */
 export type LanguageStatus =
   (typeof LANGUAGE_STATUS)[keyof typeof LANGUAGE_STATUS];
 

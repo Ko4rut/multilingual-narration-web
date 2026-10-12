@@ -1,5 +1,6 @@
 import type { POI_STATUS } from "../constants/poi.constants";
 
+/** Tập giá trị trạng thái hợp lệ của POI tham chiếu. */
 export type PoiStatus = (typeof POI_STATUS)[keyof typeof POI_STATUS];
 
 /** Bản ghi Point_Of_Interests tham chiếu riêng của feature POI content. */
