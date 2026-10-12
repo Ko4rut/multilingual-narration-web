@@ -3,102 +3,16 @@
 import { useMemo, useState } from "react";
 
 import type { FeatureFormMode } from "@/types/shared/feature-form.types";
-import { USER_ROLE, USER_STATUS } from "../constants/user.constants";
+import { MOCK_ROLES } from "../mocks/roles.mock";
 import { MOCK_MANAGER_USERS } from "../mocks/users.mock";
-import type {
-  ManagerUser,
-  ManagerUserRoleId,
-  ManagerUserStatus,
-  UsersOverviewSummary,
-} from "../types/user.types";
-
-function getFormValue(formData: FormData, key: string) {
-  const value = formData.get(key);
-  if (typeof value !== "string") {
-    return "";
-  }
-  return value.trim();
-}
-
-function createUserId(users: readonly ManagerUser[]) {
-  const date = new Date();
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = String(date.getFullYear()).slice(-2);
-  let sequence = users.length + 1;
-  let id = `user-${day}${month}${year}-${String(sequence).padStart(4, "0")}`;
-
-  while (
-    users.some(function hasUser(candidate) {
-      return candidate.id === id;
-    })
-  ) {
-    sequence += 1;
-    id = `user-${day}${month}${year}-${String(sequence).padStart(4, "0")}`;
-  }
-
-  return id;
-}
-
-function parseStatus(value: string): ManagerUserStatus {
-  if (value === USER_STATUS.DISABLED) {
-    return USER_STATUS.DISABLED;
-  }
-  return USER_STATUS.ACTIVE;
-}
-
-function parseRoleId(value: string): ManagerUserRoleId | null {
-  if (value === USER_ROLE.SUPER_ADMIN) {
-    return USER_ROLE.SUPER_ADMIN;
-  }
-  if (value === USER_ROLE.CONTENT_MANAGER) {
-    return USER_ROLE.CONTENT_MANAGER;
-  }
-  if (value === USER_ROLE.AUDIO_EDITOR) {
-    return USER_ROLE.AUDIO_EDITOR;
-  }
-  if (value === USER_ROLE.VIEWER) {
-    return USER_ROLE.VIEWER;
-  }
-  return null;
-}
-
-function createOverviewSummary(
-  users: readonly ManagerUser[],
-): UsersOverviewSummary {
-  const activeUsers = users.filter(function findActiveUser(user) {
-    return user.user_status === USER_STATUS.ACTIVE;
-  }).length;
-  const assignedRoles = new Set(users.map(function getRoleId(user) {
-    return user.role_id;
-  })).size;
-  const loginTimes = users.flatMap(function getLoginTime(user) {
-    if (!user.last_login_at) {
-      return [];
-    }
-    return [new Date(user.last_login_at).getTime()];
-  });
-  let onlineToday = 0;
-  if (loginTimes.length > 0) {
-    const latestLoginTime = Math.max(...loginTimes);
-    const oneDayBefore = latestLoginTime - 24 * 60 * 60 * 1000;
-    onlineToday = loginTimes.filter(function isWithinLastDay(loginTime) {
-      return loginTime >= oneDayBefore;
-    }).length;
-  }
-  let activeRate = 0;
-  if (users.length > 0) {
-    activeRate = Math.round((activeUsers / users.length) * 100);
-  }
-
-  return {
-    totalUsers: users.length,
-    activeUsers,
-    activeRate,
-    assignedRoles,
-    onlineToday,
-  };
-}
+import type { ManagerUser } from "../types/user.types";
+import {
+  createUserId,
+  createUsersOverviewSummary,
+  getUserFormValue,
+  parseUserRoleId,
+  parseUserStatus,
+} from "../utils/user.utils";
 
 export function useUsers() {
   const [users, setUsers] = useState<ManagerUser[]>(function initializeUsers() {
@@ -112,7 +26,7 @@ export function useUsers() {
     return user.id === selectedUserId;
   }) ?? null;
   const overviewSummary = useMemo(function getOverviewSummary() {
-    return createOverviewSummary(users);
+    return createUsersOverviewSummary(users);
   }, [users]);
 
   function openCreateSheet() {
@@ -148,21 +62,27 @@ export function useUsers() {
   }
 
   function handleSubmit(formData: FormData) {
-    const fullName = getFormValue(formData, "full_name");
-    const email = getFormValue(formData, "email");
-    const roleId = parseRoleId(getFormValue(formData, "role_id"));
-    const status = parseStatus(getFormValue(formData, "user_status"));
+    const fullName = getUserFormValue(formData, "full_name");
+    const email = getUserFormValue(formData, "email");
+    const roleId = parseUserRoleId(
+      getUserFormValue(formData, "role_id"),
+      MOCK_ROLES,
+    );
+    const status = parseUserStatus(
+      getUserFormValue(formData, "user_status"),
+    );
 
     if (!fullName || !email || !roleId) {
       return;
     }
 
-    const timestamp = new Date().toISOString();
+    const creationDate = new Date();
+    const timestamp = creationDate.toISOString();
 
     if (sheetMode === "create") {
       setUsers(function addUser(currentUsers) {
         const user: ManagerUser = {
-          id: createUserId(currentUsers),
+          id: createUserId(currentUsers, creationDate),
           role_id: roleId,
           email,
           password_hash: "[REDACTED]",

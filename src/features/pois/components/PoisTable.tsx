@@ -20,7 +20,14 @@ import { POI_STATUS_OPTIONS } from "../constants/poi.constants";
 import { MOCK_POI_CATEGORIES } from "../mocks/poi-categories.mock";
 import { MOCK_REGIONS } from "../mocks/regions.mock";
 import type { PointOfInterest, PoisTableProps } from "../types/poi.types";
-import { formatCoordinates } from "../utils/utils";
+import {
+  createPoiCategoryFilterOptions,
+  createRegionFilterOptions,
+  findPoiRegion,
+  formatCoordinates,
+  formatPoiTimestamp,
+  getPoiCategoryIds,
+} from "../utils/poi.utils";
 import { PoisStatusBadge } from "./PoisStatusBadge";
 
 export function PoisTable({
@@ -66,15 +73,11 @@ export function PoisTable({
       id: "region_id",
       header: t("Region"),
       searchValue: function getRegionSearchValue(poi) {
-        const region = MOCK_REGIONS.find(function findRegion(candidate) {
-          return candidate.id === poi.region_id;
-        });
+        const region = findPoiRegion(poi.region_id, MOCK_REGIONS);
         return `${poi.region_id} ${region?.region_name ?? ""} ${region?.region_code ?? ""}`;
       },
       cell: function renderRegion(poi) {
-        const region = MOCK_REGIONS.find(function findRegion(candidate) {
-          return candidate.id === poi.region_id;
-        });
+        const region = findPoiRegion(poi.region_id, MOCK_REGIONS);
         if (!region) {
           return <span className="font-mono text-xs">{poi.region_id}</span>;
         }
@@ -101,7 +104,9 @@ export function PoisTable({
             <span className="font-mono text-xs text-muted-foreground">
               {formatCoordinates(poi.latitude, poi.longitude)}
               <span aria-hidden="true"> · </span>
-              {t("Trigger radius")}: {poi.trigger_radius_meter.toLocaleString(locale)} m
+              {t("Trigger radius")}: {poi.trigger_radius_meter.toLocaleString(
+                locale,
+              )} m
             </span>
           </div>
         );
@@ -133,7 +138,7 @@ export function PoisTable({
               {t("Updated by")}: {poi.last_updated_by}
             </span>
             <span className="text-muted-foreground">
-              {new Date(poi.last_updated_at).toLocaleString(locale)}
+              {formatPoiTimestamp(poi.last_updated_at, locale)}
             </span>
           </div>
         );
@@ -165,14 +170,8 @@ export function PoisTable({
       },
     },
   ];
-  const regionOptions = MOCK_REGIONS.map(function createRegionOption(region) {
-    return { value: region.id, label: region.region_name };
-  });
-  const categoryOptions = MOCK_POI_CATEGORIES.map(
-    function createCategoryOption(category) {
-      return { value: category.id, label: category.category_name };
-    },
-  );
+  const regionOptions = createRegionFilterOptions(MOCK_REGIONS);
+  const categoryOptions = createPoiCategoryFilterOptions(MOCK_POI_CATEGORIES);
   const filters: readonly DataTableFilter<PointOfInterest>[] = [
     {
       id: "poi_status",
@@ -197,13 +196,8 @@ export function PoisTable({
       label: "Category",
       allLabel: "All categories",
       options: categoryOptions,
-      getValue: function getPoiCategoryIds(poi) {
-        return categoryMappings.flatMap(function findPoiCategoryId(mapping) {
-          if (mapping.poi_id !== poi.id) {
-            return [];
-          }
-          return [mapping.poi_category_id];
-        });
+      getValue: function getCategoryFilterValues(poi) {
+        return getPoiCategoryIds(poi.id, categoryMappings);
       },
     },
   ];
@@ -225,7 +219,10 @@ export function PoisTable({
             <DataTableFilters />
           </DataTableToolbarActions>
         </DataTableToolbar>
-        <DataTableContent emptyMessage="No POIs match your filters." className="min-w-[1120px]"/>
+        <DataTableContent
+          emptyMessage="No POIs match your filters."
+          className="min-w-[1120px]"
+        />
         <DataTablePagination itemLabel="POIs" pageSizeOptions={[10]} />
       </DataTablePanel>
     </DataTable>

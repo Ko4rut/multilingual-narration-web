@@ -8,85 +8,24 @@ import {
   DEFAULT_MANAGEMENT_USER_ID,
   DEFAULT_POI_IMAGE_URL,
   POI_STATUS,
-  POI_STATUS_OPTIONS,
 } from "../constants/poi.constants";
 import { MOCK_POI_CATEGORIES } from "../mocks/poi-categories.mock";
 import { MOCK_POI_CATEGORY_MAPPINGS } from "../mocks/poi-category-mappings.mock";
 import { MOCK_POIS } from "../mocks/pois.mock";
 import { MOCK_REGIONS } from "../mocks/regions.mock";
 import type { PoiCategoryMapping } from "../types/poi-category-mapping.types";
-import type {
-  PointOfInterest,
-  PoisOverviewSummary,
-  PoiStatus,
-} from "../types/poi.types";
-import { canActivatePoi } from "../utils/utils";
-
-function getFormValue(formData: FormData, key: string) {
-  const value = formData.get(key);
-  if (typeof value !== "string") {
-    return "";
-  }
-  return value.trim();
-}
-
-function getUniqueFormValues(formData: FormData, key: string) {
-  const values = formData.getAll(key).flatMap(function parseFormValue(value) {
-    if (typeof value !== "string") {
-      return [];
-    }
-    const trimmedValue = value.trim();
-    if (!trimmedValue) {
-      return [];
-    }
-    return [trimmedValue];
-  });
-  return [...new Set(values)];
-}
-
-function parsePoiStatus(value: string): PoiStatus {
-  const matchedStatus = POI_STATUS_OPTIONS.find(function findStatus(option) {
-    return option.value === value;
-  });
-  return matchedStatus?.value ?? POI_STATUS.INACTIVE;
-}
-
-function createPoiId(pois: readonly PointOfInterest[]) {
-  const date = new Date();
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = String(date.getFullYear()).slice(-2);
-  let sequence = pois.length + 1;
-  let id = `poi-${day}${month}${year}-${String(sequence).padStart(4, "0")}`;
-  while (
-    pois.some(function hasPoi(candidate) {
-      return candidate.id === id;
-    })
-  ) {
-    sequence += 1;
-    id = `poi-${day}${month}${year}-${String(sequence).padStart(4, "0")}`;
-  }
-  return id;
-}
-
-function createOverviewSummary(
-  pois: readonly PointOfInterest[],
-): PoisOverviewSummary {
-  const activePois = pois.filter(function findActivePoi(poi) {
-    return poi.poi_status === POI_STATUS.ACTIVE;
-  }).length;
-
-  return {
-    totalPois: pois.length,
-    activePois,
-    inactivePois: pois.length - activePois,
-    coveredRegions: new Set(
-      pois.map(function getRegionId(poi) {
-        return poi.region_id;
-      }),
-    ).size,
-  };
-}
+import type { PointOfInterest } from "../types/poi.types";
+import {
+  canActivatePoi,
+  createPoiId,
+  createPoisOverviewSummary,
+  getPoiCategoryIds,
+  getPoiFormValue,
+  getUniquePoiFormValues,
+  hasDuplicatePoi,
+  hasUnknownPoiCategory,
+  parsePoiStatus,
+} from "../utils/poi.utils";
 
 export function usePois() {
   const [pois, setPois] = useState<PointOfInterest[]>(function initializePois() {
@@ -102,19 +41,15 @@ export function usePois() {
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const overviewSummary = useMemo(function getOverviewSummary() {
-    return createOverviewSummary(pois);
+    return createPoisOverviewSummary(pois);
   }, [pois]);
   const selectedPoi =
     pois.find(function findSelectedPoi(poi) {
       return poi.id === selectedPoiId;
     }) ?? null;
-  const selectedCategoryIds = poiCategoryMappings.flatMap(
-    function findSelectedCategoryIds(mapping) {
-      if (mapping.poi_id !== selectedPoiId) {
-        return [];
-      }
-      return [mapping.poi_category_id];
-    },
+  const selectedCategoryIds = getPoiCategoryIds(
+    selectedPoiId,
+    poiCategoryMappings,
   );
   let canActivateSelectedPoi = false;
   if (selectedPoi) {
@@ -190,11 +125,11 @@ export function usePois() {
   }
 
   function handleSubmit(formData: FormData) {
-    const poiName = getFormValue(formData, "poi_name");
-    const regionId = getFormValue(formData, "region_id");
-    const poiLocation = getFormValue(formData, "poi_location");
-    const qrCode = getFormValue(formData, "poi_qr_code");
-    const categoryIds = getUniqueFormValues(formData, "poi_category_ids");
+    const poiName = getPoiFormValue(formData, "poi_name");
+    const regionId = getPoiFormValue(formData, "region_id");
+    const poiLocation = getPoiFormValue(formData, "poi_location");
+    const qrCode = getPoiFormValue(formData, "poi_qr_code");
+    const categoryIds = getUniquePoiFormValues(formData, "poi_category_ids");
     const hasRegion = MOCK_REGIONS.some(function findRegion(region) {
       return region.id === regionId;
     });
@@ -202,49 +137,45 @@ export function usePois() {
       setFeedback("Complete all required POI fields.");
       return;
     }
-    const hasUnknownCategory = categoryIds.some(function findUnknownCategory(
-      categoryId,
-    ) {
-      return !MOCK_POI_CATEGORIES.some(function findCategory(category) {
-        return category.id === categoryId;
-      });
-    });
+    const hasUnknownCategory = hasUnknownPoiCategory(
+      categoryIds,
+      MOCK_POI_CATEGORIES,
+    );
     if (hasUnknownCategory) {
       setFeedback("One or more selected categories are invalid.");
       return;
     }
-    const hasDuplicate = pois.some(function findDuplicatePoi(poi) {
-      if (poi.id === selectedPoi?.id) {
-        return false;
-      }
-      return (
-        poi.poi_qr_code === qrCode || poi.poi_location === poiLocation
-      );
-    });
+    const hasDuplicate = hasDuplicatePoi(
+      pois,
+      selectedPoi?.id ?? null,
+      qrCode,
+      poiLocation,
+    );
     if (hasDuplicate) {
       setFeedback("POI QR code and location must be unique.");
       return;
     }
 
-    const timestamp = new Date().toISOString();
+    const creationDate = new Date();
+    const timestamp = creationDate.toISOString();
     if (sheetMode === "create") {
-      const newPoiId = createPoiId(pois);
+      const newPoiId = createPoiId(pois, creationDate);
       setPois(function addPoi(currentPois) {
         const poi: PointOfInterest = {
           id: newPoiId,
           region_id: regionId,
           poi_image_url:
-            getFormValue(formData, "poi_image_url") || DEFAULT_POI_IMAGE_URL,
+            getPoiFormValue(formData, "poi_image_url") || DEFAULT_POI_IMAGE_URL,
           image_checksum_sha256:
-            getFormValue(formData, "image_checksum_sha256") || null,
+            getPoiFormValue(formData, "image_checksum_sha256") || null,
           poi_qr_code: qrCode,
           poi_name: poiName,
           poi_location: poiLocation,
           poi_status: POI_STATUS.INACTIVE,
-          latitude: Number(getFormValue(formData, "latitude")),
-          longitude: Number(getFormValue(formData, "longitude")),
+          latitude: Number(getPoiFormValue(formData, "latitude")),
+          longitude: Number(getPoiFormValue(formData, "longitude")),
           trigger_radius_meter: Number(
-            getFormValue(formData, "trigger_radius_meter"),
+            getPoiFormValue(formData, "trigger_radius_meter"),
           ),
           created_by: DEFAULT_MANAGEMENT_USER_ID,
           last_updated_by: DEFAULT_MANAGEMENT_USER_ID,
@@ -275,12 +206,9 @@ export function usePois() {
       return;
     }
     const requestedStatus = parsePoiStatus(
-      getFormValue(formData, "poi_status"),
+      getPoiFormValue(formData, "poi_status"),
     );
-    if (
-      requestedStatus === POI_STATUS.ACTIVE &&
-      !canActivateSelectedPoi
-    ) {
+    if (requestedStatus === POI_STATUS.ACTIVE && !canActivateSelectedPoi) {
       setFeedback(
         "This POI needs published English content with valid audio before activation.",
       );
@@ -296,17 +224,17 @@ export function usePois() {
           ...poi,
           region_id: regionId,
           poi_image_url:
-            getFormValue(formData, "poi_image_url") || DEFAULT_POI_IMAGE_URL,
+            getPoiFormValue(formData, "poi_image_url") || DEFAULT_POI_IMAGE_URL,
           image_checksum_sha256:
-            getFormValue(formData, "image_checksum_sha256") || null,
+            getPoiFormValue(formData, "image_checksum_sha256") || null,
           poi_qr_code: qrCode,
           poi_name: poiName,
           poi_location: poiLocation,
           poi_status: requestedStatus,
-          latitude: Number(getFormValue(formData, "latitude")),
-          longitude: Number(getFormValue(formData, "longitude")),
+          latitude: Number(getPoiFormValue(formData, "latitude")),
+          longitude: Number(getPoiFormValue(formData, "longitude")),
           trigger_radius_meter: Number(
-            getFormValue(formData, "trigger_radius_meter"),
+            getPoiFormValue(formData, "trigger_radius_meter"),
           ),
           last_updated_by: DEFAULT_MANAGEMENT_USER_ID,
           last_updated_at: timestamp,

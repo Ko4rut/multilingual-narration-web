@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { MOCK_POI_CONTENTS } from "@/features/poi-contents/mocks/poi-content.mock";
 import { POI_STATUS } from "@/features/pois/constants/poi.constants";
 import { MOCK_POIS } from "@/features/pois/mocks/pois.mock";
-import { canActivatePoi } from "@/features/pois/utils/utils";
+import { canActivatePoi } from "@/features/pois/utils/poi.utils";
 import { AUDIO_SOURCE_TYPE } from "../constants/audio.constants";
 import { MOCK_AUDIO_FILES } from "../mocks/audios.mock";
 import type {

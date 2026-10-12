@@ -1,6 +1,7 @@
 import type { FeatureFormMode } from "@/types/shared/feature-form.types";
 import type { CONTENT_STATUS } from "../constants/poi-content.constants";
 
+/** Tập giá trị trạng thái hợp lệ của nội dung thuyết minh. */
 export type ContentStatus =
   (typeof CONTENT_STATUS)[keyof typeof CONTENT_STATUS];
 
@@ -21,6 +22,7 @@ export interface PoiContent {
   published_at: string | null;
 }
 
+/** Các chỉ số tổng quan được tính từ danh sách POI content hiện tại. */
 export interface PoiContentsOverviewSummary {
   totalContents: number;
   publishedContents: number;
@@ -28,12 +30,12 @@ export interface PoiContentsOverviewSummary {
   coveredLanguages: number;
 }
 
-/** Props của component PoiContentStatusBadge. */
+/** Thuộc tính hiển thị badge trạng thái của POI content. */
 export interface PoiContentStatusBadgeProps {
   status: ContentStatus;
 }
 
-/** Props của component PoiContentTable. */
+/** Thuộc tính của bảng POI content và các thao tác trên từng hàng. */
 export interface PoiContentTableProps {
   contents: readonly PoiContent[];
   onCopyContent: (content: PoiContent) => void;
@@ -42,7 +44,7 @@ export interface PoiContentTableProps {
   onDeleteContent: (content: PoiContent) => void;
 }
 
-/** Props của component PoiContentFormSheet. */
+/** Thuộc tính điều khiển sheet tạo mới, xem và chỉnh sửa POI content. */
 export interface PoiContentFormSheetProps {
   open: boolean;
   mode: FeatureFormMode;

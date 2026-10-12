@@ -23,14 +23,14 @@ import type {
   PoiContent,
   PoiContentTableProps,
 } from "../types/poi-content.types";
+import {
+  createLanguageFilterOptions,
+  createPoiFilterOptions,
+  findPoiContentLanguage,
+  findPoiContentPoi,
+  formatPoiContentTimestamp,
+} from "../utils/poi-content.utils";
 import { PoiContentStatusBadge } from "./PoiContentStatusBadge";
-
-function formatTimestamp(value: string | null, locale: string) {
-  if (!value) {
-    return "—";
-  }
-  return new Date(value).toLocaleString(locale);
-}
 
 export function PoiContentTable({
   contents,
@@ -40,18 +40,8 @@ export function PoiContentTable({
   onDeleteContent,
 }: PoiContentTableProps) {
   const { t, locale } = usePreferences();
-  const languageOptions = MOCK_LANGUAGES.map(function createLanguageOption(
-    language,
-  ) {
-    return { value: language.id, label: language.language_name };
-  });
-  const poiOptions = MOCK_POIS.map(function createPoiOption(poi) {
-    return {
-      value: poi.id,
-      label: poi.poi_name,
-      description: poi.id,
-    };
-  });
+  const languageOptions = createLanguageFilterOptions(MOCK_LANGUAGES);
+  const poiOptions = createPoiFilterOptions(MOCK_POIS);
   const columns: readonly DataTableColumn<PoiContent>[] = [
     // Column Narration Content
     {
@@ -81,21 +71,19 @@ export function PoiContentTable({
       id: "references",
       header: t("References"),
       searchValue: function getReferenceSearchValue(content) {
-        const language = MOCK_LANGUAGES.find(function findLanguage(candidate) {
-          return candidate.id === content.language_id;
-        });
-        const poi = MOCK_POIS.find(function findPoi(candidate) {
-          return candidate.id === content.poi_id;
-        });
+        const language = findPoiContentLanguage(
+          content.language_id,
+          MOCK_LANGUAGES,
+        );
+        const poi = findPoiContentPoi(content.poi_id, MOCK_POIS);
         return `${content.poi_id} ${poi?.poi_name ?? ""} ${content.language_id} ${language?.language_code ?? ""} ${language?.language_name ?? ""}`;
       },
       cell: function renderReferences(content) {
-        const language = MOCK_LANGUAGES.find(function findLanguage(candidate) {
-          return candidate.id === content.language_id;
-        });
-        const poi = MOCK_POIS.find(function findPoi(candidate) {
-          return candidate.id === content.poi_id;
-        });
+        const language = findPoiContentLanguage(
+          content.language_id,
+          MOCK_LANGUAGES,
+        );
+        const poi = findPoiContentPoi(content.poi_id, MOCK_POIS);
         return (
           <div className="flex min-w-52 flex-col gap-1 font-mono text-xs">
             <span>
@@ -168,13 +156,22 @@ export function PoiContentTable({
         return (
           <div className="flex min-w-64 flex-col gap-1 text-xs">
             <span>
-              {t("Created")}: {formatTimestamp(content.created_at, locale)}
+              {t("Created")}: {formatPoiContentTimestamp(
+                content.created_at,
+                locale,
+              )}
             </span>
             <span>
-              {t("Approved")}: {formatTimestamp(content.approved_at, locale)}
+              {t("Approved")}: {formatPoiContentTimestamp(
+                content.approved_at,
+                locale,
+              )}
             </span>
             <span>
-              {t("Published")}: {formatTimestamp(content.published_at, locale)}
+              {t("Published")}: {formatPoiContentTimestamp(
+                content.published_at,
+                locale,
+              )}
             </span>
           </div>
         );
