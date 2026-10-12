@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type {
   DataTableColumn,
   DataTableFilter,
+  DataTablePageItem,
   UseDataTableOptions,
 } from "@/types/shared/data-table.types";
 
@@ -45,8 +46,8 @@ function matchesFilterValue(
 function createPageItems(
   currentPage: number,
   totalPages: number,
-): (number | "ellipsis")[] {
-  const visiblePages: (number | "ellipsis")[] = [];
+): DataTablePageItem[] {
+  const visiblePages: DataTablePageItem[] = [];
 
   if (totalPages <= 5) {
     for (let page = 1; page <= totalPages; page += 1) {

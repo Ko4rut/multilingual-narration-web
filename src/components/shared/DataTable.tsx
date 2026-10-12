@@ -49,70 +49,21 @@ import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { useDataTable } from "@/hooks/use-data-table";
 import { cn } from "@/lib/utils";
 import type {
+  DataTableContextValue,
   DataTableContentProps,
+  DataTableFilterOption,
   DataTableFilterProps,
   DataTableFiltersProps,
   DataTablePanelProps,
   DataTablePaginationProps,
   DataTableProps,
   DataTableSearchProps,
+  DataTableSearchableFilterProps,
   DataTableToolbarActionsProps,
   DataTableToolbarProps,
+  ResolvedDataTableColumn,
+  ResolvedDataTableFilter,
 } from "@/types/shared/data-table.types";
-
-interface ResolvedColumn {
-  id: string;
-  header: ReactNode;
-  accessor?: PropertyKey;
-  cell?: (row: unknown) => ReactNode;
-  className?: string;
-  headerClassName?: string;
-}
-
-interface ResolvedFilter {
-  id: string;
-  label: string;
-  options: readonly {
-    label: string;
-    value: string;
-    description?: string;
-  }[];
-  allLabel?: string;
-  searchable?: boolean;
-  searchPlaceholder?: string;
-  emptyMessage?: string;
-}
-
-interface ResolvedFilterOption {
-  label: string;
-  value: string;
-  description?: string;
-}
-
-interface DataTableContextValue {
-  columns: readonly ResolvedColumn[];
-  filters: readonly ResolvedFilter[];
-  paginatedData: readonly unknown[];
-  filteredItemCount: number;
-  filterValues: Record<string, string>;
-  searchQuery: string;
-  currentPage: number;
-  pageSize: number;
-  startIndex: number;
-  startItem: number;
-  endItem: number;
-  pageItems: readonly (number | "ellipsis")[];
-  canGoPrevious: boolean;
-  canGoNext: boolean;
-  allFiltersValue: string;
-  getRowId: (row: unknown, index: number) => string;
-  setSearchQuery: (value: string) => void;
-  setFilterValue: (filterId: string, value: string) => void;
-  setPageSize: (value: number) => void;
-  goToPage: (page: number) => void;
-  goToPreviousPage: () => void;
-  goToNextPage: () => void;
-}
 
 const DataTableContext = createContext<DataTableContextValue | null>(null);
 
@@ -147,7 +98,7 @@ function renderCellValue(value: unknown): ReactNode {
   return String(value);
 }
 
-function getCellContent(row: unknown, column: ResolvedColumn) {
+function getCellContent(row: unknown, column: ResolvedDataTableColumn) {
   if (column.cell) {
     return column.cell(row);
   }
@@ -172,8 +123,10 @@ function DataTable<TData>({
   ...props
 }: DataTableProps<TData>) {
   const table = useDataTable({ data, columns, filters, initialPageSize });
-  const resolvedColumns = columns as unknown as readonly ResolvedColumn[];
-  const resolvedFilters = filters as unknown as readonly ResolvedFilter[];
+  const resolvedColumns =
+    columns as unknown as readonly ResolvedDataTableColumn[];
+  const resolvedFilters =
+    filters as unknown as readonly ResolvedDataTableFilter[];
 
   function resolveRowId(row: unknown, index: number) {
     if (getRowId) {
@@ -295,7 +248,10 @@ function DataTableSearch({
         }}
         placeholder={t(placeholder)}
         aria-label={props["aria-label"] ?? t(placeholder)}
-        className={cn("pr-9 pl-9", className)}
+        className={cn(
+          "pr-9 pl-9 [&::-webkit-search-cancel-button]:hidden",
+          className,
+        )}
       />
       {/* Nút xóa nhanh chỉ xuất hiện khi đang có từ khóa. */}
       {table.searchQuery.length > 0 && (
@@ -367,11 +323,6 @@ function DataTableFilter({ filterId, className }: DataTableFilterProps) {
   );
 }
 
-interface DataTableSearchableFilterProps {
-  filter: ResolvedFilter;
-  className?: string;
-}
-
 /** Bộ lọc Combobox cho tập lựa chọn lớn, hỗ trợ tìm theo nhãn hiển thị. */
 function DataTableSearchableFilter({
   filter,
@@ -379,7 +330,7 @@ function DataTableSearchableFilter({
 }: DataTableSearchableFilterProps) {
   const { t } = usePreferences();
   const table = useDataTableContext();
-  const options: ResolvedFilterOption[] = [
+  const options: DataTableFilterOption[] = [
     {
       label: t(filter.allLabel ?? `All ${filter.label}`),
       value: table.allFiltersValue,
@@ -397,7 +348,7 @@ function DataTableSearchableFilter({
     return option.value === selectedValue;
   });
 
-  function handleValueChange(option: ResolvedFilterOption | null) {
+  function handleValueChange(option: DataTableFilterOption | null) {
     let nextValue = table.allFiltersValue;
 
     if (option) {
@@ -407,11 +358,11 @@ function DataTableSearchableFilter({
     table.setFilterValue(filter.id, nextValue);
   }
 
-  function getOptionLabel(option: ResolvedFilterOption) {
+  function getOptionLabel(option: DataTableFilterOption) {
     return option.label;
   }
 
-  function getOptionSearchValue(option: ResolvedFilterOption) {
+  function getOptionSearchValue(option: DataTableFilterOption) {
     let searchValue = `${option.label} ${option.value}`;
 
     if (option.description) {
@@ -421,7 +372,7 @@ function DataTableSearchableFilter({
     return searchValue;
   }
 
-  function renderOption(option: ResolvedFilterOption) {
+  function renderOption(option: DataTableFilterOption) {
     return (
       <ComboboxItem
         key={option.value}
