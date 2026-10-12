@@ -30,6 +30,56 @@ export interface DataTableFilter<TData> {
   emptyMessage?: string;
 }
 
+/** Cấu hình cột đã được chuẩn hóa để DataTable lưu trong context dùng chung. */
+export interface ResolvedDataTableColumn {
+  id: string;
+  header: ReactNode;
+  accessor?: PropertyKey;
+  cell?: (row: unknown) => ReactNode;
+  className?: string;
+  headerClassName?: string;
+}
+
+/** Cấu hình bộ lọc đã loại bỏ hàm đọc dữ liệu trước khi đưa vào context. */
+export interface ResolvedDataTableFilter {
+  id: string;
+  label: string;
+  options: readonly DataTableFilterOption[];
+  allLabel?: string;
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  emptyMessage?: string;
+}
+
+/** Một mục điều hướng được hiển thị dưới dạng số trang hoặc dấu rút gọn. */
+export type DataTablePageItem = number | "ellipsis";
+
+/** Trạng thái và hành động được chia sẻ cho các compound component của DataTable. */
+export interface DataTableContextValue {
+  columns: readonly ResolvedDataTableColumn[];
+  filters: readonly ResolvedDataTableFilter[];
+  paginatedData: readonly unknown[];
+  filteredItemCount: number;
+  filterValues: Record<string, string>;
+  searchQuery: string;
+  currentPage: number;
+  pageSize: number;
+  startIndex: number;
+  startItem: number;
+  endItem: number;
+  pageItems: readonly DataTablePageItem[];
+  canGoPrevious: boolean;
+  canGoNext: boolean;
+  allFiltersValue: string;
+  getRowId: (row: unknown, index: number) => string;
+  setSearchQuery: (value: string) => void;
+  setFilterValue: (filterId: string, value: string) => void;
+  setPageSize: (value: number) => void;
+  goToPage: (page: number) => void;
+  goToPreviousPage: () => void;
+  goToNextPage: () => void;
+}
+
 /** Thuộc tính gốc của DataTable và dữ liệu bảng cần điều phối. */
 export interface DataTableProps<TData>
   extends Omit<ComponentProps<"section">, "children"> {
@@ -59,6 +109,12 @@ export type DataTableSearchProps = Omit<
 /** Thuộc tính xác định bộ lọc mà control hiện tại đang điều khiển. */
 export interface DataTableFilterProps {
   filterId: string;
+  className?: string;
+}
+
+/** Thuộc tính của bộ lọc tìm kiếm dành cho tập lựa chọn lớn. */
+export interface DataTableSearchableFilterProps {
+  filter: ResolvedDataTableFilter;
   className?: string;
 }
 
