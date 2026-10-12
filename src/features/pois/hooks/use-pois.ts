@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { FeatureFormMode } from "@/types/shared/feature-form.types";
-import { MOCK_AUDIO_FILES } from "@/features/audios/mocks/audioData";
+import { MOCK_AUDIO_FILES } from "@/features/audios/mocks/audios.mock";
 import { MOCK_POI_CONTENTS } from "@/features/poi-contents/mocks/poi-content.mock";
 import {
   DEFAULT_MANAGEMENT_USER_ID,
@@ -15,7 +15,11 @@ import { MOCK_POI_CATEGORY_MAPPINGS } from "../mocks/poi-category-mappings.mock"
 import { MOCK_POIS } from "../mocks/pois.mock";
 import { MOCK_REGIONS } from "../mocks/regions.mock";
 import type { PoiCategoryMapping } from "../types/poi-category-mapping.types";
-import type { PointOfInterest, PoiStatus } from "../types/poi.types";
+import type {
+  PointOfInterest,
+  PoisOverviewSummary,
+  PoiStatus,
+} from "../types/poi.types";
 import { canActivatePoi } from "../utils/utils";
 
 function getFormValue(formData: FormData, key: string) {
@@ -65,6 +69,25 @@ function createPoiId(pois: readonly PointOfInterest[]) {
   return id;
 }
 
+function createOverviewSummary(
+  pois: readonly PointOfInterest[],
+): PoisOverviewSummary {
+  const activePois = pois.filter(function findActivePoi(poi) {
+    return poi.poi_status === POI_STATUS.ACTIVE;
+  }).length;
+
+  return {
+    totalPois: pois.length,
+    activePois,
+    inactivePois: pois.length - activePois,
+    coveredRegions: new Set(
+      pois.map(function getRegionId(poi) {
+        return poi.region_id;
+      }),
+    ).size,
+  };
+}
+
 export function usePois() {
   const [pois, setPois] = useState<PointOfInterest[]>(function initializePois() {
     return [...MOCK_POIS];
@@ -78,6 +101,9 @@ export function usePois() {
   const [selectedPoiId, setSelectedPoiId] = useState<string | null>(null);
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const overviewSummary = useMemo(function getOverviewSummary() {
+    return createOverviewSummary(pois);
+  }, [pois]);
   const selectedPoi =
     pois.find(function findSelectedPoi(poi) {
       return poi.id === selectedPoiId;
@@ -130,6 +156,15 @@ export function usePois() {
     setSheetOpen(open);
     if (!open) {
       setSelectedPoiId(null);
+    }
+  }
+
+  async function handleCopyPoi(poi: PointOfInterest) {
+    try {
+      await navigator.clipboard.writeText(poi.id);
+      setFeedback("POI ID copied.");
+    } catch {
+      setFeedback("Unable to copy the POI ID.");
     }
   }
 
@@ -298,6 +333,7 @@ export function usePois() {
 
   return {
     pois,
+    overviewSummary,
     poiCategoryMappings,
     selectedPoi,
     selectedCategoryIds,
@@ -310,6 +346,7 @@ export function usePois() {
     openEditSheet,
     editSelectedPoi,
     handleSheetOpenChange,
+    handleCopyPoi,
     handleDeletePoi,
     handleSubmit,
   };

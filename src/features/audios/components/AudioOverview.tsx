@@ -1,17 +1,29 @@
 "use client";
 
+import { AudioLines, Bot, Clock3, Mic2 } from "lucide-react";
 import {
   PageLayout,
   PageLayoutContent,
   PageLayoutHeader,
+  PageLayoutOverview,
+  PageLayoutStat,
 } from "@/components/shared/PageLayout";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { useAudios } from "../hooks/use-audios";
 import { AudioTable } from "./AudioTable";
 
 export function AudioOverview() {
-  const { t } = usePreferences();
-  const { audios, feedback, handleCopyAudio, handleDeleteAudio } = useAudios();
+  const { t, locale } = usePreferences();
+  const {
+    audios,
+    overviewSummary,
+    feedback,
+    handleCopyAudio,
+    handleDeleteAudio,
+  } = useAudios();
+  const totalDurationMinutes = Math.round(
+    overviewSummary.totalDurationSeconds / 60,
+  );
 
   return (
     <PageLayout>
@@ -19,6 +31,34 @@ export function AudioOverview() {
         title="Audio Management"
         description="Manage audio assets and integrity metadata linked to POI content."
       />
+      <PageLayoutOverview aria-label={t("Audio overview")}>
+        <PageLayoutStat
+          label="Total Audio"
+          value={overviewSummary.totalAudios.toLocaleString(locale)}
+          description="Audio assets"
+          icon={<AudioLines />}
+        />
+        <PageLayoutStat
+          label="Recorded Audio"
+          value={overviewSummary.recordedAudios.toLocaleString(locale)}
+          description="Human recordings"
+          icon={<Mic2 />}
+          iconClassName="bg-success/10 text-success"
+        />
+        <PageLayoutStat
+          label="TTS Audio"
+          value={overviewSummary.ttsAudios.toLocaleString(locale)}
+          description="Generated narration"
+          icon={<Bot />}
+        />
+        <PageLayoutStat
+          label="Total Duration"
+          value={`${totalDurationMinutes.toLocaleString(locale)} ${t("minutes")}`}
+          description="Across all audio assets"
+          icon={<Clock3 />}
+          iconClassName="bg-warning/10 text-warning"
+        />
+      </PageLayoutOverview>
       {feedback && (
         <p className="text-xs text-muted-foreground" role="status">
           {t(feedback)}

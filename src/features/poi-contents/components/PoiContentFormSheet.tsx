@@ -7,9 +7,9 @@ import {
 } from "@/components/shared/FeatureFormSheet";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { DEFAULT_MOCK_LANGUAGE_ID } from "@/features/languages/mocks/languages.mock";
 import { CONTENT_STATUS } from "../constants/poi-content.constants";
 import { usePoiContentFormSheet } from "../hooks/use-poi-content-form-sheet";
+import { DEFAULT_MOCK_LANGUAGE_ID } from "../mocks/languages.mock";
 import type { PoiContentFormSheetProps } from "../types/poi-content.types";
 
 export function PoiContentFormSheet({

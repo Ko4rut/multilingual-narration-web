@@ -1,22 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { MOCK_AUDIO_FILES } from "@/features/audios/mocks/audioData";
-import { LANGUAGE_STATUS } from "@/features/languages/constants/language.constants";
-import {
-  DEFAULT_MOCK_LANGUAGE_ID,
-  MOCK_LANGUAGES,
-} from "@/features/languages/mocks/languages.mock";
-import { POI_STATUS } from "@/features/pois/constants/poi.constants";
-import { MOCK_POIS } from "@/features/pois/mocks/pois.mock";
+import { useMemo, useState } from "react";
+import { MOCK_AUDIO_FILES } from "@/features/audios/mocks/audios.mock";
 import { canActivatePoi } from "@/features/pois/utils/utils";
 import type { FeatureFormMode } from "@/types/shared/feature-form.types";
 import {
   CONTENT_STATUS,
   DEFAULT_CONTENT_AUTHOR_ID,
 } from "../constants/poi-content.constants";
+import { LANGUAGE_STATUS } from "../constants/language.constants";
+import { POI_STATUS } from "../constants/poi.constants";
+import {
+  DEFAULT_MOCK_LANGUAGE_ID,
+  MOCK_LANGUAGES,
+} from "../mocks/languages.mock";
 import { MOCK_POI_CONTENTS } from "../mocks/poi-content.mock";
-import type { PoiContent } from "../types/poi-content.types";
+import { MOCK_POIS } from "../mocks/poi.mock";
+import type {
+  PoiContent,
+  PoiContentsOverviewSummary,
+} from "../types/poi-content.types";
 
 function getFormValue(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -61,6 +64,33 @@ function getNextVersion(
   return Math.max(...versions) + 1;
 }
 
+function createOverviewSummary(
+  contents: readonly PoiContent[],
+): PoiContentsOverviewSummary {
+  const publishedContents = contents.filter(function findPublishedContent(
+    content,
+  ) {
+    return content.content_status === CONTENT_STATUS.PUBLISHED;
+  }).length;
+  const pendingContents = contents.filter(function findPendingContent(content) {
+    return (
+      content.content_status === CONTENT_STATUS.WAITING_APPROVAL ||
+      content.content_status === CONTENT_STATUS.APPROVED
+    );
+  }).length;
+
+  return {
+    totalContents: contents.length,
+    publishedContents,
+    pendingContents,
+    coveredLanguages: new Set(
+      contents.map(function getLanguageId(content) {
+        return content.language_id;
+      }),
+    ).size,
+  };
+}
+
 export function usePoiContents() {
   const [contents, setContents] = useState<PoiContent[]>(
     function initializeContents() {
@@ -71,6 +101,9 @@ export function usePoiContents() {
   const [selectedContentId, setSelectedContentId] = useState<string | null>(null);
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const overviewSummary = useMemo(function getOverviewSummary() {
+    return createOverviewSummary(contents);
+  }, [contents]);
   const selectedContent =
     contents.find(function findSelectedContent(content) {
       return content.id === selectedContentId;
@@ -110,6 +143,15 @@ export function usePoiContents() {
     setSheetOpen(open);
     if (!open) {
       setSelectedContentId(null);
+    }
+  }
+
+  async function handleCopyContent(content: PoiContent) {
+    try {
+      await navigator.clipboard.writeText(content.id);
+      setFeedback("Content ID copied.");
+    } catch {
+      setFeedback("Unable to copy the content ID.");
     }
   }
 
@@ -235,6 +277,7 @@ export function usePoiContents() {
 
   return {
     contents,
+    overviewSummary,
     poiOptions,
     selectedContent,
     sheetMode,
@@ -245,6 +288,7 @@ export function usePoiContents() {
     openEditSheet,
     editSelectedContent,
     handleSheetOpenChange,
+    handleCopyContent,
     handleDeleteContent,
     handleSubmit,
   };

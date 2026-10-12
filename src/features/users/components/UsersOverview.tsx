@@ -45,7 +45,7 @@ export function UsersOverview() {
         </Button>
       </PageLayoutHeader>
 
-      {/* --- PageOvervview --- */}
+      {/* --- PageOverview --- */}
       <PageLayoutOverview aria-label={t("User overview")}>
         <PageLayoutStat
           label="Total Users"

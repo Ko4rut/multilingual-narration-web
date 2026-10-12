@@ -15,6 +15,7 @@ export interface DataTableColumn<TData> {
 export interface DataTableFilterOption {
   label: string;
   value: string;
+  description?: string;
 }
 
 /** Cấu hình bộ lọc và cách lấy giá trị lọc từ mỗi bản ghi. */
@@ -24,6 +25,9 @@ export interface DataTableFilter<TData> {
   options: readonly DataTableFilterOption[];
   getValue: (row: TData) => string | readonly string[];
   allLabel?: string;
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  emptyMessage?: string;
 }
 
 /** Thuộc tính gốc của DataTable và dữ liệu bảng cần điều phối. */

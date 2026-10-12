@@ -11,13 +11,14 @@ import {
   DataTableToolbarActions,
 } from "@/components/shared/DataTable";
 import { MoreMenu } from "@/components/shared/MoreMenu";
-import { MOCK_LANGUAGES } from "@/features/languages/mocks/languages.mock";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type {
   DataTableColumn,
   DataTableFilter,
 } from "@/types/shared/data-table.types";
 import { CONTENT_STATUS_OPTIONS } from "../constants/poi-content.constants";
+import { MOCK_LANGUAGES } from "../mocks/languages.mock";
+import { MOCK_POIS } from "../mocks/poi.mock";
 import type {
   PoiContent,
   PoiContentTableProps,
@@ -35,6 +36,7 @@ export function PoiContentTable({
   contents,
   onViewContent,
   onEditContent,
+  onCopyContent,
   onDeleteContent,
 }: PoiContentTableProps) {
   const { t, locale } = usePreferences();
@@ -43,7 +45,15 @@ export function PoiContentTable({
   ) {
     return { value: language.id, label: language.language_name };
   });
+  const poiOptions = MOCK_POIS.map(function createPoiOption(poi) {
+    return {
+      value: poi.id,
+      label: poi.poi_name,
+      description: poi.id,
+    };
+  });
   const columns: readonly DataTableColumn<PoiContent>[] = [
+    // Column Narration Content
     {
       id: "content",
       header: t("Narration content"),
@@ -52,20 +62,21 @@ export function PoiContentTable({
       },
       cell: function renderContent(content) {
         return (
-          <div className="flex min-w-80 max-w-112 flex-col gap-1">
+          <div className="flex min-w-80 max-w-96 flex-col gap-1">
             <span className="font-medium text-foreground">
               {content.narration_title}
             </span>
-            <span className="line-clamp-2 text-xs text-muted-foreground">
+            <span className="truncate text-xs text-muted-foreground">
               {content.narration_script}
             </span>
-            <span className="font-mono text-xs text-muted-foreground">
+            <span className="font-mono text-xs text-success">
               {content.id}
             </span>
           </div>
         );
       },
     },
+    // Column References
     {
       id: "references",
       header: t("References"),
@@ -73,16 +84,22 @@ export function PoiContentTable({
         const language = MOCK_LANGUAGES.find(function findLanguage(candidate) {
           return candidate.id === content.language_id;
         });
-        return `${content.poi_id} ${content.language_id} ${language?.language_code ?? ""} ${language?.language_name ?? ""}`;
+        const poi = MOCK_POIS.find(function findPoi(candidate) {
+          return candidate.id === content.poi_id;
+        });
+        return `${content.poi_id} ${poi?.poi_name ?? ""} ${content.language_id} ${language?.language_code ?? ""} ${language?.language_name ?? ""}`;
       },
       cell: function renderReferences(content) {
         const language = MOCK_LANGUAGES.find(function findLanguage(candidate) {
           return candidate.id === content.language_id;
         });
+        const poi = MOCK_POIS.find(function findPoi(candidate) {
+          return candidate.id === content.poi_id;
+        });
         return (
           <div className="flex min-w-52 flex-col gap-1 font-mono text-xs">
             <span>
-              {t("POI")}: {content.poi_id}
+              {t("POI")}: {poi?.poi_name ?? content.poi_id}
             </span>
             <span>
               {t("Language")}: {t(language?.language_name ?? content.language_id)}
@@ -91,6 +108,7 @@ export function PoiContentTable({
         );
       },
     },
+    // Column Version
     {
       id: "content_version",
       header: t("Version"),
@@ -99,6 +117,7 @@ export function PoiContentTable({
         return `v${content.content_version}`;
       },
     },
+    // Column Content Status
     {
       id: "content_status",
       header: t("Content status"),
@@ -107,6 +126,7 @@ export function PoiContentTable({
         return <PoiContentStatusBadge status={content.content_status} />;
       },
     },
+    // Column Workflow Users
     {
       id: "workflow_users",
       header: t("Workflow users"),
@@ -133,6 +153,7 @@ export function PoiContentTable({
         );
       },
     },
+    // Column Workflow Timestamps
     {
       id: "workflow_timestamps",
       header: t("Workflow timestamps"),
@@ -159,6 +180,7 @@ export function PoiContentTable({
         );
       },
     },
+    // Column Actions
     {
       id: "actions",
       header: <span className="sr-only">{t("Actions")}</span>,
@@ -167,6 +189,9 @@ export function PoiContentTable({
       cell: function renderActions(content) {
         return (
           <MoreMenu
+            onCopy={function handleCopy() {
+              onCopyContent(content);
+            }}
             onView={function handleView() {
               onViewContent(content);
             }}
@@ -182,6 +207,18 @@ export function PoiContentTable({
     },
   ];
   const filters: readonly DataTableFilter<PoiContent>[] = [
+    {
+      id: "poi_id",
+      label: "POI",
+      allLabel: "All POIs",
+      options: poiOptions,
+      searchable: true,
+      searchPlaceholder: "Search POIs by name or ID...",
+      emptyMessage: "No POIs found.",
+      getValue: function getPoiId(content) {
+        return content.poi_id;
+      },
+    },
     {
       id: "content_status",
       label: "Content status",

@@ -17,6 +17,13 @@ export interface ContentAudio {
   last_updated_at: string | null;
 }
 
+export interface AudiosOverviewSummary {
+  totalAudios: number;
+  recordedAudios: number;
+  ttsAudios: number;
+  totalDurationSeconds: number;
+}
+
 export interface AudioStatusBadgeProps {
   type: AudioSourceType;
 }

@@ -23,6 +23,13 @@ export interface PointOfInterest {
   last_updated_at: string;
 }
 
+export interface PoisOverviewSummary {
+  totalPois: number;
+  activePois: number;
+  inactivePois: number;
+  coveredRegions: number;
+}
+
 export interface PoisStatusBadgeProps {
   status: PoiStatus;
 }
@@ -32,6 +39,7 @@ export interface PoisTableProps {
   categoryMappings: readonly PoiCategoryMapping[];
   onViewPoi: (poi: PointOfInterest) => void;
   onEditPoi: (poi: PointOfInterest) => void;
+  onCopyPoi: (poi: PointOfInterest) => void;
   onDeletePoi: (poi: PointOfInterest) => void;
 }
 

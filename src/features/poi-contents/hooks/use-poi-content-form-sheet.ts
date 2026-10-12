@@ -1,11 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
-import { LANGUAGE_STATUS } from "@/features/languages/constants/language.constants";
-import { MOCK_LANGUAGES } from "@/features/languages/mocks/languages.mock";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type { FeatureFormMode, FormComboboxOption } from "@/types/shared/feature-form.types";
+import { LANGUAGE_STATUS } from "../constants/language.constants";
 import { CONTENT_STATUS_OPTIONS } from "../constants/poi-content.constants";
+import { MOCK_LANGUAGES } from "../mocks/languages.mock";
 
 export function usePoiContentFormSheet(mode: FeatureFormMode) {
   const { t } = usePreferences();

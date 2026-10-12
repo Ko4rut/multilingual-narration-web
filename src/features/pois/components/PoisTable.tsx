@@ -28,10 +28,12 @@ export function PoisTable({
   categoryMappings,
   onViewPoi,
   onEditPoi,
+  onCopyPoi,
   onDeletePoi,
 }: PoisTableProps) {
   const { t, locale } = usePreferences();
   const columns: readonly DataTableColumn<PointOfInterest>[] = [
+    // Column POI
     {
       id: "poi",
       header: t("Point of Interest"),
@@ -51,7 +53,7 @@ export function PoisTable({
               <p className="truncate text-sm font-medium text-foreground">
                 {poi.poi_name}
               </p>
-              <p className="truncate font-mono text-xs text-muted-foreground">
+              <p className="truncate font-mono text-xs text-success">
                 {poi.id}
               </p>
             </div>
@@ -59,6 +61,7 @@ export function PoisTable({
         );
       },
     },
+    // Column Region
     {
       id: "region_id",
       header: t("Region"),
@@ -76,7 +79,7 @@ export function PoisTable({
           return <span className="font-mono text-xs">{poi.region_id}</span>;
         }
         return (
-          <div className="flex min-w-40 flex-col gap-1">
+          <div className="flex min-w-32 max-w-40 truncate flex-col gap-1">
             <span className="text-sm text-foreground">
               {t(region.region_name)}
             </span>
@@ -87,31 +90,24 @@ export function PoisTable({
         );
       },
     },
+    // Column Location & GPS & Trigger Radius
     {
       id: "location",
-      header: t("Location & GPS"),
-      searchValue: function getLocationSearchValue(poi) {
-        return `${poi.poi_location} ${poi.latitude} ${poi.longitude}`;
-      },
+      header: t("Location & GPS & Trigger Radius"),
       cell: function renderLocation(poi) {
         return (
-          <div className="flex min-w-72 flex-col gap-1">
+          <div className="flex min-w-72 max-w-92 truncate flex-col gap-1">
             <span className="text-sm text-foreground">{poi.poi_location}</span>
             <span className="font-mono text-xs text-muted-foreground">
               {formatCoordinates(poi.latitude, poi.longitude)}
+              <span aria-hidden="true"> · </span>
+              {t("Trigger radius")}: {poi.trigger_radius_meter.toLocaleString(locale)} m
             </span>
           </div>
         );
       },
     },
-    {
-      id: "trigger_radius_meter",
-      header: t("Trigger radius"),
-      accessor: "trigger_radius_meter",
-      cell: function renderTriggerRadius(poi) {
-        return `${poi.trigger_radius_meter.toLocaleString(locale)} m`;
-      },
-    },
+    // Column Status
     {
       id: "poi_status",
       header: t("Status"),
@@ -120,6 +116,7 @@ export function PoisTable({
         return <PoisStatusBadge status={poi.poi_status} />;
       },
     },
+    // Column Audit
     {
       id: "audit",
       header: t("Audit details"),
@@ -142,6 +139,7 @@ export function PoisTable({
         );
       },
     },
+    // Column Actions
     {
       id: "actions",
       header: <span className="sr-only">{t("Actions")}</span>,
@@ -155,6 +153,9 @@ export function PoisTable({
             }}
             onEdit={function handleEdit() {
               onEditPoi(poi);
+            }}
+            onCopy={function handleCopy() {
+              onCopyPoi(poi);
             }}
             onDelete={function handleDelete() {
               onDeletePoi(poi);
@@ -224,10 +225,7 @@ export function PoisTable({
             <DataTableFilters />
           </DataTableToolbarActions>
         </DataTableToolbar>
-        <DataTableContent
-          emptyMessage="No POIs match your filters."
-          className="min-w-[1120px]"
-        />
+        <DataTableContent emptyMessage="No POIs match your filters." className="min-w-[1120px]"/>
         <DataTablePagination itemLabel="POIs" pageSizeOptions={[10]} />
       </DataTablePanel>
     </DataTable>
