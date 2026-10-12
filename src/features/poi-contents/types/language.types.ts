@@ -1,0 +1,12 @@
+import type { LANGUAGE_STATUS } from "../constants/language.constants";
+
+export type LanguageStatus =
+  (typeof LANGUAGE_STATUS)[keyof typeof LANGUAGE_STATUS];
+
+/** Bản ghi Languages được POI content sử dụng làm dữ liệu tham chiếu. */
+export interface Language {
+  id: string;
+  language_code: string;
+  language_name: string;
+  language_status: LanguageStatus;
+}

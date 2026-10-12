@@ -6,10 +6,7 @@ export const POI_STATUS = {
 export const POI_STATUS_LABELS = {
   [POI_STATUS.ACTIVE]: "Active",
   [POI_STATUS.INACTIVE]: "Inactive",
-} as const satisfies Record<
-  (typeof POI_STATUS)[keyof typeof POI_STATUS],
-  string
->;
+} as const satisfies Record<(typeof POI_STATUS)[keyof typeof POI_STATUS], string>;
 
 export const POI_STATUS_OPTIONS = [
   {

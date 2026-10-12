@@ -7,14 +7,7 @@ export function PoisStatusBadge({ status }: PoisStatusBadgeProps) {
   const { t } = usePreferences();
 
   if (status === POI_STATUS.ACTIVE) {
-    return (
-      <StatusBadge
-        label={t(POI_STATUS_LABELS[status])}
-        tone="success"
-        pulse
-      />
-    );
+    return <StatusBadge label={t(POI_STATUS_LABELS[status])} tone="success" pulse />;
   }
-
   return <StatusBadge label={t(POI_STATUS_LABELS[status])} tone="neutral" />;
 }

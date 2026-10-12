@@ -21,17 +21,28 @@ export interface PoiContent {
   published_at: string | null;
 }
 
+export interface PoiContentsOverviewSummary {
+  totalContents: number;
+  publishedContents: number;
+  pendingContents: number;
+  coveredLanguages: number;
+}
+
+/** Props của component PoiContentStatusBadge. */
 export interface PoiContentStatusBadgeProps {
   status: ContentStatus;
 }
 
+/** Props của component PoiContentTable. */
 export interface PoiContentTableProps {
   contents: readonly PoiContent[];
+  onCopyContent: (content: PoiContent) => void;
   onViewContent: (content: PoiContent) => void;
   onEditContent: (content: PoiContent) => void;
   onDeleteContent: (content: PoiContent) => void;
 }
 
+/** Props của component PoiContentFormSheet. */
 export interface PoiContentFormSheetProps {
   open: boolean;
   mode: FeatureFormMode;

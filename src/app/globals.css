@@ -13,6 +13,7 @@
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-border: var(--border);
+  --color-hover: var(--hover);
   --color-accent: var(--accent);
   --color-success: var(--success);
   --color-success-emphasis: var(--success-emphasis);

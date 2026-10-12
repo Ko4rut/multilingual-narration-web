@@ -1,0 +1,4 @@
+export const LANGUAGE_STATUS = {
+  SUPPORTED: "SUPPORTED",
+  UNSUPPORTED: "UNSUPPORTED",
+} as const;

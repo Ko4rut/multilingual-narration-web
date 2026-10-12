@@ -13,6 +13,15 @@ import {
   XIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxTrigger,
+} from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import {
   Pagination,
@@ -63,8 +72,21 @@ interface ResolvedColumn {
 interface ResolvedFilter {
   id: string;
   label: string;
-  options: readonly { label: string; value: string }[];
+  options: readonly {
+    label: string;
+    value: string;
+    description?: string;
+  }[];
   allLabel?: string;
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  emptyMessage?: string;
+}
+
+interface ResolvedFilterOption {
+  label: string;
+  value: string;
+  description?: string;
 }
 
 interface DataTableContextValue {
@@ -306,6 +328,10 @@ function DataTableFilter({ filterId, className }: DataTableFilterProps) {
     return null;
   }
 
+  if (filter.searchable) {
+    return <DataTableSearchableFilter filter={filter} className={className} />;
+  }
+
   const selectedValue =
     table.filterValues[filter.id] ?? table.allFiltersValue;
 
@@ -338,6 +364,124 @@ function DataTableFilter({ filterId, className }: DataTableFilterProps) {
         })}
       </SelectContent>
     </Select>
+  );
+}
+
+interface DataTableSearchableFilterProps {
+  filter: ResolvedFilter;
+  className?: string;
+}
+
+/** Bộ lọc Combobox cho tập lựa chọn lớn, hỗ trợ tìm theo nhãn hiển thị. */
+function DataTableSearchableFilter({
+  filter,
+  className,
+}: DataTableSearchableFilterProps) {
+  const { t } = usePreferences();
+  const table = useDataTableContext();
+  const options: ResolvedFilterOption[] = [
+    {
+      label: t(filter.allLabel ?? `All ${filter.label}`),
+      value: table.allFiltersValue,
+    },
+    ...filter.options.map(function translateOption(option) {
+      return {
+        label: t(option.label),
+        value: option.value,
+        description: option.description,
+      };
+    }),
+  ];
+  const selectedValue = table.filterValues[filter.id] ?? table.allFiltersValue;
+  const selectedOption = options.find(function findSelectedOption(option) {
+    return option.value === selectedValue;
+  });
+
+  function handleValueChange(option: ResolvedFilterOption | null) {
+    let nextValue = table.allFiltersValue;
+
+    if (option) {
+      nextValue = option.value;
+    }
+
+    table.setFilterValue(filter.id, nextValue);
+  }
+
+  function getOptionLabel(option: ResolvedFilterOption) {
+    return option.label;
+  }
+
+  function getOptionSearchValue(option: ResolvedFilterOption) {
+    let searchValue = `${option.label} ${option.value}`;
+
+    if (option.description) {
+      searchValue = `${option.label} ${option.description}`;
+    }
+
+    return searchValue;
+  }
+
+  function renderOption(option: ResolvedFilterOption) {
+    return (
+      <ComboboxItem
+        key={option.value}
+        value={option}
+        className="items-start py-2 data-highlighted:bg-hover! data-highlighted:text-foreground!"
+      >
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <span className="truncate font-medium text-foreground">
+            {option.label}
+          </span>
+          {option.description && (
+            <span className="truncate font-mono text-xs text-muted-foreground">
+              {option.description}
+            </span>
+          )}
+        </div>
+      </ComboboxItem>
+    );
+  }
+
+  return (
+    <Combobox
+      items={options}
+      value={selectedOption ?? options[0]}
+      onValueChange={handleValueChange}
+      itemToStringLabel={getOptionLabel}
+      itemToStringValue={getOptionSearchValue}
+    >
+      <ComboboxTrigger
+        aria-label={t(filter.label)}
+        render={
+          <Button
+            type="button"
+            variant="outline"
+            className={cn(
+              "min-w-72 justify-between bg-background font-normal",
+              className,
+            )}
+          />
+        }
+      >
+        <span className="truncate">
+          {selectedOption?.label ?? t(filter.label)}
+        </span>
+      </ComboboxTrigger>
+      <ComboboxContent>
+        <ComboboxInput
+          aria-label={t(filter.searchPlaceholder ?? filter.label)}
+          placeholder={t(filter.searchPlaceholder ?? filter.label)}
+          showTrigger={false}
+          className="border-transparent! has-[[data-slot=input-group-control]:focus-visible]:border-transparent! has-[[data-slot=input-group-control]:focus-visible]:ring-0! [&_[data-slot=input-group-control]:focus-visible]:outline-none!"
+        />
+        <ComboboxEmpty>
+          {t(filter.emptyMessage ?? "No results found.")}
+        </ComboboxEmpty>
+        <ComboboxList className="scrollbar-hidden">
+          {renderOption}
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
   );
 }
 

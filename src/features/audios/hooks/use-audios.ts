@@ -1,12 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { MOCK_POI_CONTENTS } from "@/features/poi-contents/mocks/poi-content.mock";
 import { POI_STATUS } from "@/features/pois/constants/poi.constants";
 import { MOCK_POIS } from "@/features/pois/mocks/pois.mock";
 import { canActivatePoi } from "@/features/pois/utils/utils";
-import { MOCK_AUDIO_FILES } from "../mocks/audioData";
-import type { ContentAudio } from "../types/audio.types";
+import { AUDIO_SOURCE_TYPE } from "../constants/audio.constants";
+import { MOCK_AUDIO_FILES } from "../mocks/audios.mock";
+import type {
+  AudiosOverviewSummary,
+  ContentAudio,
+} from "../types/audio.types";
+
+function createOverviewSummary(
+  audios: readonly ContentAudio[],
+): AudiosOverviewSummary {
+  let recordedAudios = 0;
+  let ttsAudios = 0;
+  let totalDurationSeconds = 0;
+
+  audios.forEach(function addAudioToSummary(audio) {
+    if (audio.audio_source_type === AUDIO_SOURCE_TYPE.RECORD) {
+      recordedAudios += 1;
+    }
+    if (audio.audio_source_type === AUDIO_SOURCE_TYPE.TTS) {
+      ttsAudios += 1;
+    }
+    totalDurationSeconds += audio.audio_duration_sec;
+  });
+
+  return {
+    totalAudios: audios.length,
+    recordedAudios,
+    ttsAudios,
+    totalDurationSeconds,
+  };
+}
 
 export function useAudios() {
   const [audios, setAudios] = useState<ContentAudio[]>(
@@ -15,6 +44,9 @@ export function useAudios() {
     },
   );
   const [feedback, setFeedback] = useState<string | null>(null);
+  const overviewSummary = useMemo(function getOverviewSummary() {
+    return createOverviewSummary(audios);
+  }, [audios]);
 
   async function handleCopyAudio(audio: ContentAudio) {
     try {
@@ -51,5 +83,11 @@ export function useAudios() {
     setFeedback("Audio deleted from demo data.");
   }
 
-  return { audios, feedback, handleCopyAudio, handleDeleteAudio };
+  return {
+    audios,
+    overviewSummary,
+    feedback,
+    handleCopyAudio,
+    handleDeleteAudio,
+  };
 }
