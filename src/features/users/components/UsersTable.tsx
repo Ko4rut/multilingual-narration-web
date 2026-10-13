@@ -154,7 +154,6 @@ export function UsersTable({ users, onViewUser, onEditUser }: UsersTableProps) {
       getRowId={function getUserId(user) {
         return user.id;
       }}
-      initialPageSize={10}
     >
       <DataTablePanel>
         <DataTableToolbar>

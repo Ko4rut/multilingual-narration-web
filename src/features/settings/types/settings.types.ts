@@ -21,15 +21,6 @@ export type PreferencesContextValue = {
   setTheme: (value: Theme) => void;
 };
 
-export type SettingsTab = "general" | "account" | "appearance" | "notifications";
-export type SettingsPageProps = {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-};
-
-export type SettingsOverviewProps = {
-  tab: SettingsTab;
-};
-
 export type ApplicationDefaultsProps = {
   language: string;
   theme: string;

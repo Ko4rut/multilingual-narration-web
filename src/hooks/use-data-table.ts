@@ -120,6 +120,9 @@ export function useDataTable<TData>({
   }
   const endItem = Math.min(startIndex + pageSize, filteredData.length);
   const pageItems = createPageItems(activePage, totalPages);
+  const hasActiveFilters = filters.some(function checkActiveFilter(filter) {
+    return (filterValues[filter.id] ?? ALL_FILTERS) !== ALL_FILTERS;
+  });
 
   function setSearchQuery(value: string) {
     setSearchQueryState(value);
@@ -130,6 +133,11 @@ export function useDataTable<TData>({
     setFilterValues(function updateFilterValues(currentValues) {
       return { ...currentValues, [filterId]: value };
     });
+    setCurrentPage(1);
+  }
+
+  function resetFilters() {
+    setFilterValues(createInitialFilters(filters));
     setCurrentPage(1);
   }
 
@@ -167,9 +175,11 @@ export function useDataTable<TData>({
     pageItems,
     canGoPrevious: activePage > 1,
     canGoNext: activePage < totalPages,
+    hasActiveFilters,
     allFiltersValue: ALL_FILTERS,
     setSearchQuery,
     setFilterValue,
+    resetFilters,
     setPageSize,
     goToPage,
     goToPreviousPage,

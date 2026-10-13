@@ -152,7 +152,6 @@ export function LanguagesTable({
       getRowId={function getLanguageId(language) {
         return language.id;
       }}
-      initialPageSize={10}
     >
       <DataTablePanel>
         <DataTableToolbar>

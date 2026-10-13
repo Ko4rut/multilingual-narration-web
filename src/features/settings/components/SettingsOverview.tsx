@@ -7,7 +7,6 @@ import {
   PageLayoutHeader,
 } from "@/components/shared/PageLayout";
 import { useGeneralSettings } from "../hooks/use-general-settings";
-import type { SettingsOverviewProps } from "../types/settings.types";
 
 import { ApplicationDefaults } from "./ApplicationDefaults";
 import { GeofenceConfig } from "./GeofenceConfig";
@@ -15,7 +14,7 @@ import { SecurityMaintenance } from "./SecurityMaintenance";
 import { AudioSystemSettings } from "./AudioSystemSettings";
 import { ContentWorkflow } from "./ContentWorkflow";
 
-export function SettingsOverview(props: SettingsOverviewProps) {
+export function SettingsOverview() {
   const {
     t,
     formData,
@@ -25,7 +24,7 @@ export function SettingsOverview(props: SettingsOverviewProps) {
     handleLanguageChange,
     handleThemeChange,
     handleSave,
-  } = useGeneralSettings(props);
+  } = useGeneralSettings();
 
   return (
     <PageLayout>

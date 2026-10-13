@@ -24,7 +24,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { FORM_COMBOBOX_DEFAULT_PLACEHOLDER } from "@/constants/components";
+import {
+  COMBOBOX_MATCH_TRIGGER_WIDTH_CLASS,
+  FORM_COMBOBOX_DEFAULT_PLACEHOLDER,
+} from "@/constants/components";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type {
   FeatureFormSheetProps,
@@ -73,9 +76,27 @@ export function FeatureFormSheet({
     onOpenChange(false);
   }
 
+  function handleInteractOutside(event: Event) {
+    const target = event.target;
+    if (!(target instanceof Element)) {
+      return;
+    }
+    if (target.closest('[data-slot="combobox-content"]')) {
+      event.preventDefault();
+    }
+  }
+
+  function handleFocusOutside(event: Event) {
+    event.preventDefault();
+  }
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full gap-0 overflow-hidden sm:max-w-lg">
+    <Sheet modal={false} open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        className="w-full gap-0 overflow-hidden sm:max-w-lg"
+        onFocusOutside={handleFocusOutside}
+        onInteractOutside={handleInteractOutside}
+      >
         {/* Tiêu đề và mô tả thay đổi theo chế độ của form. */}
         <SheetHeader className="border-b">
           <SheetTitle>
@@ -176,7 +197,7 @@ export function FormCombobox({
         value={option.value}
         className="text-xs"
       >
-        {option.label}
+        <span className="min-w-0 flex-1 truncate">{option.label}</span>
       </ComboboxItem>
     );
   }
@@ -200,8 +221,12 @@ export function FormCombobox({
         </ComboboxValue>
       </ComboboxTrigger>
       {/* Danh sách các lựa chọn được chuẩn hóa từ options. */}
-      <ComboboxContent>
-        <ComboboxList>{options.map(renderOption)}</ComboboxList>
+      <ComboboxContent
+        className={COMBOBOX_MATCH_TRIGGER_WIDTH_CLASS}
+      >
+        <ComboboxList className="scrollbar-hidden">
+          {options.map(renderOption)}
+        </ComboboxList>
       </ComboboxContent>
     </Combobox>
   );
@@ -267,7 +292,7 @@ export function FormMultiCombobox({
         value={option}
         className="text-xs"
       >
-        {option.label}
+        <span className="min-w-0 flex-1 truncate">{option.label}</span>
       </ComboboxItem>
     );
   }
@@ -303,8 +328,13 @@ export function FormMultiCombobox({
           className="ml-auto shrink-0"
         />
       </ComboboxChips>
-      <ComboboxContent anchor={anchor}>
-        <ComboboxList>{options.map(renderOption)}</ComboboxList>
+      <ComboboxContent
+        anchor={anchor}
+        className={COMBOBOX_MATCH_TRIGGER_WIDTH_CLASS}
+      >
+        <ComboboxList className="scrollbar-hidden">
+          {options.map(renderOption)}
+        </ComboboxList>
       </ComboboxContent>
       {selectedOptions.map(renderHiddenInput)}
     </Combobox>

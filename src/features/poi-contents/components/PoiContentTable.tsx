@@ -200,7 +200,6 @@ export function PoiContentTable({
       getRowId={function getContentId(content) {
         return content.id;
       }}
-      initialPageSize={10}
     >
       <DataTablePanel>
         <DataTableToolbar>
