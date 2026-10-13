@@ -19,6 +19,8 @@ import { Button } from "@/components/ui/button";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { usePoiContents } from "../hooks/use-poi-contents";
 import { PoiContentFormSheet } from "./PoiContentFormSheet";
+import { PoiContentPublishSheet } from "./PoiContentPublishSheet";
+import { PoiContentReviewSheet } from "./PoiContentReviewSheet";
 import { PoiContentTable } from "./PoiContentTable";
 
 export function PoiContentOverview() {
@@ -30,6 +32,14 @@ export function PoiContentOverview() {
     selectedContent,
     sheetMode,
     isSheetOpen,
+    reviewContent,
+    isReviewSheetOpen,
+    reviewNote,
+    publishContent,
+    isPublishSheetOpen,
+    publishAudio,
+    archivedContent,
+    workflowError,
     feedback,
     openCreateSheet,
     openViewSheet,
@@ -39,6 +49,16 @@ export function PoiContentOverview() {
     handleCopyContent,
     handleDeleteContent,
     handleSubmit,
+    handleSubmitForApproval,
+    openReviewSheet,
+    handleReviewSheetOpenChange,
+    handleReviewNoteChange,
+    handleApproveContent,
+    handleRejectContent,
+    openPublishSheet,
+    handlePublishSheetOpenChange,
+    handleGenerateAudio,
+    handlePublishContent,
   } = usePoiContents();
   let sheetKey = "create";
   if (selectedContent) {
@@ -104,6 +124,9 @@ export function PoiContentOverview() {
           onViewContent={openViewSheet}
           onEditContent={openEditSheet}
           onDeleteContent={handleDeleteContent}
+          onSubmitContent={handleSubmitForApproval}
+          onReviewContent={openReviewSheet}
+          onPublishContent={openPublishSheet}
         />
       </PageLayoutContent>
       <PoiContentFormSheet
@@ -115,6 +138,28 @@ export function PoiContentOverview() {
         onOpenChange={handleSheetOpenChange}
         onSubmit={handleSubmit}
         onEdit={editSelectedContent}
+      />
+      <PoiContentReviewSheet
+        open={isReviewSheetOpen}
+        content={reviewContent}
+        reviewNote={reviewNote}
+        errorMessage={workflowError}
+        onOpenChange={handleReviewSheetOpenChange}
+        onReviewNoteChange={handleReviewNoteChange}
+        onApprove={handleApproveContent}
+        onReject={handleRejectContent}
+      />
+      <PoiContentPublishSheet
+        open={isPublishSheetOpen}
+        content={publishContent}
+        hasValidAudio={Boolean(publishAudio)}
+        audioDurationSeconds={publishAudio?.audio_duration_sec ?? null}
+        audioMimeType={publishAudio?.audio_mime_type ?? null}
+        archivedContent={archivedContent}
+        errorMessage={workflowError}
+        onOpenChange={handlePublishSheetOpenChange}
+        onGenerateAudio={handleGenerateAudio}
+        onPublish={handlePublishContent}
       />
     </PageLayout>
   );

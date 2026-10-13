@@ -1,8 +1,15 @@
 /** @file Contract dữ liệu và props dành riêng cho feature hồ sơ cá nhân. */
 import type { LucideIcon } from "lucide-react";
+import type { Locale } from "@/i18n/types";
 
 /** Trạng thái tài khoản có thể hiển thị trên hồ sơ người dùng. */
 export type ProfileStatus = "ACTIVE" | "DISABLED";
+
+/** Một lựa chọn ngôn ngữ có thể sử dụng trên trang hồ sơ. */
+export type ProfileLanguageOption = {
+  value: Locale;
+  label: string;
+};
 
 /** Hồ sơ đầy đủ của nhân viên đang đăng nhập. */
 export type EmployeeProfile = {

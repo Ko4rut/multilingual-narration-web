@@ -21,6 +21,7 @@ export function useUsers() {
   const [sheetMode, setSheetMode] = useState<FeatureFormMode>("create");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isSheetOpen, setSheetOpen] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const selectedUser = users.find(function findSelectedUser(user) {
     return user.id === selectedUserId;
@@ -33,18 +34,21 @@ export function useUsers() {
     setSelectedUserId(null);
     setSheetMode("create");
     setSheetOpen(true);
+    setFormError(null);
   }
 
   function openViewSheet(user: ManagerUser) {
     setSelectedUserId(user.id);
     setSheetMode("view");
     setSheetOpen(true);
+    setFormError(null);
   }
 
   function openEditSheet(user: ManagerUser) {
     setSelectedUserId(user.id);
     setSheetMode("edit");
     setSheetOpen(true);
+    setFormError(null);
   }
 
   function editSelectedUser() {
@@ -58,6 +62,7 @@ export function useUsers() {
     setSheetOpen(open);
     if (!open) {
       setSelectedUserId(null);
+      setFormError(null);
     }
   }
 
@@ -80,6 +85,20 @@ export function useUsers() {
     const timestamp = creationDate.toISOString();
 
     if (sheetMode === "create") {
+      const password = getUserFormValue(formData, "password");
+      const passwordConfirmation = getUserFormValue(
+        formData,
+        "password_confirmation",
+      );
+      if (password.length < 8) {
+        setFormError("Initial password must contain at least 8 characters.");
+        return;
+      }
+      if (password !== passwordConfirmation) {
+        setFormError("Initial passwords do not match.");
+        return;
+      }
+      setFormError(null);
       setUsers(function addUser(currentUsers) {
         const user: ManagerUser = {
           id: createUserId(currentUsers, creationDate),
@@ -126,6 +145,7 @@ export function useUsers() {
     selectedUser,
     sheetMode,
     isSheetOpen,
+    formError,
     openCreateSheet,
     openViewSheet,
     openEditSheet,

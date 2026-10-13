@@ -7,10 +7,15 @@ import {
 } from "@/components/shared/FeatureFormSheet";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CONTENT_STATUS } from "../constants/poi-content.constants";
+import {
+  CONTENT_STATUS,
+  DEFAULT_CONTENT_AUTHOR_ID,
+} from "../constants/poi-content.constants";
 import { usePoiContentFormSheet } from "../hooks/use-poi-content-form-sheet";
 import { DEFAULT_MOCK_LANGUAGE_ID } from "../mocks/languages.mock";
 import type { PoiContentFormSheetProps } from "../types/poi-content.types";
+import { PoiContentPoiCombobox } from "./PoiContentPoiCombobox";
+import { PoiContentWorkflowFields } from "./PoiContentWorkflowFields";
 
 export function PoiContentFormSheet({
   open,
@@ -38,12 +43,11 @@ export function PoiContentFormSheet({
       onEdit={onEdit}
     >
       <FormField label={t("Point of Interest")} htmlFor="content-poi" required>
-        <FormCombobox
+        <PoiContentPoiCombobox
           id="content-poi"
           name="poi_id"
           options={poiOptions}
           defaultValue={content?.poi_id ?? null}
-          placeholder="Select a POI"
           disabled={!isCreateMode}
           required
         />
@@ -114,6 +118,11 @@ export function PoiContentFormSheet({
           disabled
         />
       </FormField>
+
+      <PoiContentWorkflowFields
+        content={content}
+        createdByFallback={DEFAULT_CONTENT_AUTHOR_ID}
+      />
     </FeatureFormSheet>
   );
 }

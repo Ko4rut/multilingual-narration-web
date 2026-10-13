@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type {
@@ -12,6 +12,9 @@ import { MOCK_ROLES } from "../mocks/roles.mock";
 
 export function useUserFormSheet(mode: FeatureFormMode) {
   const { t } = usePreferences();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirmation, setShowPasswordConfirmation] =
+    useState(false);
 
   const roleOptions = useMemo<FormComboboxOption[]>(function createRoleOptions() {
     return MOCK_ROLES.map(function translateRoleOption(role) {
@@ -33,5 +36,28 @@ export function useUserFormSheet(mode: FeatureFormMode) {
     description = t("Update this administrator account and its access settings.");
   }
 
-  return { t, roleOptions, statusOptions, description };
+  /** Chuyển trạng thái ẩn hoặc hiện của mật khẩu ban đầu. */
+  function togglePasswordVisibility() {
+    setShowPassword(function updatePasswordVisibility(value) {
+      return !value;
+    });
+  }
+
+  /** Chuyển trạng thái ẩn hoặc hiện của trường xác nhận mật khẩu. */
+  function togglePasswordConfirmationVisibility() {
+    setShowPasswordConfirmation(function updatePasswordVisibility(value) {
+      return !value;
+    });
+  }
+
+  return {
+    t,
+    roleOptions,
+    statusOptions,
+    description,
+    showPassword,
+    showPasswordConfirmation,
+    togglePasswordVisibility,
+    togglePasswordConfirmationVisibility,
+  };
 }

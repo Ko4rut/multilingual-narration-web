@@ -46,4 +46,15 @@ export const CONTENT_STATUS_OPTIONS = [
   },
 ] as const;
 
-export const DEFAULT_CONTENT_AUTHOR_ID = "user-010126-0001";
+export const DEFAULT_CONTENT_AUTHOR_ID = "user-010126-0002";
+
+export const DEFAULT_CONTENT_REVIEWER_ID = "user-010126-0001";
+
+export const DEFAULT_CONTENT_PUBLISHER_ID = "user-010126-0001";
+
+export const CONTENT_WORKFLOW_ACTION = {
+  SUBMIT: "SUBMIT",
+  RESUBMIT: "RESUBMIT",
+  REVIEW: "REVIEW",
+  PUBLISH: "PUBLISH",
+} as const;
