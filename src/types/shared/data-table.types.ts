@@ -70,10 +70,14 @@ export interface DataTableContextValue {
   pageItems: readonly DataTablePageItem[];
   canGoPrevious: boolean;
   canGoNext: boolean;
+  hasActiveFilters: boolean;
   allFiltersValue: string;
+  selectedRowId?: string;
   getRowId: (row: unknown, index: number) => string;
+  onRowClick?: (row: unknown) => void;
   setSearchQuery: (value: string) => void;
   setFilterValue: (filterId: string, value: string) => void;
+  resetFilters: () => void;
   setPageSize: (value: number) => void;
   goToPage: (page: number) => void;
   goToPreviousPage: () => void;
@@ -86,6 +90,8 @@ export interface DataTableProps<TData>
   data: readonly TData[];
   columns: readonly DataTableColumn<TData>[];
   getRowId?: (row: TData, index: number) => string;
+  selectedRowId?: string;
+  onRowClick?: (row: TData) => void;
   filters?: readonly DataTableFilter<TData>[];
   initialPageSize?: number;
   children: ReactNode;

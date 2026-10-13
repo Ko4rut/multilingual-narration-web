@@ -9,6 +9,7 @@ import {
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
+  RotateCcwIcon,
   SearchIcon,
   XIcon,
 } from "lucide-react";
@@ -23,6 +24,7 @@ import {
   ComboboxTrigger,
 } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
+import { COMBOBOX_MATCH_TRIGGER_WIDTH_CLASS } from "@/constants/components";
 import {
   Pagination,
   PaginationContent,
@@ -116,6 +118,8 @@ function DataTable<TData>({
   data,
   columns,
   getRowId,
+  selectedRowId,
+  onRowClick,
   filters = [],
   initialPageSize = 10,
   children,
@@ -135,6 +139,15 @@ function DataTable<TData>({
     return String(index);
   }
 
+  function handleRowClick(row: unknown) {
+    onRowClick?.(row as TData);
+  }
+
+  let resolvedOnRowClick: ((row: unknown) => void) | undefined;
+  if (onRowClick) {
+    resolvedOnRowClick = handleRowClick;
+  }
+
   const context: DataTableContextValue = {
     columns: resolvedColumns,
     filters: resolvedFilters,
@@ -150,10 +163,14 @@ function DataTable<TData>({
     pageItems: table.pageItems,
     canGoPrevious: table.canGoPrevious,
     canGoNext: table.canGoNext,
+    hasActiveFilters: table.hasActiveFilters,
     allFiltersValue: table.allFiltersValue,
+    selectedRowId,
     getRowId: resolveRowId,
+    onRowClick: resolvedOnRowClick,
     setSearchQuery: table.setSearchQuery,
     setFilterValue: table.setFilterValue,
+    resetFilters: table.resetFilters,
     setPageSize: table.setPageSize,
     goToPage: table.goToPage,
     goToPreviousPage: table.goToPreviousPage,
@@ -379,7 +396,7 @@ function DataTableSearchableFilter({
         value={option}
         className="items-start py-2 data-highlighted:bg-hover! data-highlighted:text-foreground!"
       >
-        <div className="flex min-w-0 flex-col gap-0.5">
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="truncate font-medium text-foreground">
             {option.label}
           </span>
@@ -418,7 +435,7 @@ function DataTableSearchableFilter({
           {selectedOption?.label ?? t(filter.label)}
         </span>
       </ComboboxTrigger>
-      <ComboboxContent>
+      <ComboboxContent className={COMBOBOX_MATCH_TRIGGER_WIDTH_CLASS}>
         <ComboboxInput
           aria-label={t(filter.searchPlaceholder ?? filter.label)}
           placeholder={t(filter.searchPlaceholder ?? filter.label)}
@@ -441,6 +458,7 @@ function DataTableFilters({
   className,
   ...props
 }: DataTableFiltersProps) {
+  const { t } = usePreferences();
   const table = useDataTableContext();
 
   return (
@@ -452,6 +470,18 @@ function DataTableFilters({
       {table.filters.map(function renderFilter(filter) {
         return <DataTableFilter key={filter.id} filterId={filter.id} />;
       })}
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        disabled={!table.hasActiveFilters}
+        onClick={table.resetFilters}
+        aria-label={t("Reset filters")}
+        title={t("Reset filters")}
+        className="bg-background"
+      >
+        <RotateCcwIcon aria-hidden="true" />
+      </Button>
     </div>
   );
 }
@@ -502,9 +532,34 @@ function DataTableContent({
         )}
         {/* Các hàng dữ liệu của trang hiện tại. */}
         {table.paginatedData.map(function renderRow(row, rowIndex) {
+          const rowId = table.getRowId(row, table.startIndex + rowIndex);
+          let rowClassName = "";
+          let rowTabIndex: number | undefined;
+          if (table.onRowClick) {
+            rowClassName =
+              "cursor-pointer outline-none focus-visible:bg-hover focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring";
+            rowTabIndex = 0;
+          }
+          if (table.selectedRowId === rowId) {
+            rowClassName = cn(rowClassName, "bg-selected hover:bg-selected");
+          }
+
           return (
             <TableRow
-              key={table.getRowId(row, table.startIndex + rowIndex)}
+              key={rowId}
+              tabIndex={rowTabIndex}
+              aria-selected={table.selectedRowId === rowId}
+              className={rowClassName}
+              onClick={function handleRowClick() {
+                table.onRowClick?.(row);
+              }}
+              onKeyDown={function handleRowKeyDown(event) {
+                if (event.key !== "Enter" && event.key !== " ") {
+                  return;
+                }
+                event.preventDefault();
+                table.onRowClick?.(row);
+              }}
             >
               {table.columns.map(function renderCell(column) {
                 return (

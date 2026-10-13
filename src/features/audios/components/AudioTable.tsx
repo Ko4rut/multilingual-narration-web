@@ -21,16 +21,20 @@ import {
   AUDIO_SOURCE_TYPE_OPTIONS,
 } from "../constants/audio.constants";
 import type { AudioTableProps, ContentAudio } from "../types/audio.types";
+import {
+  findAudioPoiContent,
+  formatAudioDuration,
+} from "../utils/audio.utils";
 import { AudioStatusBadge } from "./AudioStatusBadge";
-
-function formatDuration(totalSeconds: number) {
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = String(totalSeconds % 60).padStart(2, "0");
-  return `${minutes}:${seconds}`;
-}
 
 export function AudioTable({
   audios,
+  languages,
+  contents,
+  pois,
+  selectedAudioId,
+  onPreviewAudio,
+  onEditAudio,
   onCopyAudio,
   onDeleteAudio,
 }: AudioTableProps) {
@@ -67,9 +71,24 @@ export function AudioTable({
     },
     {
       id: "poi_content_id",
-      header: t("POI content ID"),
-      accessor: "poi_content_id",
-      className: "font-mono text-xs",
+      header: t("Narration content"),
+      searchValue: function getContentSearchValue(audio) {
+        const content = findAudioPoiContent(audio.poi_content_id, contents);
+        return `${audio.poi_content_id} ${content?.narration_title ?? ""}`;
+      },
+      cell: function renderContent(audio) {
+        const content = findAudioPoiContent(audio.poi_content_id, contents);
+        return (
+          <div className="flex min-w-56 max-w-72 flex-col gap-1">
+            <span className="truncate text-sm text-foreground">
+              {content?.narration_title ?? audio.poi_content_id}
+            </span>
+            <span className="truncate font-mono text-xs text-success">
+              {audio.poi_content_id}
+            </span>
+          </div>
+        );
+      },
     },
     {
       id: "audio_source_type",
@@ -90,7 +109,7 @@ export function AudioTable({
           <div className="flex min-w-40 flex-col gap-1 text-xs">
             <span>{audio.audio_mime_type}</span>
             <span>
-              {formatDuration(audio.audio_duration_sec)} ·{" "}
+              {formatAudioDuration(audio.audio_duration_sec)} ·{" "}
               {byteFormatter.format(audio.audio_size / 1_000_000)}
             </span>
           </div>
@@ -128,6 +147,9 @@ export function AudioTable({
       cell: function renderActions(audio) {
         return (
           <MoreMenu
+            onEdit={function handleEdit() {
+              onEditAudio(audio);
+            }}
             onCopy={function handleCopy() {
               onCopyAudio(audio);
             }}
@@ -139,7 +161,41 @@ export function AudioTable({
       },
     },
   ];
+  const languageOptions = languages.map(function createLanguageOption(language) {
+    return {
+      value: language.id,
+      label: language.language_name,
+    };
+  });
+  const poiOptions = pois.map(function createPoiOption(poi) {
+    return {
+      value: poi.id,
+      label: poi.poi_name,
+      description: poi.id,
+    };
+  });
   const filters: readonly DataTableFilter<ContentAudio>[] = [
+    {
+      id: "poi_id",
+      label: "POI",
+      allLabel: "All POIs",
+      options: poiOptions,
+      searchable: true,
+      searchPlaceholder: "Search POIs by name or ID...",
+      emptyMessage: "No POIs found.",
+      getValue: function getPoiId(audio) {
+        return findAudioPoiContent(audio.poi_content_id, contents)?.poi_id ?? "";
+      },
+    },
+    {
+      id: "language_id",
+      label: "Language",
+      allLabel: "All languages",
+      options: languageOptions,
+      getValue: function getLanguageId(audio) {
+        return findAudioPoiContent(audio.poi_content_id, contents)?.language_id ?? "";
+      },
+    },
     {
       id: "audio_source_type",
       label: "Source type",
@@ -168,7 +224,8 @@ export function AudioTable({
       getRowId={function getAudioId(audio) {
         return audio.id;
       }}
-      initialPageSize={10}
+      selectedRowId={selectedAudioId ?? undefined}
+      onRowClick={onPreviewAudio}
     >
       <DataTablePanel>
         <DataTableToolbar>

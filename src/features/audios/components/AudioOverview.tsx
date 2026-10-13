@@ -10,6 +10,8 @@ import {
 } from "@/components/shared/PageLayout";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { useAudios } from "../hooks/use-audios";
+import { AudioEditSheet } from "./AudioEditSheet";
+import { AudioPreview } from "./AudioPreview";
 import { AudioTable } from "./AudioTable";
 
 export function AudioOverview() {
@@ -17,7 +19,18 @@ export function AudioOverview() {
   const {
     audios,
     overviewSummary,
+    audioContents,
+    audioLanguages,
+    audioPois,
+    selectedAudio,
+    editingAudio,
+    isEditSheetOpen,
+    formError,
     feedback,
+    handleSelectAudio,
+    openEditAudioSheet,
+    handleEditSheetOpenChange,
+    handleEditAudio,
     handleCopyAudio,
     handleDeleteAudio,
   } = useAudios();
@@ -59,6 +72,10 @@ export function AudioOverview() {
           iconClassName="bg-warning/10 text-warning"
         />
       </PageLayoutOverview>
+      <AudioPreview
+        contents={audioContents}
+        selectedAudio={selectedAudio}
+      />
       {feedback && (
         <p className="text-xs text-muted-foreground" role="status">
           {t(feedback)}
@@ -67,10 +84,24 @@ export function AudioOverview() {
       <PageLayoutContent>
         <AudioTable
           audios={audios}
+          languages={audioLanguages}
+          contents={audioContents}
+          pois={audioPois}
+          selectedAudioId={selectedAudio?.id ?? null}
+          onPreviewAudio={handleSelectAudio}
+          onEditAudio={openEditAudioSheet}
           onCopyAudio={handleCopyAudio}
           onDeleteAudio={handleDeleteAudio}
         />
       </PageLayoutContent>
+      <AudioEditSheet
+        key={editingAudio?.id ?? "audio-edit-sheet"}
+        open={isEditSheetOpen}
+        audio={editingAudio}
+        errorMessage={formError}
+        onOpenChange={handleEditSheetOpenChange}
+        onSubmit={handleEditAudio}
+      />
     </PageLayout>
   );
 }

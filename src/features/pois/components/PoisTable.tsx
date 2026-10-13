@@ -210,7 +210,6 @@ export function PoisTable({
       getRowId={function getPoiId(poi) {
         return poi.id;
       }}
-      initialPageSize={10}
     >
       <DataTablePanel>
         <DataTableToolbar>

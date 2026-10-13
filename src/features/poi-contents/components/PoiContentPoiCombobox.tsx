@@ -11,6 +11,7 @@ import {
   ComboboxTrigger,
   ComboboxValue,
 } from "@/components/ui/combobox";
+import { COMBOBOX_MATCH_TRIGGER_WIDTH_CLASS } from "@/constants/components";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type { DataTableFilterOption } from "@/types/shared/data-table.types";
 import type { PoiContentPoiComboboxProps } from "../types/poi-content.types";
@@ -50,7 +51,7 @@ export function PoiContentPoiCombobox({
         value={option}
         className="items-start py-2 data-highlighted:bg-hover! data-highlighted:text-foreground!"
       >
-        <div className="flex min-w-0 flex-col gap-0.5">
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="truncate font-medium text-foreground">
             {option.label}
           </span>
@@ -89,7 +90,9 @@ export function PoiContentPoiCombobox({
           <ComboboxValue placeholder={t("Select a POI")} />
         </span>
       </ComboboxTrigger>
-      <ComboboxContent>
+      <ComboboxContent
+        className={COMBOBOX_MATCH_TRIGGER_WIDTH_CLASS}
+      >
         <ComboboxInput
           aria-label={t("Search POIs by name or ID...")}
           placeholder={t("Search POIs by name or ID...")}

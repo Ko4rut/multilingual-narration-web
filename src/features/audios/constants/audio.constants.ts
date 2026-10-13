@@ -27,3 +27,17 @@ export const AUDIO_MIME_TYPE_OPTIONS = [
   { value: "audio/aac", label: "audio/aac" },
   { value: "audio/ogg", label: "audio/ogg" },
 ] as const;
+
+export const AUDIO_LANGUAGE_STATUS = {
+  SUPPORTED: "SUPPORTED",
+  UNSUPPORTED: "UNSUPPORTED",
+} as const;
+
+export const AUDIO_CONTENT_STATUS = {
+  DRAFT: "DRAFT",
+  WAITING_APPROVAL: "WAITING_APPROVAL",
+  REJECTED: "REJECTED",
+  APPROVED: "APPROVED",
+  PUBLISHED: "PUBLISHED",
+  ARCHIVED: "ARCHIVED",
+} as const;
