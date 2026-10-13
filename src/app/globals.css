@@ -65,6 +65,8 @@ h1, h2, p { margin: 0; }
 .main-content { padding: 34px 30px; width: 100%; max-width: 1600px; margin-inline: auto; min-width: 0; }
 .scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
 .scrollbar-hidden::-webkit-scrollbar { display: none; }
+[data-slot="data-table-panel"] [data-slot="table-container"] { -ms-overflow-style: none; scrollbar-width: none; }
+[data-slot="data-table-panel"] [data-slot="table-container"]::-webkit-scrollbar { display: none; }
 .mobile-sidebar-trigger { display: none; }
 .sidebar-preferences { padding: 0 8px 6px; }
 .sidebar-preferences .preference-controls { margin: 0; gap: 8px; flex-wrap: nowrap; }

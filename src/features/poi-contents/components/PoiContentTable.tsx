@@ -28,9 +28,9 @@ import {
   createPoiFilterOptions,
   findPoiContentLanguage,
   findPoiContentPoi,
-  formatPoiContentTimestamp,
 } from "../utils/poi-content.utils";
 import { PoiContentStatusBadge } from "./PoiContentStatusBadge";
+import { PoiContentWorkflowAction } from "./PoiContentWorkflowAction";
 
 export function PoiContentTable({
   contents,
@@ -38,8 +38,11 @@ export function PoiContentTable({
   onEditContent,
   onCopyContent,
   onDeleteContent,
+  onSubmitContent,
+  onReviewContent,
+  onPublishContent,
 }: PoiContentTableProps) {
-  const { t, locale } = usePreferences();
+  const { t } = usePreferences();
   const languageOptions = createLanguageFilterOptions(MOCK_LANGUAGES);
   const poiOptions = createPoiFilterOptions(MOCK_POIS);
   const columns: readonly DataTableColumn<PoiContent>[] = [
@@ -114,66 +117,19 @@ export function PoiContentTable({
         return <PoiContentStatusBadge status={content.content_status} />;
       },
     },
-    // Column Workflow Users
+    // Column Workflow
     {
-      id: "workflow_users",
-      header: t("Workflow users"),
-      searchValue: function getWorkflowUserSearchValue(content) {
-        return [
-          content.created_by,
-          content.approved_by,
-          content.published_by,
-        ].join(" ");
-      },
-      cell: function renderWorkflowUsers(content) {
+      id: "workflow",
+      header: t("Workflow"),
+      className: "min-w-44",
+      cell: function renderWorkflow(content) {
         return (
-          <div className="flex min-w-52 flex-col gap-1 text-xs">
-            <span>
-              {t("Created by")}: {content.created_by}
-            </span>
-            <span>
-              {t("Approved by")}: {content.approved_by ?? "—"}
-            </span>
-            <span>
-              {t("Published by")}: {content.published_by ?? "—"}
-            </span>
-          </div>
-        );
-      },
-    },
-    // Column Workflow Timestamps
-    {
-      id: "workflow_timestamps",
-      header: t("Workflow timestamps"),
-      searchValue: function getWorkflowTimestampSearchValue(content) {
-        return [
-          content.created_at,
-          content.approved_at,
-          content.published_at,
-        ].join(" ");
-      },
-      cell: function renderWorkflowTimestamps(content) {
-        return (
-          <div className="flex min-w-64 flex-col gap-1 text-xs">
-            <span>
-              {t("Created")}: {formatPoiContentTimestamp(
-                content.created_at,
-                locale,
-              )}
-            </span>
-            <span>
-              {t("Approved")}: {formatPoiContentTimestamp(
-                content.approved_at,
-                locale,
-              )}
-            </span>
-            <span>
-              {t("Published")}: {formatPoiContentTimestamp(
-                content.published_at,
-                locale,
-              )}
-            </span>
-          </div>
+          <PoiContentWorkflowAction
+            content={content}
+            onSubmit={onSubmitContent}
+            onReview={onReviewContent}
+            onPublish={onPublishContent}
+          />
         );
       },
     },
@@ -255,7 +211,7 @@ export function PoiContentTable({
         </DataTableToolbar>
         <DataTableContent
           emptyMessage="No POI content matches your filters."
-          className="min-w-[1320px]"
+          className="min-w-[1000px]"
         />
         <DataTablePagination
           itemLabel="content records"

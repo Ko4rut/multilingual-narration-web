@@ -22,6 +22,7 @@ export function UsersOverview() {
     selectedUser,
     sheetMode,
     isSheetOpen,
+    formError,
     openCreateSheet,
     openViewSheet,
     openEditSheet,
@@ -91,6 +92,7 @@ export function UsersOverview() {
         open={isSheetOpen}
         mode={sheetMode}
         user={selectedUser}
+        errorMessage={formError}
         onOpenChange={handleSheetOpenChange}
         onSubmit={handleSubmit}
         onEdit={editSelectedUser}

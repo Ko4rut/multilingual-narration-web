@@ -17,6 +17,9 @@ export function RoleDirectory({
     <Card className="gap-0 py-0 lg:min-h-[36rem]">
       <CardHeader className="border-b px-5 py-4">
         <CardTitle className="text-sm">{t("Roles Directory")}</CardTitle>
+        <p className="text-xs text-muted-foreground">
+          {t("Select a role to view and configure permissions.")}
+        </p>
       </CardHeader>
       <CardContent className="space-y-3 p-4">
         {items.map(function renderRole(item) {

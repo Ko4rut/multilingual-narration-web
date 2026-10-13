@@ -1,53 +1,115 @@
 "use client";
 
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {
+  CircleCheck,
+  CircleOff,
+  Globe2,
+  Languages,
+  Plus,
+} from "lucide-react";
 import {
   PageLayout,
   PageLayoutContent,
   PageLayoutHeader,
+  PageLayoutOverview,
+  PageLayoutStat,
 } from "@/components/shared/PageLayout";
-import { useLanguageOverview } from "../hooks/use-language-overview";
-import type { LanguageOverviewProps } from "../types/language.types";
-import { LanguageFilterBar } from "./LanguageFilterBar";
-import { LanguageGrid } from "./LanguageGrid";
+import { Button } from "@/components/ui/button";
+import { usePreferences } from "@/features/settings/hooks/use-preferences";
+import { useLanguages } from "../hooks/use-languages";
+import { LanguageFormSheet } from "./LanguageFormSheet";
+import { LanguagesTable } from "./LanguagesTable";
 
-export function LanguageOverview({ q }: LanguageOverviewProps) {
+/** Trang tổng quan và quản lý danh mục ngôn ngữ của hệ thống. */
+export function LanguageOverview() {
+  const { t, locale } = usePreferences();
   const {
-    t,
     languages,
-    totalCount,
-    supportedCount,
+    overviewSummary,
+    selectedLanguage,
+    sheetMode,
+    isSheetOpen,
+    formError,
+    feedback,
+    openCreateSheet,
+    openViewSheet,
+    openEditSheet,
+    editSelectedLanguage,
+    handleSheetOpenChange,
     handleToggleStatus,
-  } = useLanguageOverview();
+    handleSubmit,
+  } = useLanguages();
+  let sheetKey = "create";
+  if (selectedLanguage) {
+    sheetKey = `${sheetMode}-${selectedLanguage.id}`;
+  }
 
   return (
     <PageLayout>
       <PageLayoutHeader
-        title={t("Language Management")}
-        description={t("Manage supported languages for narration content")}
+        title="Language Management"
+        description="Manage supported languages for narration content"
       >
-        <div className="flex items-center gap-3">
-          <Button type="button">
-            <Plus aria-hidden="true" className="mr-2 h-4 w-4" />
-            {t("Add Language")}
-          </Button>
-        </div>
+        <Button type="button" onClick={openCreateSheet}>
+          <Plus aria-hidden="true" />
+          {t("Add Language")}
+        </Button>
       </PageLayoutHeader>
 
-      <PageLayoutContent>
-        <LanguageFilterBar
-          initialQ={q}
-          totalCount={totalCount}
-          supportedCount={supportedCount}
+      <PageLayoutOverview aria-label={t("Language overview")}>
+        <PageLayoutStat
+          label="Total Languages"
+          value={overviewSummary.totalLanguages.toLocaleString(locale)}
+          description="Catalog entries"
+          icon={<Languages />}
         />
+        <PageLayoutStat
+          label="Supported Languages"
+          value={overviewSummary.supportedLanguages.toLocaleString(locale)}
+          description="Available for new content"
+          icon={<CircleCheck />}
+          iconClassName="bg-success/10 text-success"
+        />
+        <PageLayoutStat
+          label="Unsupported Languages"
+          value={overviewSummary.unsupportedLanguages.toLocaleString(locale)}
+          description="Distribution paused"
+          icon={<CircleOff />}
+          iconClassName="bg-warning/10 text-warning"
+        />
+        <PageLayoutStat
+          label="ISO Standards"
+          value={overviewSummary.isoCodeLengths.toLocaleString(locale)}
+          description="2- or 3-letter codes"
+          icon={<Globe2 />}
+        />
+      </PageLayoutOverview>
 
-        <LanguageGrid
-          q={q}
+      {feedback && (
+        <p role="status" className="text-xs text-success">
+          {t(feedback)}
+        </p>
+      )}
+
+      <PageLayoutContent>
+        <LanguagesTable
           languages={languages}
+          onViewLanguage={openViewSheet}
+          onEditLanguage={openEditSheet}
           onToggleStatus={handleToggleStatus}
         />
       </PageLayoutContent>
+
+      <LanguageFormSheet
+        key={sheetKey}
+        open={isSheetOpen}
+        mode={sheetMode}
+        language={selectedLanguage}
+        errorMessage={formError}
+        onOpenChange={handleSheetOpenChange}
+        onSubmit={handleSubmit}
+        onEdit={editSelectedLanguage}
+      />
     </PageLayout>
   );
 }

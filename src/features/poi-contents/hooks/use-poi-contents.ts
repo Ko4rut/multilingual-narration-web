@@ -6,6 +6,8 @@ import type { FeatureFormMode } from "@/types/shared/feature-form.types";
 import {
   CONTENT_STATUS,
   DEFAULT_CONTENT_AUTHOR_ID,
+  DEFAULT_CONTENT_PUBLISHER_ID,
+  DEFAULT_CONTENT_REVIEWER_ID,
 } from "../constants/poi-content.constants";
 import { LANGUAGE_STATUS } from "../constants/language.constants";
 import {
@@ -17,9 +19,12 @@ import { MOCK_POIS } from "../mocks/poi.mock";
 import type { PoiContent } from "../types/poi-content.types";
 import {
   canDeletePoiContent,
+  createMockPoiContentTtsAudio,
   createPoiContentId,
   createPoiContentsOverviewSummary,
-  createPoiFormOptions,
+  createPoiFilterOptions,
+  findPublishedPoiContentVersion,
+  findValidPoiContentAudio,
   getNextPoiContentVersion,
   getPoiContentFormValue,
 } from "../utils/poi-content.utils";
@@ -33,6 +38,15 @@ export function usePoiContents() {
   const [sheetMode, setSheetMode] = useState<FeatureFormMode>("create");
   const [selectedContentId, setSelectedContentId] = useState<string | null>(null);
   const [isSheetOpen, setSheetOpen] = useState(false);
+  const [reviewContentId, setReviewContentId] = useState<string | null>(null);
+  const [isReviewSheetOpen, setReviewSheetOpen] = useState(false);
+  const [reviewNote, setReviewNote] = useState("");
+  const [publishContentId, setPublishContentId] = useState<string | null>(null);
+  const [isPublishSheetOpen, setPublishSheetOpen] = useState(false);
+  const [audios, setAudios] = useState(function initializeAudios() {
+    return [...MOCK_AUDIO_FILES];
+  });
+  const [workflowError, setWorkflowError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const overviewSummary = useMemo(function getOverviewSummary() {
     return createPoiContentsOverviewSummary(contents);
@@ -41,7 +55,21 @@ export function usePoiContents() {
     contents.find(function findSelectedContent(content) {
       return content.id === selectedContentId;
     }) ?? null;
-  const poiOptions = createPoiFormOptions(MOCK_POIS);
+  const reviewContent =
+    contents.find(function findReviewContent(content) {
+      return content.id === reviewContentId;
+    }) ?? null;
+  const publishContent =
+    contents.find(function findPublishContent(content) {
+      return content.id === publishContentId;
+    }) ?? null;
+  let publishAudio = null;
+  let archivedContent = null;
+  if (publishContent) {
+    publishAudio = findValidPoiContentAudio(publishContent.id, audios);
+    archivedContent = findPublishedPoiContentVersion(publishContent, contents);
+  }
+  const poiOptions = createPoiFilterOptions(MOCK_POIS);
 
   function openCreateSheet() {
     setSelectedContentId(null);
@@ -87,7 +115,7 @@ export function usePoiContents() {
   }
 
   function handleDeleteContent(content: PoiContent) {
-    if (!canDeletePoiContent(content, contents, MOCK_POIS, MOCK_AUDIO_FILES)) {
+    if (!canDeletePoiContent(content, contents, MOCK_POIS, audios)) {
       setFeedback(
         "This content cannot be deleted because it keeps an active POI available.",
       );
@@ -206,6 +234,187 @@ export function usePoiContents() {
     setFeedback("Content updated in demo data.");
   }
 
+  function handleSubmitForApproval(content: PoiContent) {
+    if (
+      content.content_status !== CONTENT_STATUS.DRAFT &&
+      content.content_status !== CONTENT_STATUS.REJECTED
+    ) {
+      setFeedback("Only draft or rejected content can be submitted for approval.");
+      return;
+    }
+
+    setContents(function submitContent(currentContents) {
+      return currentContents.map(function updateContent(candidate) {
+        if (candidate.id !== content.id) {
+          return candidate;
+        }
+        return {
+          ...candidate,
+          content_status: CONTENT_STATUS.WAITING_APPROVAL,
+          approved_by: null,
+          approved_at: null,
+          published_by: null,
+          published_at: null,
+        };
+      });
+    });
+    setFeedback("Content submitted for approval.");
+  }
+
+  function openReviewSheet(content: PoiContent) {
+    if (content.content_status !== CONTENT_STATUS.WAITING_APPROVAL) {
+      setFeedback("Only content waiting for approval can be reviewed.");
+      return;
+    }
+    setReviewContentId(content.id);
+    setReviewNote("");
+    setWorkflowError(null);
+    setReviewSheetOpen(true);
+  }
+
+  function handleReviewSheetOpenChange(open: boolean) {
+    setReviewSheetOpen(open);
+    if (!open) {
+      setReviewContentId(null);
+      setReviewNote("");
+      setWorkflowError(null);
+    }
+  }
+
+  function handleReviewNoteChange(value: string) {
+    setReviewNote(value);
+    setWorkflowError(null);
+  }
+
+  function handleApproveContent() {
+    if (!reviewContent) {
+      return;
+    }
+    if (reviewContent.created_by === DEFAULT_CONTENT_REVIEWER_ID) {
+      setWorkflowError("Authors cannot approve their own content.");
+      return;
+    }
+    const approvedAt = new Date().toISOString();
+    setContents(function approveContent(currentContents) {
+      return currentContents.map(function updateContent(content) {
+        if (content.id !== reviewContent.id) {
+          return content;
+        }
+        return {
+          ...content,
+          content_status: CONTENT_STATUS.APPROVED,
+          approved_by: DEFAULT_CONTENT_REVIEWER_ID,
+          approved_at: approvedAt,
+        };
+      });
+    });
+    handleReviewSheetOpenChange(false);
+    setFeedback("Content approved and ready for publishing.");
+  }
+
+  function handleRejectContent() {
+    if (!reviewContent) {
+      return;
+    }
+    if (!reviewNote.trim()) {
+      setWorkflowError("Enter a review note before rejecting content.");
+      return;
+    }
+    setContents(function rejectContent(currentContents) {
+      return currentContents.map(function updateContent(content) {
+        if (content.id !== reviewContent.id) {
+          return content;
+        }
+        return {
+          ...content,
+          content_status: CONTENT_STATUS.REJECTED,
+          approved_by: null,
+          approved_at: null,
+          published_by: null,
+          published_at: null,
+        };
+      });
+    });
+    handleReviewSheetOpenChange(false);
+    setFeedback("Content rejected and returned for revision.");
+  }
+
+  function openPublishSheet(content: PoiContent) {
+    if (content.content_status !== CONTENT_STATUS.APPROVED) {
+      setFeedback("Only approved content can be published.");
+      return;
+    }
+    setPublishContentId(content.id);
+    setWorkflowError(null);
+    setPublishSheetOpen(true);
+  }
+
+  function handlePublishSheetOpenChange(open: boolean) {
+    setPublishSheetOpen(open);
+    if (!open) {
+      setPublishContentId(null);
+      setWorkflowError(null);
+    }
+  }
+
+  function handleGenerateAudio() {
+    if (!publishContent) {
+      return;
+    }
+    const existingAudio = findValidPoiContentAudio(publishContent.id, audios);
+    if (existingAudio) {
+      return;
+    }
+    const generatedAudio = createMockPoiContentTtsAudio(
+      publishContent,
+      audios,
+      new Date(),
+    );
+    setAudios(function addGeneratedAudio(currentAudios) {
+      return [generatedAudio, ...currentAudios];
+    });
+    setWorkflowError(null);
+    setFeedback("TTS audio generated and validated.");
+  }
+
+  function handlePublishContent() {
+    if (!publishContent) {
+      return;
+    }
+    const validAudio = findValidPoiContentAudio(publishContent.id, audios);
+    if (!validAudio) {
+      setWorkflowError("Generate or attach a valid audio file before publishing.");
+      return;
+    }
+    const publishedAt = new Date().toISOString();
+    setContents(function publishContentVersion(currentContents) {
+      return currentContents.map(function updateContent(content) {
+        if (
+          content.id !== publishContent.id &&
+          content.poi_id === publishContent.poi_id &&
+          content.language_id === publishContent.language_id &&
+          content.content_status === CONTENT_STATUS.PUBLISHED
+        ) {
+          return {
+            ...content,
+            content_status: CONTENT_STATUS.ARCHIVED,
+          };
+        }
+        if (content.id !== publishContent.id) {
+          return content;
+        }
+        return {
+          ...content,
+          content_status: CONTENT_STATUS.PUBLISHED,
+          published_by: DEFAULT_CONTENT_PUBLISHER_ID,
+          published_at: publishedAt,
+        };
+      });
+    });
+    handlePublishSheetOpenChange(false);
+    setFeedback("Content published successfully.");
+  }
+
   return {
     contents,
     overviewSummary,
@@ -213,6 +422,14 @@ export function usePoiContents() {
     selectedContent,
     sheetMode,
     isSheetOpen,
+    reviewContent,
+    isReviewSheetOpen,
+    reviewNote,
+    publishContent,
+    isPublishSheetOpen,
+    publishAudio,
+    archivedContent,
+    workflowError,
     feedback,
     openCreateSheet,
     openViewSheet,
@@ -222,5 +439,15 @@ export function usePoiContents() {
     handleCopyContent,
     handleDeleteContent,
     handleSubmit,
+    handleSubmitForApproval,
+    openReviewSheet,
+    handleReviewSheetOpenChange,
+    handleReviewNoteChange,
+    handleApproveContent,
+    handleRejectContent,
+    openPublishSheet,
+    handlePublishSheetOpenChange,
+    handleGenerateAudio,
+    handlePublishContent,
   };
 }

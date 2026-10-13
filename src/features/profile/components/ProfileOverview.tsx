@@ -9,6 +9,7 @@ import { useProfileOverview } from "../hooks/use-profile-overview";
 import { ChangePasswordSheet } from "./ChangePasswordSheet";
 import { ProfileIdentityCard } from "./ProfileIdentityCard";
 import { ProfileInfoCard } from "./ProfileInfoCard";
+import { ProfilePreferencesCard } from "./ProfilePreferencesCard";
 
 export function ProfileOverview() {
   const {
@@ -46,6 +47,7 @@ export function ProfileOverview() {
             items={accountItems}
           />
         </div>
+        <ProfilePreferencesCard />
       </PageLayoutContent>
     </PageLayout>
   );

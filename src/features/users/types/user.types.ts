@@ -46,6 +46,7 @@ export interface UserFormSheetProps {
   open: boolean;
   mode: FeatureFormMode;
   user: ManagerUser | null;
+  errorMessage: string | null;
   onOpenChange: (open: boolean) => void;
   onSubmit: (formData: FormData) => void;
   onEdit: () => void;
