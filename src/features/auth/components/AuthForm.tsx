@@ -22,7 +22,7 @@ import styles from "./AuthForm.module.css";
 import { useAuthForm } from "../hooks/use-auth-form";
 import type { AuthFormProps, AuthFormValues } from "../types/auth.types";
 
-export function AuthForm({ mode }: AuthFormProps) {
+export function AuthForm({ mode, defaultEmail, defaultPassword }: AuthFormProps) {
   const {
     t,
     copy,
@@ -33,7 +33,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     notice,
     togglePassword,
     onSubmit,
-  } = useAuthForm(mode);
+  } = useAuthForm(mode, defaultEmail, defaultPassword);
   let passwordType = "password";
   let passwordToggleLabel = t("Show password");
   let PasswordVisibilityGlyph = Eye;
@@ -146,9 +146,6 @@ export function AuthForm({ mode }: AuthFormProps) {
             {submitLabel}
           </Button>
 
-          {mode === "login" && (
-            <p className={styles.footer}>Demo: admin@mans.vn / admin123</p>
-          )}
           {error && (
             <p className={styles.notice} role="alert">
               {t(error)}

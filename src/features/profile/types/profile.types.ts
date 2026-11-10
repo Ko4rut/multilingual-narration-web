@@ -3,7 +3,7 @@ import type { LucideIcon } from "lucide-react";
 import type { Locale } from "@/i18n/types";
 
 /** Trạng thái tài khoản có thể hiển thị trên hồ sơ người dùng. */
-export type ProfileStatus = "ACTIVE" | "DISABLED";
+export type ProfileStatus = "ACTIVE" | "INACTIVE";
 
 /** Một lựa chọn ngôn ngữ có thể sử dụng trên trang hồ sơ. */
 export type ProfileLanguageOption = {
@@ -17,13 +17,11 @@ export type EmployeeProfile = {
   fullName: string;
   email: string;
   initials: string;
-  phone: string;
-  department: string;
-  location: string;
   role: string;
   status: ProfileStatus;
   joinedAt: string;
-  lastLoginAt: string;
+  updatedAt: string;
+  lastLoginAt: string | null;
 };
 
 /** Một dòng thông tin có icon, nhãn và giá trị trong thẻ hồ sơ. */
@@ -47,6 +45,10 @@ export type ProfileIdentityCardProps = {
   roleLabel: string;
   statusLabel: string;
   employeeIdLabel: string;
+};
+
+export type ProfileOverviewProps = {
+  profile: EmployeeProfile;
 };
 
 /** Phản hồi sau khi kiểm tra form đổi mật khẩu ở chế độ demo. */

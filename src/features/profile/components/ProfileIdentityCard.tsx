@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import type { ProfileIdentityCardProps } from "../types/profile.types";
+import type { StatusBadgeTone } from "@/types/shared/status-badge.types";
 
 /** Hiển thị nhận diện chính, vai trò và trạng thái của người dùng hiện tại. */
 export function ProfileIdentityCard({
@@ -15,6 +16,10 @@ export function ProfileIdentityCard({
   statusLabel,
   employeeIdLabel,
 }: ProfileIdentityCardProps) {
+  let statusTone: StatusBadgeTone = "destructive";
+  if (profile.status === "ACTIVE") {
+    statusTone = "success";
+  }
   return (
     <Card className="gap-0 overflow-hidden py-0">
       <div className="h-20 bg-linear-to-r from-success/25 via-info/10 to-transparent" />
@@ -38,7 +43,7 @@ export function ProfileIdentityCard({
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Badge variant="secondary">{roleLabel}</Badge>
-              <StatusBadge tone="success" label={statusLabel} />
+              <StatusBadge tone={statusTone} label={statusLabel} />
             </div>
           </div>
         </div>
