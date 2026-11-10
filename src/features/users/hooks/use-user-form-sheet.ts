@@ -8,19 +8,19 @@ import type {
   FormComboboxOption,
 } from "@/types/shared/feature-form.types";
 import { USER_STATUS_OPTIONS } from "../constants/user.constants";
-import { MOCK_ROLES } from "../mocks/roles.mock";
+import type { ManagerRole } from "../types/user.types";
 
-export function useUserFormSheet(mode: FeatureFormMode) {
+export function useUserFormSheet(mode: FeatureFormMode, roles: readonly ManagerRole[]) {
   const { t } = usePreferences();
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirmation, setShowPasswordConfirmation] =
     useState(false);
 
   const roleOptions = useMemo<FormComboboxOption[]>(function createRoleOptions() {
-    return MOCK_ROLES.map(function translateRoleOption(role) {
+    return roles.map(function translateRoleOption(role) {
       return { value: role.id, label: t(role.name) };
     });
-  }, [t]);
+  }, [roles, t]);
 
   const statusOptions = useMemo<FormComboboxOption[]>(function createStatusOptions() {
     return USER_STATUS_OPTIONS.map(function translateStatusOption(option) {

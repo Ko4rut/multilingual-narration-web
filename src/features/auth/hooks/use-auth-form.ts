@@ -6,15 +6,19 @@ import { authContent } from "../constants/auth.constants";
 import type { AuthFormValues, AuthMode } from "../types/auth.types";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 
-export function useAuthForm(mode: AuthMode) {
+export function useAuthForm(
+  mode: AuthMode,
+  defaultEmail = "",
+  defaultPassword = "",
+) {
   const { t } = usePreferences();
   const [state, loginAction, pending] = useActionState(login, { error: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [notice, setNotice] = useState("");
   const form = useForm<AuthFormValues>({
     defaultValues: {
-      email: "",
-      password: "",
+      email: defaultEmail,
+      password: defaultPassword,
     },
   });
   const copy = authContent[mode];

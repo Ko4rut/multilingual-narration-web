@@ -28,9 +28,10 @@ import {
 } from "@/components/ui/sidebar";
 import { navigation } from "@/constants/navigation";
 import { logout } from "@/features/auth/actions";
+import { getUserInitials } from "@/features/auth/utils/auth-user.utils";
+import type { AuthenticatedUser } from "@/features/auth/types/auth.types";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { useSidebarNavigation } from "@/hooks/use-sidebar-navigation";
-import { mockCurrentUser } from "@/mocks/current-user.mock";
 import type { SidebarNavigationItemProps } from "@/types/layout/sidebar.types";
 
 /** Hiển thị một liên kết điều hướng và đánh dấu liên kết của trang hiện tại. */
@@ -62,9 +63,10 @@ export function MobileSidebarTrigger() {
 }
 
 /** Kết hợp phần thương hiệu, menu điều hướng và menu tài khoản của sidebar. */
-export function Sidebar() {
+export function Sidebar({ currentUser }: { currentUser: AuthenticatedUser }) {
   const { t } = usePreferences();
   const { closeMobileSidebar, isActive } = useSidebarNavigation();
+  const initials = getUserInitials(currentUser.full_name);
 
   return (
     <ShadcnSidebar collapsible="icon" className="border-sidebar-border">
@@ -123,19 +125,19 @@ export function Sidebar() {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild >
-                <SidebarMenuButton size="lg" tooltip={mockCurrentUser.fullName} className="data-[state=open]:bg-sidebar-accent">
+                <SidebarMenuButton size="lg" tooltip={currentUser.full_name} className="data-[state=open]:bg-sidebar-accent">
                   <Avatar className="overflow-visible">
                     <AvatarFallback className="bg-sidebar-accent text-[10px] font-semibold text-sidebar-accent-foreground">
-                      {mockCurrentUser.initials}
+                      {initials}
                     </AvatarFallback>
                     <AvatarBadge aria-hidden="true" className="bg-success ring-sidebar"/>
                   </Avatar>
                   <div className="min-w-0 flex-1 text-left">
                     <strong className="block truncate text-xs font-medium text-sidebar-accent-foreground">
-                      {mockCurrentUser.fullName}
+                      {currentUser.full_name}
                     </strong>
                     <small className="block truncate text-[9px] text-sidebar-foreground/60">
-                      {mockCurrentUser.email}
+                      {currentUser.email}
                     </small>
                   </div>
                   <ChevronsUpDown className="ml-auto size-3.5 text-sidebar-foreground/60" />

@@ -10,15 +10,15 @@ import { ChangePasswordSheet } from "./ChangePasswordSheet";
 import { ProfileIdentityCard } from "./ProfileIdentityCard";
 import { ProfileInfoCard } from "./ProfileInfoCard";
 import { ProfilePreferencesCard } from "./ProfilePreferencesCard";
+import type { ProfileOverviewProps } from "../types/profile.types";
 
-export function ProfileOverview() {
+export function ProfileOverview({ profile }: ProfileOverviewProps) {
   const {
     t,
-    profile,
     personalItems,
     accountItems,
     statusLabel,
-  } = useProfileOverview();
+  } = useProfileOverview(profile);
 
   return (
     <PageLayout>

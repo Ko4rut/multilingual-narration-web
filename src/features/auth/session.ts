@@ -3,8 +3,10 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export const SESSION_COOKIE = "mans-session";
+export const ACCESS_TOKEN_COOKIE = "mans-access-token";
 export const SESSION_SECONDS = 60 * 60 * 8;
-// Demo only: set AUTH_SECRET when replacing mock authentication.
+// AUTH_SECRET ký cookie session của lớp Next.js; production phải inject giá trị
+// entropy cao, không dùng fallback chỉ dành cho phát triển cục bộ bên dưới.
 const secret = process.env.AUTH_SECRET ?? "mans-local-demo-session-only";
 const sign = (value: string) => createHmac("sha256", secret).update(value).digest("hex");
 

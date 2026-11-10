@@ -22,6 +22,7 @@ export function UserFormSheet({
   mode,
   user,
   errorMessage,
+  roles,
   onOpenChange,
   onSubmit,
   onEdit,
@@ -35,7 +36,7 @@ export function UserFormSheet({
     showPasswordConfirmation,
     togglePasswordVisibility,
     togglePasswordConfirmationVisibility,
-  } = useUserFormSheet(mode);
+  } = useUserFormSheet(mode, roles);
   const isViewMode = mode === "view";
   let passwordType = "password";
   let passwordToggleLabel = t("Show password");

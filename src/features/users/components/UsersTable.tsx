@@ -17,14 +17,13 @@ import type {
   DataTableFilter,
 } from "@/types/shared/data-table.types";
 import { USER_STATUS_OPTIONS } from "../constants/user.constants";
-import { MOCK_ROLES } from "../mocks/roles.mock";
 import type { ManagerUser, UsersTableProps } from "../types/user.types";
 import { formatUserTimestamp, getUserRoleName } from "../utils/user.utils";
 import { UserStatusBadge } from "./UserStatusBadge";
 
-export function UsersTable({ users, onViewUser, onEditUser }: UsersTableProps) {
+export function UsersTable({ users, roles, onViewUser, onEditUser }: UsersTableProps) {
   const { t, locale } = usePreferences();
-  const roleOptions = MOCK_ROLES.map(function createRoleOption(role) {
+  const roleOptions = roles.map(function createRoleOption(role) {
     return { value: role.id, label: role.name };
   });
 
@@ -55,7 +54,7 @@ export function UsersTable({ users, onViewUser, onEditUser }: UsersTableProps) {
       header: t("Role"),
       accessor: "role_id",
       cell: function renderRole(user) {
-        const roleName = getUserRoleName(user.role_id, MOCK_ROLES);
+        const roleName = getUserRoleName(user.role_id, roles);
 
         return (
           <div className="flex min-w-44 flex-col gap-1">
@@ -86,10 +85,10 @@ export function UsersTable({ users, onViewUser, onEditUser }: UsersTableProps) {
         return (
           <div className="flex min-w-64 flex-col gap-1 text-xs">
             <span>
-              {t("Created")}: {formatUserTimestamp(user.created_at, locale)}
+              {t("Created at")}: {formatUserTimestamp(user.created_at, locale)}
             </span>
             <span>
-              {t("Updated")}: {formatUserTimestamp(user.last_updated_at, locale)}
+              {t("Updated at")}: {formatUserTimestamp(user.last_updated_at, locale)}
             </span>
             <span>
               {t("Last login at")}: {formatUserTimestamp(
@@ -115,9 +114,6 @@ export function UsersTable({ users, onViewUser, onEditUser }: UsersTableProps) {
             }}
             onEdit={function handleEdit() {
               onEditUser(user);
-            }}
-            onDelete={function handleDelete() {
-              return user.id;
             }}
           />
         );

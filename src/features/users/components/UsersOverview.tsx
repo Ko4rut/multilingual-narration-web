@@ -18,11 +18,14 @@ export function UsersOverview() {
   const { t, locale } = usePreferences();
   const {
     users,
+    roles,
     overviewSummary,
     selectedUser,
     sheetMode,
     isSheetOpen,
     formError,
+    loadError,
+    isLoading,
     openCreateSheet,
     openViewSheet,
     openEditSheet,
@@ -40,7 +43,11 @@ export function UsersOverview() {
     <PageLayout>
       {/* --- PageHeader --- */}
       <PageLayoutHeader title={t("User Management")} description={t("Manage administrator accounts, roles and access status.")}>
-        <Button type="button" onClick={openCreateSheet}>
+        <Button
+          type="button"
+          onClick={openCreateSheet}
+          disabled={isLoading || roles.length === 0}
+        >
           <UserPlus aria-hidden="true" />
           {t("Add User")}
         </Button>
@@ -79,8 +86,11 @@ export function UsersOverview() {
 
       {/* --- PageContent --- */}
       <PageLayoutContent>
+        {isLoading && <p className="text-sm text-muted-foreground">{t("Loading users...")}</p>}
+        {loadError && <p role="alert" className="text-sm text-destructive">{t(loadError)}</p>}
         <UsersTable
           users={users}
+          roles={roles}
           onViewUser={openViewSheet}
           onEditUser={openEditSheet}
         />
@@ -93,6 +103,7 @@ export function UsersOverview() {
         mode={sheetMode}
         user={selectedUser}
         errorMessage={formError}
+        roles={roles}
         onOpenChange={handleSheetOpenChange}
         onSubmit={handleSubmit}
         onEdit={editSelectedUser}

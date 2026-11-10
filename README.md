@@ -2,16 +2,17 @@
 
 MANS Admin là giao diện quản trị cho hệ thống thuyết minh tự động đa ngôn ngữ. Ứng dụng quản lý điểm tham quan (POI), nội dung thuyết minh, audio, ngôn ngữ, người dùng, vai trò và các thiết lập vận hành của hệ thống.
 
-> Trạng thái hiện tại: frontend prototype sử dụng dữ liệu mock. Các thao tác thêm, sửa, xóa chỉ thay đổi React state trong phiên hiện tại và chưa được lưu vào backend hoặc cơ sở dữ liệu thật.
+> Trạng thái hiện tại: User Management và đăng nhập đã kết nối MNR Backend;
+> các feature còn lại vẫn sử dụng dữ liệu mock trong phiên hiện tại.
 
 ## Chức năng hiện có
 
-- Đăng nhập tài khoản nhân viên demo bằng session cookie HttpOnly có chữ ký.
+- Đăng nhập tài khoản nhân viên qua MNR Backend; Access Token được giữ trong cookie HttpOnly.
 - Dashboard thống kê với bộ lọc 7/30/90 ngày, biểu đồ xu hướng, POI phổ biến và heatmap lượt truy cập.
 - Quản lý POI bằng DataTable: tìm kiếm, lọc trạng thái/khu vực/category, phân trang, thêm, xem, sửa, sao chép ID và xóa.
 - Quản lý nội dung POI đa ngôn ngữ: lọc theo POI/ngôn ngữ/trạng thái, quản lý phiên bản content và bảo vệ content đang duy trì điều kiện active của POI.
 - Quản lý audio với dữ liệu và trạng thái tuân theo thiết kế cơ sở dữ liệu.
-- Quản lý người dùng, vai trò và ma trận phân quyền trên dữ liệu mock.
+- Quản lý người dùng bằng API thật; màn hình vai trò và ma trận phân quyền vẫn dùng dữ liệu mock.
 - Quản lý ngôn ngữ, hồ sơ cá nhân và các nhóm thiết lập hệ thống.
 - Giao diện responsive, hỗ trợ light/dark theme và tiếng Anh/tiếng Việt.
 
@@ -42,20 +43,16 @@ npm run dev
 
 Mở [http://localhost:3000](http://localhost:3000). Route `/` tự động chuyển tới `/login`.
 
-Tài khoản demo:
-
-```text
-Email:    admin@mans.vn
-Password: admin123
-```
-
-Ứng dụng demo không bắt buộc có file `.env`. Có thể khai báo secret riêng cho session local:
+Tạo `.env.local` để khai báo backend và secret session local:
 
 ```bash
+BACKEND_API_URL=http://127.0.0.1:8000/api/v1
 AUTH_SECRET=replace-with-a-private-random-value
 ```
 
-Giá trị fallback trong source chỉ dành cho demo, không được sử dụng khi triển khai với dữ liệu thật.
+Backend phải chạy và có JWT được cấu hình. Đăng nhập web dùng tài khoản thật trong
+`manager_user`; User Management tải role/user và lưu thao tác tạo, sửa vào database.
+Giá trị fallback của `AUTH_SECRET` chỉ dành cho demo, không dùng ở production.
 
 ## Scripts
 
@@ -169,15 +166,16 @@ Kiểm tra diff sau khi thêm để tránh công cụ ghi đè token hoặc conv
 - Giá trị domain giữ nguyên theo schema, ví dụ `PUBLISHED`, `ACTIVE`, `DISABLED`; label giao diện được ánh xạ riêng thành `Published`, `Active`, `Inactive`.
 - Không coi mock state là persistence, authentication hoặc authorization production.
 
-## Xác thực và giới hạn demo
+## Xác thực và giới hạn hiện tại
 
-Credential demo được kiểm tra phía server. Login thành công tạo cookie HttpOnly, SameSite=Lax có thời hạn tám giờ. Forgot password chưa gửi email thật.
+Credential được kiểm tra bởi MNR Backend. Login thành công giữ Access Token trong
+cookie HttpOnly, SameSite=Lax; Forgot password chưa gửi email thật.
 
 Trước khi nối dữ liệu thật cần:
 
-1. Thay credential mock bằng identity provider hoặc API nội bộ.
-2. Cấu hình `AUTH_SECRET` riêng và rà lại chiến lược session.
-3. Thay mock bằng service adapter có validation tại boundary.
+1. Cấu hình `BACKEND_API_URL`, JWT backend và `AUTH_SECRET` riêng cho từng môi trường.
+2. Bổ sung refresh-token rotation ở lớp web để tự cấp lại Access Token khi hết hạn.
+3. Nối các feature còn dùng mock bằng adapter có validation tại boundary.
 4. Kiểm tra authorization tại mỗi action/service được bảo vệ.
 5. Không đưa secret hoặc token server vào biến có prefix `NEXT_PUBLIC_`.
 6. Bổ sung test cho lỗi mạng, dữ liệu không hợp lệ, session hết hạn và phân quyền.

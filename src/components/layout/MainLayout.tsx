@@ -3,7 +3,7 @@ import type { MainLayoutProps } from "@/types/layout/main-layout.types";
 import { MobileSidebarTrigger, Sidebar } from "./Sidebar";
 
 /* Dựng shell dùng chung cho toàn bộ khu vực quản trị.*/
-export default function MainLayout({ children }: MainLayoutProps) {
+export default function MainLayout({ children, currentUser }: MainLayoutProps) {
   // Cung cấp trạng thái đóng/mở Sidebar cho tất cả component nằm bên trong.
   return (
     <SidebarProvider className="h-svh overflow-hidden">
@@ -11,7 +11,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
       <a className="skip-link" href="#main-content"> Skip to content </a>
 
       {/* Hiển thị thương hiệu, các nhóm điều hướng và menu tài khoản. */}
-      <Sidebar />
+      <Sidebar currentUser={currentUser} />
 
       {/* Vùng nội dung chính; id này là đích đến của liên kết "Skip to content". */}
       <main id="main-content" className="main-content scrollbar-hidden flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
