@@ -12,13 +12,22 @@ Next.js reads routes from `src/app`. A folder becomes a public page when it cont
 - `next.config.ts` configures Next.js; `src/constants/navigation.ts` defines menu links, not routes.
 - Framework package and version: `node_modules/next`, `package.json`.
 
-## Mock authentication
+## Backend authentication
 
-Use **admin@mans.vn / admin123**. Credentials are compared as exact strings in `src/features/auth/actions.ts` on the server. Successful login creates a signed, HttpOnly, SameSite=Lax cookie lasting eight hours. Logout deletes it.
+Login gọi `POST /api/v1/auth/login` của MNR Backend qua Server Action. Access token
+được giữ trong cookie HttpOnly; sidebar và Profile lấy user hiện tại từ
+`GET /api/v1/auth/me`. User Management gọi API thật để đọc role/user và lưu thao
+tác tạo, cập nhật vào PostgreSQL.
+
+Khai báo `BACKEND_API_URL` và `AUTH_SECRET` theo `.env.example`. Có thể dùng
+`LOCAL_LOGIN_EMAIL`/`LOCAL_LOGIN_PASSWORD` để điền sẵn form trên máy local; không
+cấu hình hai biến này ở production.
 
 `src/proxy.ts` guards every current admin route, the admin layout also checks the session, and the dashboard service checks before reading data. Add future admin paths to the proxy matcher and authenticate future services/actions at their data boundary.
 
-This is a demo account, not production authentication. Replace the string comparison and demo signing secret with a real identity backend and a private `AUTH_SECRET` before using real data. Employees receive provisioned accounts; public registration is removed. Password reset remains a placeholder.
+`AUTH_SECRET` ký session cookie của Next.js và phải là secret riêng có entropy cao
+ở production. Employees receive provisioned accounts; public registration is
+removed. Password reset remains a placeholder.
 
 ## Components and charts
 
@@ -53,6 +62,10 @@ Run `npm run lint`, `npm run typecheck`, and `npm run build`. Auth changes shoul
 
 ## Feature architecture
 
-Authentication UI lives in `features/auth/components`, form behavior in `hooks/use-auth-form.ts`, contracts in `types/auth.types.ts`, static copy in `constants/auth.constants.ts`, and demo credentials in `mocks/auth.mock.ts`. Server actions still validate credentials and manage sessions. Shared preference behavior lives in `features/settings/hooks`, separate from its rendering components and types.
+Authentication UI lives in `features/auth/components`, form behavior in
+`hooks/use-auth-form.ts`, endpoint adapters in `api/auth.api.ts`, contracts in
+`types/auth.types.ts`, and static copy in `constants/auth.constants.ts`. Server
+actions manage cookies and call the backend adapter. Shared preference behavior
+lives in `features/settings/hooks`, separate from rendering components and types.
 
 Required project conventions: [MANS frontend skill](skills/mans-frontend/SKILL.md). Read `docs/agent-handoff.md` when resuming unfinished work.
