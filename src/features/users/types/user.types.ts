@@ -9,6 +9,9 @@ export type ManagerUserStatus =
 export interface ManagerRole {
   id: string;
   name: string;
+  description?: string | null;
+  created_by?: string | null;
+  last_updated_by?: string | null;
   created_at: string;
   last_updated_at: string | null;
 }
@@ -21,7 +24,8 @@ export interface ManagerUser {
   id: string;
   role_id: ManagerUserRoleId;
   email: string;
-  password_hash: string;
+  /** Chỉ tồn tại trong mock cũ; API backend không bao giờ trả password hash. */
+  password_hash?: string;
   full_name: string;
   user_status: ManagerUserStatus;
   created_at: string;
@@ -37,6 +41,7 @@ export interface UserStatusBadgeProps {
 /** Thuộc tính của bảng danh sách người dùng và các thao tác trên từng hàng. */
 export interface UsersTableProps {
   users: readonly ManagerUser[];
+  roles: readonly ManagerRole[];
   onViewUser: (user: ManagerUser) => void;
   onEditUser: (user: ManagerUser) => void;
 }
@@ -47,10 +52,38 @@ export interface UserFormSheetProps {
   mode: FeatureFormMode;
   user: ManagerUser | null;
   errorMessage: string | null;
+  roles: readonly ManagerRole[];
   onOpenChange: (open: boolean) => void;
-  onSubmit: (formData: FormData) => void;
+  onSubmit: (formData: FormData) => void | Promise<void>;
   onEdit: () => void;
 }
+
+export interface ManagerUserPage {
+  items: ManagerUser[];
+  total: number;
+  offset: number;
+  limit: number;
+}
+
+export interface ManagerUserCreatePayload {
+  role_id: string;
+  email: string;
+  password: string;
+  full_name: string;
+  user_status: ManagerUserStatus;
+}
+
+export type ManagerUserUpdatePayload = Omit<ManagerUserCreatePayload, "password">;
+
+export interface UserManagementData {
+  users: ManagerUser[];
+  roles: ManagerRole[];
+}
+
+export type UserActionResult<T> = {
+  data: T | null;
+  error: string | null;
+};
 
 /** Các chỉ số tổng quan được tính từ danh sách người dùng hiện tại. */
 export interface UsersOverviewSummary {

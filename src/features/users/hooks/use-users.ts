@@ -1,151 +1,179 @@
 "use client";
 
-import { useMemo, useState } from "react";
-
+import { useEffect, useMemo, useState } from "react";
 import type { FeatureFormMode } from "@/types/shared/feature-form.types";
-import { MOCK_ROLES } from "../mocks/roles.mock";
-import { MOCK_MANAGER_USERS } from "../mocks/users.mock";
-import type { ManagerUser } from "../types/user.types";
+import { createUser, loadUserManagement, updateUser } from "../actions";
+import type { ManagerRole, ManagerUser } from "../types/user.types";
 import {
-  createUserId,
   createUsersOverviewSummary,
+  getUserSecretFormValue,
   getUserFormValue,
   parseUserRoleId,
   parseUserStatus,
 } from "../utils/user.utils";
 
 export function useUsers() {
-  const [users, setUsers] = useState<ManagerUser[]>(function initializeUsers() {
-    return [...MOCK_MANAGER_USERS];
-  });
+  const [users, setUsers] = useState<ManagerUser[]>([]);
+  const [roles, setRoles] = useState<ManagerRole[]>([]);
+  const [selectedUser, setSelectedUser] = useState<ManagerUser | null>(null);
   const [sheetMode, setSheetMode] = useState<FeatureFormMode>("create");
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [isLoading, setLoading] = useState(true);
 
-  const selectedUser = users.find(function findSelectedUser(user) {
-    return user.id === selectedUserId;
-  }) ?? null;
-  const overviewSummary = useMemo(function getOverviewSummary() {
+  useEffect(function loadUsersFromApi() {
+    let active = true;
+    async function load() {
+      try {
+        const result = await loadUserManagement();
+        if (active) {
+          if (result.data) {
+            setUsers(result.data.users);
+            setRoles(result.data.roles);
+          }
+          setLoadError(result.error);
+        }
+      } catch (error) {
+        if (active) {
+          let message = "Unable to load users.";
+          if (error instanceof Error) {
+            message = error.message;
+          }
+          setLoadError(message);
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+    void load();
+    return function cancelLoad() {
+      active = false;
+    };
+  }, []);
+
+  const overviewSummary = useMemo(function summarizeUsers() {
     return createUsersOverviewSummary(users);
   }, [users]);
 
-  function openCreateSheet() {
-    setSelectedUserId(null);
-    setSheetMode("create");
-    setSheetOpen(true);
-    setFormError(null);
-  }
-
   function openViewSheet(user: ManagerUser) {
-    setSelectedUserId(user.id);
+    setSelectedUser(user);
     setSheetMode("view");
     setSheetOpen(true);
     setFormError(null);
   }
 
   function openEditSheet(user: ManagerUser) {
-    setSelectedUserId(user.id);
+    setSelectedUser(user);
     setSheetMode("edit");
     setSheetOpen(true);
     setFormError(null);
   }
 
+  function openCreateSheet() {
+    setSelectedUser(null);
+    setSheetMode("create");
+    setSheetOpen(true);
+    setFormError(null);
+  }
+
   function editSelectedUser() {
-    if (!selectedUser) {
-      return;
+    if (selectedUser) {
+      setSheetMode("edit");
     }
-    setSheetMode("edit");
   }
 
   function handleSheetOpenChange(open: boolean) {
     setSheetOpen(open);
     if (!open) {
-      setSelectedUserId(null);
+      setSelectedUser(null);
       setFormError(null);
     }
   }
 
-  function handleSubmit(formData: FormData) {
+  async function handleSubmit(formData: FormData) {
     const fullName = getUserFormValue(formData, "full_name");
     const email = getUserFormValue(formData, "email");
-    const roleId = parseUserRoleId(
-      getUserFormValue(formData, "role_id"),
-      MOCK_ROLES,
-    );
-    const status = parseUserStatus(
-      getUserFormValue(formData, "user_status"),
-    );
-
+    const roleId = parseUserRoleId(getUserFormValue(formData, "role_id"), roles);
+    const userStatus = parseUserStatus(getUserFormValue(formData, "user_status"));
     if (!fullName || !email || !roleId) {
+      setFormError("Please provide all required user fields.");
       return;
     }
 
-    const creationDate = new Date();
-    const timestamp = creationDate.toISOString();
-
-    if (sheetMode === "create") {
-      const password = getUserFormValue(formData, "password");
-      const passwordConfirmation = getUserFormValue(
-        formData,
-        "password_confirmation",
-      );
-      if (password.length < 8) {
-        setFormError("Initial password must contain at least 8 characters.");
-        return;
-      }
-      if (password !== passwordConfirmation) {
-        setFormError("Initial passwords do not match.");
-        return;
+    try {
+      if (sheetMode === "create") {
+        const password = getUserSecretFormValue(formData, "password");
+        const confirmation = getUserSecretFormValue(formData, "password_confirmation");
+        if (password.length < 8) {
+          setFormError("Initial password must contain at least 8 characters.");
+          return;
+        }
+        if (password !== confirmation) {
+          setFormError("Initial passwords do not match.");
+          return;
+        }
+        const result = await createUser({
+          role_id: roleId,
+          email,
+          password,
+          full_name: fullName,
+          user_status: userStatus,
+        });
+        if (!result.data) {
+          setFormError(result.error ?? "Unable to create manager user.");
+          return;
+        }
+        setUsers(function addUser(currentUsers) {
+          return [result.data!, ...currentUsers];
+        });
+      } else {
+        if (!selectedUser) {
+          return;
+        }
+        const result = await updateUser(selectedUser.id, {
+          role_id: roleId,
+          email,
+          full_name: fullName,
+          user_status: userStatus,
+        });
+        if (!result.data) {
+          setFormError(result.error ?? "Unable to update manager user.");
+          return;
+        }
+        const updated = result.data;
+        setUsers(function replaceUser(currentUsers) {
+          return currentUsers.map(function replace(candidate) {
+            if (candidate.id === updated.id) {
+              return updated;
+            }
+            return candidate;
+          });
+        });
       }
       setFormError(null);
-      setUsers(function addUser(currentUsers) {
-        const user: ManagerUser = {
-          id: createUserId(currentUsers, creationDate),
-          role_id: roleId,
-          email,
-          password_hash: "[REDACTED]",
-          full_name: fullName,
-          user_status: status,
-          created_at: timestamp,
-          last_updated_at: timestamp,
-          last_login_at: null,
-        };
-        return [user, ...currentUsers];
-      });
       setSheetOpen(false);
-      return;
+    } catch (error) {
+      let message = "Unable to save user.";
+      if (error instanceof Error) {
+        message = error.message;
+      }
+      setFormError(message);
     }
-
-    if (!selectedUser) {
-      return;
-    }
-
-    setUsers(function updateUsers(currentUsers) {
-      return currentUsers.map(function updateUser(user) {
-        if (user.id !== selectedUser.id) {
-          return user;
-        }
-        return {
-          ...user,
-          role_id: roleId,
-          email,
-          full_name: fullName,
-          user_status: status,
-          last_updated_at: timestamp,
-        };
-      });
-    });
-    setSheetOpen(false);
   }
 
   return {
     users,
+    roles,
     overviewSummary,
     selectedUser,
     sheetMode,
     isSheetOpen,
     formError,
+    loadError,
+    isLoading,
     openCreateSheet,
     openViewSheet,
     openEditSheet,

@@ -17,33 +17,19 @@ export function getUserFormValue(formData: FormData, key: string) {
   return value.trim();
 }
 
-/** Tạo mã người dùng dạng user-ddmmyy-xxxx và tránh trùng với dữ liệu hiện có. */
-export function createUserId(
-  users: readonly ManagerUser[],
-  creationDate: Date,
-) {
-  const day = String(creationDate.getDate()).padStart(2, "0");
-  const month = String(creationDate.getMonth() + 1).padStart(2, "0");
-  const year = String(creationDate.getFullYear()).slice(-2);
-  let sequence = users.length + 1;
-  let id = `user-${day}${month}${year}-${String(sequence).padStart(4, "0")}`;
-
-  while (
-    users.some(function hasUser(candidate) {
-      return candidate.id === id;
-    })
-  ) {
-    sequence += 1;
-    id = `user-${day}${month}${year}-${String(sequence).padStart(4, "0")}`;
+/** Đọc field nhạy cảm mà không trim hoặc biến đổi plaintext. */
+export function getUserSecretFormValue(formData: FormData, key: string) {
+  const value = formData.get(key);
+  if (typeof value !== "string") {
+    return "";
   }
-
-  return id;
+  return value;
 }
 
 /** Chuẩn hóa giá trị trạng thái form về một trạng thái tài khoản hợp lệ. */
 export function parseUserStatus(value: string): ManagerUserStatus {
-  if (value === USER_STATUS.DISABLED) {
-    return USER_STATUS.DISABLED;
+  if (value === USER_STATUS.INACTIVE) {
+    return USER_STATUS.INACTIVE;
   }
   return USER_STATUS.ACTIVE;
 }
