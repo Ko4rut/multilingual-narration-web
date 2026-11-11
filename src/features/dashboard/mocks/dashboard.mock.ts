@@ -1,6 +1,9 @@
 import type { DashboardData, Period } from "../types";
 
-export function createDashboardMock(period: Period): DashboardData {
+export function createDashboardMock(
+  period: Period,
+  totalListeningSessions: number,
+): DashboardData {
   let factor = 1;
 
   if (period === "7") {
@@ -17,9 +20,7 @@ export function createDashboardMock(period: Period): DashboardData {
     stats: [
       {
         label: "Total Listening Sessions",
-        value: count(152482).toLocaleString("en-US"),
-        change: "+14.2%",
-        positive: true,
+        value: totalListeningSessions,
       },
       {
         label: "Total Active POIs",

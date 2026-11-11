@@ -4,8 +4,13 @@ import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type { DashboardStat } from "../types";
 
 export function useStatCard(stat: DashboardStat) {
-  const { t } = usePreferences();
+  const { t, locale } = usePreferences();
+  let value = stat.value;
   let changeClassName = "negative";
+
+  if (typeof stat.value === "number") {
+    value = stat.value.toLocaleString(locale);
+  }
 
   if (stat.positive) {
     changeClassName = "positive";
@@ -13,7 +18,7 @@ export function useStatCard(stat: DashboardStat) {
 
   return {
     label: t(stat.label),
-    value: stat.value,
+    value,
     change: stat.change,
     changeClassName,
   };

@@ -66,7 +66,7 @@ export function DashboardOverview(props: DashboardOverviewProps) {
 
         <footer className="dashboard-footer">
           <span className="status-dot" />
-          {t("Demo workspace \u00b7 All metrics are sample data")}
+          {t("Listening total is live · Other metrics are sample data")}
         </footer>
       </PageLayoutContent>
     </PageLayout>

@@ -2,13 +2,13 @@
 
 MANS Admin là giao diện quản trị cho hệ thống thuyết minh tự động đa ngôn ngữ. Ứng dụng quản lý điểm tham quan (POI), nội dung thuyết minh, audio, ngôn ngữ, người dùng, vai trò và các thiết lập vận hành của hệ thống.
 
-> Trạng thái hiện tại: User Management và đăng nhập đã kết nối MNR Backend;
+> Trạng thái hiện tại: Dashboard, User Management và đăng nhập đã kết nối MNR Backend;
 > các feature còn lại vẫn sử dụng dữ liệu mock trong phiên hiện tại.
 
 ## Chức năng hiện có
 
 - Đăng nhập tài khoản nhân viên qua MNR Backend; Access Token được giữ trong cookie HttpOnly.
-- Dashboard thống kê với bộ lọc 7/30/90 ngày, biểu đồ xu hướng, POI phổ biến và heatmap lượt truy cập.
+- Dashboard giữ giao diện thống kê 7/30/90 ngày; tổng lượt nghe lấy từ API `GET /api/v1/listening/dashboard`, còn các metric và biểu đồ khác tạm dùng dữ liệu mẫu.
 - Quản lý POI bằng DataTable: tìm kiếm, lọc trạng thái/khu vực/category, phân trang, thêm, xem, sửa, sao chép ID và xóa.
 - Quản lý nội dung POI đa ngôn ngữ: lọc theo POI/ngôn ngữ/trạng thái, quản lý phiên bản content và bảo vệ content đang duy trì điều kiện active của POI.
 - Quản lý audio với dữ liệu và trạng thái tuân theo thiết kế cơ sở dữ liệu.
