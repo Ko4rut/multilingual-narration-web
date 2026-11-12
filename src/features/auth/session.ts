@@ -27,3 +27,9 @@ export function validSession(value?: string) {
 export async function requireSession() {
   if (!validSession((await cookies()).get(SESSION_COOKIE)?.value)) redirect("/login");
 }
+
+/** Đọc access token sau khi xác nhận phiên Next.js còn hợp lệ. */
+export async function getAccessToken() {
+  await requireSession();
+  return (await cookies()).get(ACCESS_TOKEN_COOKIE)?.value ?? null;
+}

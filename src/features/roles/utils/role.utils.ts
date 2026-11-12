@@ -23,31 +23,6 @@ export function getRoleFormValue(formData: FormData, key: string) {
   return value.trim();
 }
 
-/** Tạo mã vai trò dạng role-xxxx và tránh trùng với dữ liệu hiện có. */
-export function createRoleId(roles: readonly Role[]) {
-  let sequence = roles.length + 1;
-  let id = `role-${String(sequence).padStart(4, "0")}`;
-
-  while (
-    roles.some(function hasRole(role) {
-      return role.id === id;
-    })
-  ) {
-    sequence += 1;
-    id = `role-${String(sequence).padStart(4, "0")}`;
-  }
-
-  return id;
-}
-
-/** Kiểm tra tên vai trò đã tồn tại mà không phân biệt chữ hoa, chữ thường. */
-export function hasRoleName(roles: readonly Role[], name: string) {
-  const normalizedName = name.toLocaleLowerCase();
-  return roles.some(function matchRoleName(role) {
-    return role.name.toLocaleLowerCase() === normalizedName;
-  });
-}
-
 /** Kết hợp role với thông tin trình bày và số người dùng để tạo Roles Directory. */
 export function createRoleDirectoryItems(
   roles: readonly Role[],
@@ -62,7 +37,7 @@ export function createRoleDirectoryItems(
 
     return {
       role,
-      description: presentation.description,
+      description: role.description ?? presentation.description,
       indicatorClassName: presentation.indicatorClassName,
       userCount,
     };

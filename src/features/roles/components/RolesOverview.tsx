@@ -1,6 +1,5 @@
 "use client";
 
-import { Plus } from "lucide-react";
 import {
   PageLayout,
   PageLayoutContent,
@@ -23,6 +22,8 @@ export function RolesOverview() {
     matrixRows,
     isCreateSheetOpen,
     roleFormError,
+    isLoading,
+    pageError,
     openCreateSheet,
     handleCreateSheetOpenChange,
     handleCreateRole,
@@ -36,24 +37,37 @@ export function RolesOverview() {
         title="Role-Based Access Control"
         description="Configure roles, permissions, and access levels for system users."
       >
-        <Button type="button" onClick={openCreateSheet}>
-          <Plus aria-hidden="true" />
+        <Button type="button" onClick={openCreateSheet} disabled={isLoading}>
           {t("Create New Role")}
         </Button>
       </PageLayoutHeader>
 
       <PageLayoutContent className="grid gap-5 lg:grid-cols-[minmax(16rem,0.75fr)_minmax(0,1.75fr)]">
+        {pageError && (
+          <p role="alert" className="text-sm text-destructive lg:col-span-2">
+            {t(pageError)}
+          </p>
+        )}
+        {isLoading && (
+          <p className="text-sm text-muted-foreground lg:col-span-2">
+            {t("Loading roles...")}
+          </p>
+        )}
+        {!isLoading && (
         <RoleDirectory
           items={directoryItems}
           selectedRoleId={selectedRoleId}
           onSelectRole={handleSelectRole}
         />
+        )}
+        {!isLoading && selectedRole && (
         <PermissionMatrix
           selectedRole={selectedRole}
           actions={actions}
           rows={matrixRows}
           onPermissionChange={handlePermissionChange}
         />
+        )}
       </PageLayoutContent>
 
       <RoleFormSheet

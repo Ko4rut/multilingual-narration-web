@@ -2,8 +2,17 @@
 export interface Role {
   id: string;
   name: string;
+  description: string | null;
+  created_by: string | null;
+  last_updated_by: string | null;
   created_at: string;
   last_updated_at: string | null;
+}
+
+export interface RoleCreatePayload {
+  name: string;
+  description: string | null;
+  permission_ids: string[];
 }
 
 /** Hành động có thể cấp cho một chức năng quản trị. */
@@ -72,5 +81,17 @@ export interface RoleFormSheetProps {
   open: boolean;
   errorMessage: string | null;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (formData: FormData) => void;
+  onSubmit: (formData: FormData) => void | Promise<void>;
 }
+
+export interface RoleManagementData {
+  roles: Role[];
+  permissions: Permission[];
+  rolePermissions: RolePermission[];
+  users: import("@/features/users/types/user.types").ManagerUser[];
+}
+
+export type RoleActionResult<T> = {
+  data: T | null;
+  error: string | null;
+};
