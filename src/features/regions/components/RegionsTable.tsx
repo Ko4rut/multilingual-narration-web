@@ -59,7 +59,7 @@ export function RegionsTable({ regions }: RegionsTableProps) {
           <DataTableSearch placeholder="Search region name, code or ID..." />
         </DataTableToolbar>
         <DataTableContent emptyMessage="No regions match your search." />
-        <DataTablePagination itemLabel="region records" pageSizeOptions={[10]} />
+        <DataTablePagination itemLabel="region records" />
       </DataTablePanel>
     </DataTable>
   );

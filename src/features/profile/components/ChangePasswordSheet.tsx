@@ -45,7 +45,7 @@ export function ChangePasswordSheet() {
           className="flex min-h-0 flex-1 flex-col"
           onSubmit={handleSubmit}
         >
-          <div className="flex-1 space-y-5 overflow-y-auto p-4">
+          <div className="scrollbar-hidden flex-1 space-y-5 overflow-y-auto p-4">
             <div className="rounded-lg border border-warning/30 bg-warning-bg p-3 text-xs text-warning">
               {t("Demo mode: password changes are not persisted.")}
             </div>
