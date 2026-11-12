@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleCheck, CircleOff, Map, MapPinned, Plus } from "lucide-react";
+import { CircleCheck, CircleOff, Map, MapPinned } from "lucide-react";
 import {
   PageLayout,
   PageLayoutContent,
@@ -18,6 +18,8 @@ export function PoisOverview() {
   const { t, locale } = usePreferences();
   const {
     pois,
+    regions,
+    categories,
     overviewSummary,
     poiCategoryMappings,
     selectedPoi,
@@ -25,14 +27,18 @@ export function PoisOverview() {
     sheetMode,
     isSheetOpen,
     feedback,
+    isLoading,
     canActivateSelectedPoi,
+    qrCodeDataUrl,
+    isQrLoading,
     openCreateSheet,
     openViewSheet,
     openEditSheet,
     editSelectedPoi,
     handleSheetOpenChange,
     handleCopyPoi,
-    handleDeletePoi,
+    handleLoadQrCode,
+    handleDownloadQrCode,
     handleSubmit,
   } = usePois();
   let sheetKey = "create";
@@ -51,8 +57,7 @@ export function PoisOverview() {
         title="Point of Interest Management"
         description="Manage POI location, activation and synchronization metadata."
       >
-        <Button type="button" onClick={openCreateSheet}>
-          <Plus aria-hidden="true" />
+        <Button type="button" onClick={openCreateSheet} disabled={isLoading}>
           {t("Add POI")}
         </Button>
       </PageLayoutHeader>
@@ -96,10 +101,11 @@ export function PoisOverview() {
         <PoisTable
           pois={pois}
           categoryMappings={poiCategoryMappings}
+          regions={regions}
+          categories={categories}
           onViewPoi={openViewSheet}
           onEditPoi={openEditSheet}
           onCopyPoi={handleCopyPoi}
-          onDeletePoi={handleDeletePoi}
         />
       </PageLayoutContent>
       <PoiFormSheet
@@ -109,9 +115,15 @@ export function PoisOverview() {
         poi={selectedPoi}
         categoryIds={selectedCategoryIds}
         canActivate={canActivateSelectedPoi}
+        regions={regions}
+        categories={categories}
         onOpenChange={handleSheetOpenChange}
         onSubmit={handleSubmit}
         onEdit={editSelectedPoi}
+        qrCodeDataUrl={qrCodeDataUrl}
+        isQrLoading={isQrLoading}
+        onLoadQrCode={handleLoadQrCode}
+        onDownloadQrCode={handleDownloadQrCode}
       />
     </PageLayout>
   );

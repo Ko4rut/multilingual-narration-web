@@ -4,21 +4,23 @@ import { useMemo } from "react";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type { FeatureFormMode, FormComboboxOption } from "@/types/shared/feature-form.types";
 import { POI_STATUS, POI_STATUS_OPTIONS } from "../constants/poi.constants";
-import { MOCK_POI_CATEGORIES } from "../mocks/poi-categories.mock";
-import { MOCK_REGIONS } from "../mocks/regions.mock";
+import type { PoiCategory } from "../types/poi-category.types";
+import type { Region } from "../types/region.types";
 
 export function usePoiFormSheet(
   mode: FeatureFormMode,
   canActivate: boolean,
+  regions: readonly Region[],
+  categories: readonly PoiCategory[],
 ) {
   const { t } = usePreferences();
   const regionOptions = useMemo<FormComboboxOption[]>(
     function createRegionOptions() {
-      return MOCK_REGIONS.map(function createRegionOption(region) {
+      return regions.map(function createRegionOption(region) {
         return { value: region.id, label: t(region.region_name) };
       });
     },
-    [t],
+    [regions, t],
   );
   const statusOptions = useMemo<FormComboboxOption[]>(
     function createStatusOptions() {
@@ -33,14 +35,14 @@ export function usePoiFormSheet(
   );
   const categoryOptions = useMemo<FormComboboxOption[]>(
     function createCategoryOptions() {
-      return MOCK_POI_CATEGORIES.map(function createCategoryOption(category) {
+      return categories.map(function createCategoryOption(category) {
         return {
           value: category.id,
           label: t(category.category_name),
         };
       });
     },
-    [t],
+    [categories, t],
   );
 
   let description = t("Create a POI. New POIs remain inactive until publish requirements are met.");

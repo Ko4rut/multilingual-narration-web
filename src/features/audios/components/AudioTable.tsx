@@ -34,9 +34,7 @@ export function AudioTable({
   pois,
   selectedAudioId,
   onPreviewAudio,
-  onEditAudio,
   onCopyAudio,
-  onDeleteAudio,
 }: AudioTableProps) {
   const { t, locale } = usePreferences();
   const byteFormatter = new Intl.NumberFormat(locale, {
@@ -147,14 +145,8 @@ export function AudioTable({
       cell: function renderActions(audio) {
         return (
           <MoreMenu
-            onEdit={function handleEdit() {
-              onEditAudio(audio);
-            }}
             onCopy={function handleCopy() {
               onCopyAudio(audio);
-            }}
-            onDelete={function handleDelete() {
-              onDeleteAudio(audio);
             }}
           />
         );

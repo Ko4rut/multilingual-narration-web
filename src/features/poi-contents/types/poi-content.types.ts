@@ -4,6 +4,9 @@ import type {
   CONTENT_STATUS,
   CONTENT_WORKFLOW_ACTION,
 } from "../constants/poi-content.constants";
+import type { ContentAudio } from "@/features/audios/types/audio.types";
+import type { Language } from "./language.types";
+import type { PointOfInterest } from "./poi.types";
 
 /** Tập giá trị trạng thái hợp lệ của nội dung thuyết minh. */
 export type ContentStatus =
@@ -28,7 +31,14 @@ export interface PoiContent {
   created_at: string;
   approved_at: string | null;
   published_at: string | null;
+  audio?: ContentAudio | null;
 }
+
+export interface PoiContentPage { items: PoiContent[]; total: number; offset: number; limit: number; }
+export interface PoiContentOptions { pois: Pick<PointOfInterest, "id" | "poi_name">[]; languages: Language[]; }
+export interface PoiContentCreatePayload { poi_id: string; language_id: string; narration_title: string; narration_script: string; }
+export interface PoiContentUpdatePayload { narration_title: string; narration_script: string; }
+export type ReviewDecision = "APPROVE" | "REJECT";
 
 /** Các chỉ số tổng quan được tính từ danh sách POI content hiện tại. */
 export interface PoiContentsOverviewSummary {
@@ -55,7 +65,8 @@ export interface PoiContentTableProps {
   onCopyContent: (content: PoiContent) => void;
   onViewContent: (content: PoiContent) => void;
   onEditContent: (content: PoiContent) => void;
-  onDeleteContent: (content: PoiContent) => void;
+  pois: readonly PointOfInterest[];
+  languages: readonly Language[];
   onSubmitContent: (content: PoiContent) => void;
   onReviewContent: (content: PoiContent) => void;
   onPublishContent: (content: PoiContent) => void;
@@ -68,7 +79,8 @@ export interface PoiContentFormSheetProps {
   content: PoiContent | null;
   poiOptions: readonly DataTableFilterOption[];
   onOpenChange: (open: boolean) => void;
-  onSubmit: (formData: FormData) => void;
+  languages: readonly Language[];
+  onSubmit: (formData: FormData) => void | Promise<void>;
   onEdit: () => void;
 }
 
@@ -94,10 +106,10 @@ export interface PoiContentWorkflowActionProps {
 export interface PoiContentReviewSheetProps {
   open: boolean;
   content: PoiContent | null;
-  reviewNote: string;
   errorMessage: string | null;
+  pois: readonly PointOfInterest[];
+  languages: readonly Language[];
   onOpenChange: (open: boolean) => void;
-  onReviewNoteChange: (value: string) => void;
   onApprove: () => void;
   onReject: () => void;
 }
@@ -111,7 +123,8 @@ export interface PoiContentPublishSheetProps {
   audioMimeType: string | null;
   archivedContent: PoiContent | null;
   errorMessage: string | null;
+  pois: readonly PointOfInterest[];
+  languages: readonly Language[];
   onOpenChange: (open: boolean) => void;
-  onGenerateAudio: () => void;
   onPublish: () => void;
 }

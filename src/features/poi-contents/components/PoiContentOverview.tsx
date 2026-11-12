@@ -5,7 +5,6 @@ import {
   Clock3,
   FileText,
   Languages,
-  Plus,
   Send,
 } from "lucide-react";
 import {
@@ -27,6 +26,8 @@ export function PoiContentOverview() {
   const { t, locale } = usePreferences();
   const {
     contents,
+    pois,
+    languages,
     overviewSummary,
     poiOptions,
     selectedContent,
@@ -34,30 +35,27 @@ export function PoiContentOverview() {
     isSheetOpen,
     reviewContent,
     isReviewSheetOpen,
-    reviewNote,
     publishContent,
     isPublishSheetOpen,
     publishAudio,
     archivedContent,
     workflowError,
     feedback,
+    isLoading,
     openCreateSheet,
     openViewSheet,
     openEditSheet,
     editSelectedContent,
     handleSheetOpenChange,
     handleCopyContent,
-    handleDeleteContent,
     handleSubmit,
     handleSubmitForApproval,
     openReviewSheet,
     handleReviewSheetOpenChange,
-    handleReviewNoteChange,
     handleApproveContent,
     handleRejectContent,
     openPublishSheet,
     handlePublishSheetOpenChange,
-    handleGenerateAudio,
     handlePublishContent,
   } = usePoiContents();
   let sheetKey = "create";
@@ -76,8 +74,7 @@ export function PoiContentOverview() {
         title="POIs Content Management"
         description="Manage multilingual narration versions and publishing workflows."
       >
-        <Button type="button" onClick={openCreateSheet}>
-          <Plus aria-hidden="true" />
+        <Button type="button" onClick={openCreateSheet} disabled={isLoading}>
           {t("Add New Content")}
         </Button>
       </PageLayoutHeader>
@@ -120,10 +117,11 @@ export function PoiContentOverview() {
       <PageLayoutContent>
         <PoiContentTable
           contents={contents}
+          pois={pois}
+          languages={languages}
           onCopyContent={handleCopyContent}
           onViewContent={openViewSheet}
           onEditContent={openEditSheet}
-          onDeleteContent={handleDeleteContent}
           onSubmitContent={handleSubmitForApproval}
           onReviewContent={openReviewSheet}
           onPublishContent={openPublishSheet}
@@ -135,6 +133,7 @@ export function PoiContentOverview() {
         mode={sheetMode}
         content={selectedContent}
         poiOptions={poiOptions}
+        languages={languages}
         onOpenChange={handleSheetOpenChange}
         onSubmit={handleSubmit}
         onEdit={editSelectedContent}
@@ -142,10 +141,10 @@ export function PoiContentOverview() {
       <PoiContentReviewSheet
         open={isReviewSheetOpen}
         content={reviewContent}
-        reviewNote={reviewNote}
         errorMessage={workflowError}
+        pois={pois}
+        languages={languages}
         onOpenChange={handleReviewSheetOpenChange}
-        onReviewNoteChange={handleReviewNoteChange}
         onApprove={handleApproveContent}
         onReject={handleRejectContent}
       />
@@ -157,8 +156,9 @@ export function PoiContentOverview() {
         audioMimeType={publishAudio?.audio_mime_type ?? null}
         archivedContent={archivedContent}
         errorMessage={workflowError}
+        pois={pois}
+        languages={languages}
         onOpenChange={handlePublishSheetOpenChange}
-        onGenerateAudio={handleGenerateAudio}
         onPublish={handlePublishContent}
       />
     </PageLayout>

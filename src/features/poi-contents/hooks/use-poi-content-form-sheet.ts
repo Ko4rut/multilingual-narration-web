@@ -5,20 +5,20 @@ import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type { FeatureFormMode, FormComboboxOption } from "@/types/shared/feature-form.types";
 import { LANGUAGE_STATUS } from "../constants/language.constants";
 import { CONTENT_STATUS_OPTIONS } from "../constants/poi-content.constants";
-import { MOCK_LANGUAGES } from "../mocks/languages.mock";
+import type { Language } from "../types/language.types";
 
-export function usePoiContentFormSheet(mode: FeatureFormMode) {
+export function usePoiContentFormSheet(mode: FeatureFormMode, languages: readonly Language[]) {
   const { t } = usePreferences();
   const languageOptions = useMemo<FormComboboxOption[]>(
     function createLanguageOptions() {
-      return MOCK_LANGUAGES.flatMap(function createLanguageOption(language) {
+      return languages.flatMap(function createLanguageOption(language) {
         if (language.language_status !== LANGUAGE_STATUS.SUPPORTED) {
           return [];
         }
         return [{ value: language.id, label: t(language.language_name) }];
       });
     },
-    [t],
+    [languages, t],
   );
   const statusOptions = useMemo<FormComboboxOption[]>(
     function createStatusOptions() {

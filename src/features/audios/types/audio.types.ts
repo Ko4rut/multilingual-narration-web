@@ -60,6 +60,7 @@ export interface ContentAudio {
   last_updated_at: string | null;
 }
 
+export interface ContentAudioPage { items: ContentAudio[]; total: number; offset: number; limit: number; }
 export interface AudiosOverviewSummary {
   totalAudios: number;
   recordedAudios: number;
@@ -78,22 +79,11 @@ export interface AudioTableProps {
   pois: readonly AudioPoi[];
   selectedAudioId: string | null;
   onPreviewAudio: (audio: ContentAudio) => void;
-  onEditAudio: (audio: ContentAudio) => void;
   onCopyAudio: (audio: ContentAudio) => void;
-  onDeleteAudio: (audio: ContentAudio) => void;
 }
 
 /** Thuộc tính khu vực nghe thử và lựa chọn bản ghi âm thanh. */
 export interface AudioPreviewProps {
   contents: readonly AudioPoiContent[];
   selectedAudio: ContentAudio | null;
-}
-
-/** Thuộc tính sheet chỉnh sửa đường dẫn nguồn của một bản ghi audio. */
-export interface AudioEditSheetProps {
-  open: boolean;
-  audio: ContentAudio | null;
-  errorMessage: string | null;
-  onOpenChange: (open: boolean) => void;
-  onSubmit: (formData: FormData) => void;
 }

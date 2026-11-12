@@ -12,8 +12,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
-import { MOCK_LANGUAGES } from "../mocks/languages.mock";
-import { MOCK_POIS } from "../mocks/poi.mock";
 import type { PoiContentPublishSheetProps } from "../types/poi-content.types";
 import {
   findPoiContentLanguage,
@@ -30,16 +28,17 @@ export function PoiContentPublishSheet({
   audioMimeType,
   archivedContent,
   errorMessage,
+  pois,
+  languages,
   onOpenChange,
-  onGenerateAudio,
   onPublish,
 }: PoiContentPublishSheetProps) {
   const { t, locale } = usePreferences();
   let poi = null;
   let language = null;
   if (content) {
-    poi = findPoiContentPoi(content.poi_id, MOCK_POIS);
-    language = findPoiContentLanguage(content.language_id, MOCK_LANGUAGES);
+    poi = findPoiContentPoi(content.poi_id, pois);
+    language = findPoiContentLanguage(content.language_id, languages);
   }
 
   function handleClose() {
@@ -107,7 +106,7 @@ export function PoiContentPublishSheet({
                       {t("Audio readiness")}
                     </h3>
                     <p className="text-xs text-muted-foreground">
-                      {t("A valid audio asset is required before publishing.")}
+                      {t("Publishing automatically generates TTS audio when no valid audio exists.")}
                     </p>
                   </div>
                 </div>
@@ -136,17 +135,6 @@ export function PoiContentPublishSheet({
                 </dl>
               )}
 
-              {!hasValidAudio && (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={onGenerateAudio}
-                >
-                  <AudioLines aria-hidden="true" />
-                  {t("Generate TTS audio")}
-                </Button>
-              )}
             </section>
 
             {archivedContent && (
@@ -175,7 +163,6 @@ export function PoiContentPublishSheet({
             </Button>
             <Button
               type="button"
-              disabled={!hasValidAudio}
               onClick={onPublish}
             >
               <Rocket aria-hidden="true" />

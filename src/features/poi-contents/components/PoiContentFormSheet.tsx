@@ -12,7 +12,6 @@ import {
   DEFAULT_CONTENT_AUTHOR_ID,
 } from "../constants/poi-content.constants";
 import { usePoiContentFormSheet } from "../hooks/use-poi-content-form-sheet";
-import { DEFAULT_MOCK_LANGUAGE_ID } from "../mocks/languages.mock";
 import type { PoiContentFormSheetProps } from "../types/poi-content.types";
 import { PoiContentPoiCombobox } from "./PoiContentPoiCombobox";
 import { PoiContentWorkflowFields } from "./PoiContentWorkflowFields";
@@ -22,12 +21,16 @@ export function PoiContentFormSheet({
   mode,
   content,
   poiOptions,
+  languages,
   onOpenChange,
   onSubmit,
   onEdit,
 }: PoiContentFormSheetProps) {
   const { t, languageOptions, statusOptions, description } =
-    usePoiContentFormSheet(mode);
+    usePoiContentFormSheet(mode, languages);
+  const defaultLanguageId = languages.find(function findEnglish(language) {
+    return language.language_code === "en";
+  })?.id ?? "";
   const isViewMode = mode === "view";
   const isCreateMode = mode === "create";
 
@@ -58,7 +61,7 @@ export function PoiContentFormSheet({
           id="content-language"
           name="language_id"
           options={languageOptions}
-          defaultValue={content?.language_id ?? DEFAULT_MOCK_LANGUAGE_ID}
+          defaultValue={content?.language_id ?? defaultLanguageId}
           placeholder="Select a language"
           disabled={!isCreateMode}
           required
