@@ -1,6 +1,6 @@
 "use client";
 
-import { AudioLines, CircleAlert, Rocket } from "lucide-react";
+import { AudioLines, CircleAlert, LoaderCircle } from "lucide-react";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,7 @@ export function PoiContentPublishSheet({
   open,
   content,
   hasValidAudio,
+  isPublishing,
   audioDurationSeconds,
   audioMimeType,
   archivedContent,
@@ -42,11 +43,17 @@ export function PoiContentPublishSheet({
   }
 
   function handleClose() {
+    if (isPublishing) return;
     onOpenChange(false);
   }
 
+  function handleOpenChange(nextOpen: boolean) {
+    if (isPublishing && !nextOpen) return;
+    onOpenChange(nextOpen);
+  }
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent className="w-full gap-0 overflow-hidden sm:max-w-xl">
         <SheetHeader className="border-b">
           <SheetTitle>{t("Publish narration content")}</SheetTitle>
@@ -158,15 +165,25 @@ export function PoiContentPublishSheet({
 
         <SheetFooter className="border-t">
           <div className="flex w-full justify-end gap-2">
-            <Button type="button" variant="outline" onClick={handleClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isPublishing}
+            >
               {t("Cancel")}
             </Button>
             <Button
               type="button"
               onClick={onPublish}
+              disabled={isPublishing}
+              aria-busy={isPublishing}
             >
-              <Rocket aria-hidden="true" />
-              {t("Publish content")}
+              {isPublishing && (
+                <LoaderCircle aria-hidden="true" className="animate-spin" />
+              )}
+              {isPublishing && t("Generating audio and publishing…")}
+              {!isPublishing && "PUBLISH"}
             </Button>
           </div>
         </SheetFooter>

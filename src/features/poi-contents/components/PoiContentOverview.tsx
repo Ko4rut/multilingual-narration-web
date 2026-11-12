@@ -38,10 +38,12 @@ export function PoiContentOverview() {
     publishContent,
     isPublishSheetOpen,
     publishAudio,
+    hasValidPublishAudio,
     archivedContent,
     workflowError,
     feedback,
     isLoading,
+    isPublishing,
     openCreateSheet,
     openViewSheet,
     openEditSheet,
@@ -125,6 +127,9 @@ export function PoiContentOverview() {
           onSubmitContent={handleSubmitForApproval}
           onReviewContent={openReviewSheet}
           onPublishContent={openPublishSheet}
+          disabledWorkflowContentId={
+            isPublishSheetOpen ? publishContent?.id ?? null : null
+          }
         />
       </PageLayoutContent>
       <PoiContentFormSheet
@@ -151,7 +156,8 @@ export function PoiContentOverview() {
       <PoiContentPublishSheet
         open={isPublishSheetOpen}
         content={publishContent}
-        hasValidAudio={Boolean(publishAudio)}
+        hasValidAudio={hasValidPublishAudio}
+        isPublishing={isPublishing}
         audioDurationSeconds={publishAudio?.audio_duration_sec ?? null}
         audioMimeType={publishAudio?.audio_mime_type ?? null}
         archivedContent={archivedContent}
