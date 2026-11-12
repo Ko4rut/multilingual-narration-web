@@ -5,7 +5,6 @@ import {
   CircleOff,
   Globe2,
   Languages,
-  Plus,
 } from "lucide-react";
 import {
   PageLayout,
@@ -51,7 +50,6 @@ export function LanguageOverview() {
         description="Manage supported languages for narration content"
       >
         <Button type="button" onClick={openCreateSheet}>
-          <Plus aria-hidden="true" />
           {t("Add Language")}
         </Button>
       </PageLayoutHeader>

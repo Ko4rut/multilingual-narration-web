@@ -6,6 +6,9 @@ import {
   FormField,
   FormMultiCombobox,
 } from "@/components/shared/FeatureFormSheet";
+import Image from "next/image";
+import { Download, QrCode } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { POI_STATUS } from "../constants/poi.constants";
@@ -18,9 +21,15 @@ export function PoiFormSheet({
   poi,
   categoryIds,
   canActivate,
+  regions,
+  categories,
   onOpenChange,
   onSubmit,
   onEdit,
+  qrCodeDataUrl,
+  isQrLoading,
+  onLoadQrCode,
+  onDownloadQrCode,
 }: PoiFormSheetProps) {
   const {
     t,
@@ -28,7 +37,7 @@ export function PoiFormSheet({
     categoryOptions,
     statusOptions,
     description,
-  } = usePoiFormSheet(mode, canActivate);
+  } = usePoiFormSheet(mode, canActivate, regions, categories);
   const isViewMode = mode === "view";
   const isCreateMode = mode === "create";
 
@@ -54,16 +63,51 @@ export function PoiFormSheet({
         />
       </FormField>
 
-      <FormField label={t("QR code")} htmlFor="poi-qr-code" required>
-        <Input
-          id="poi-qr-code"
-          name="poi_qr_code"
-          defaultValue={poi?.poi_qr_code ?? ""}
-          placeholder="MANS:POI:LANDMARK"
-          disabled={isViewMode}
-          required
-        />
-      </FormField>
+      {poi && (
+        <div className="space-y-3 rounded-lg border p-3">
+          <FormField
+            label={t("QR code payload")}
+            htmlFor="poi-qr-code"
+            hint={t("This value is generated automatically by the backend.")}
+          >
+            <Input
+              id="poi-qr-code"
+              value={poi.poi_qr_code}
+              className="font-mono"
+              disabled
+              readOnly
+            />
+          </FormField>
+          {qrCodeDataUrl && (
+            <Image
+              src={qrCodeDataUrl}
+              alt={t("POI QR code")}
+              width={220}
+              height={220}
+              unoptimized
+              className="mx-auto rounded-md border bg-white p-2"
+            />
+          )}
+          <div className="flex flex-wrap justify-end gap-2">
+            {!qrCodeDataUrl && (
+              <Button type="button" variant="outline" onClick={onLoadQrCode} disabled={isQrLoading}>
+                <QrCode aria-hidden="true" />
+                {isQrLoading ? t("Loading QR code…") : t("View QR code")}
+              </Button>
+            )}
+            <Button type="button" variant="outline" onClick={onDownloadQrCode} disabled={isQrLoading}>
+              <Download aria-hidden="true" />
+              {t("Download QR code")}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {isCreateMode && (
+        <p className="text-xs text-muted-foreground">
+          {t("The QR code will be generated automatically after the POI is created.")}
+        </p>
+      )}
 
       <FormField label={t("Region")} htmlFor="poi-region" required>
         <FormCombobox
@@ -159,21 +203,6 @@ export function PoiFormSheet({
           placeholder="https://example.com/poi.jpg"
           disabled={isViewMode}
           required
-        />
-      </FormField>
-
-      <FormField
-        label={t("Image checksum")}
-        htmlFor="poi-image-checksum"
-      >
-        <Input
-          id="poi-image-checksum"
-          name="image_checksum_sha256"
-          defaultValue={poi?.image_checksum_sha256 ?? ""}
-          placeholder={t("Optional SHA-256 checksum")}
-          minLength={64}
-          maxLength={64}
-          disabled={isViewMode}
         />
       </FormField>
 

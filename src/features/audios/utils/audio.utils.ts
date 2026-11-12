@@ -17,23 +17,3 @@ export function findAudioPoiContent(
   });
 }
 
-/** Đọc và chuẩn hóa một giá trị chuỗi từ dữ liệu form audio. */
-export function getAudioFormValue(formData: FormData, key: string) {
-  const value = formData.get(key);
-  if (typeof value !== "string") {
-    return "";
-  }
-  return value.trim();
-}
-
-/** Kiểm tra URL audio sử dụng giao thức HTTPS trước khi cập nhật dữ liệu. */
-export function isValidAudioUrl(value: string) {
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
-

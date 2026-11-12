@@ -2,12 +2,19 @@
 
 MANS Admin là giao diện quản trị cho hệ thống thuyết minh tự động đa ngôn ngữ. Ứng dụng quản lý điểm tham quan (POI), nội dung thuyết minh, audio, ngôn ngữ, người dùng, vai trò và các thiết lập vận hành của hệ thống.
 
+> Trạng thái hiện tại: đăng nhập, User Management, Role, POI, POI Content và
+> Audio Management đã kết nối MNR Backend; các feature còn lại vẫn dùng mock.
 > Trạng thái hiện tại: Dashboard, User Management và đăng nhập đã kết nối MNR Backend;
 > các feature còn lại vẫn sử dụng dữ liệu mock trong phiên hiện tại.
 
 ## Chức năng hiện có
 
 - Đăng nhập tài khoản nhân viên qua MNR Backend; Access Token được giữ trong cookie HttpOnly.
+- Dashboard thống kê với bộ lọc 7/30/90 ngày, biểu đồ xu hướng, POI phổ biến và heatmap lượt truy cập.
+- Quản lý POI qua API: tìm kiếm, lọc trạng thái/khu vực/category, phân trang, thêm, xem, sửa, sao chép ID và xem/tải QR. Backend tự sinh payload/ảnh QR khi tạo POI; PATCH chỉ gửi các trường thực sự thay đổi.
+- Quản lý nội dung POI qua API: tạo/sửa phiên bản, submit, review và publish; backend tự sinh TTS khi publish nếu chưa có audio hợp lệ.
+- Quản lý và nghe thử metadata audio từ API. Asset audio đã lưu là bất biến; giao diện không cho thay URL khi chưa có quy trình upload/import xác minh file mới.
+- Quản lý người dùng, vai trò và ma trận phân quyền bằng API thật. Tên hiển thị Action và Management Function vẫn được ánh xạ cục bộ vì backend chưa có API danh mục tương ứng.
 - Dashboard giữ giao diện thống kê 7/30/90 ngày; tổng lượt nghe lấy từ API `GET /api/v1/listening/dashboard`, còn các metric và biểu đồ khác tạm dùng dữ liệu mẫu.
 - Quản lý POI bằng DataTable: tìm kiếm, lọc trạng thái/khu vực/category, phân trang, thêm, xem, sửa, sao chép ID và xóa.
 - Quản lý nội dung POI đa ngôn ngữ: lọc theo POI/ngôn ngữ/trạng thái, quản lý phiên bản content và bảo vệ content đang duy trì điều kiện active của POI.
@@ -161,7 +168,7 @@ Kiểm tra diff sau khi thêm để tránh công cụ ghi đè token hoặc conv
 ## Dữ liệu mock và trạng thái domain
 
 - Mock phải có type rõ ràng và nằm trong `mocks/` của feature sở hữu dữ liệu đó.
-- Các bảng tham chiếu như languages, roles, regions hoặc POI categories vẫn là mock data, không biến thành constant chỉ vì ít thay đổi trong demo.
+- Chỉ giữ mock cho feature chưa có API; role, region và POI category của các màn hình đã kết nối phải lấy từ backend.
 - Enum-like status, label mapping, option metadata và default kỹ thuật nằm trong `constants/`.
 - Giá trị domain giữ nguyên theo schema, ví dụ `PUBLISHED`, `ACTIVE`, `DISABLED`; label giao diện được ánh xạ riêng thành `Published`, `Active`, `Inactive`.
 - Không coi mock state là persistence, authentication hoặc authorization production.

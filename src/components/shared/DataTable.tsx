@@ -200,7 +200,7 @@ function DataTableToolbar({
     <div
       data-slot="data-table-toolbar"
       className={cn(
-        "flex flex-col gap-3 border-b border-border bg-card p-4 lg:flex-row lg:items-center lg:justify-between",
+        "flex min-w-0 flex-col gap-3 border-b border-border bg-card p-4 xl:flex-row xl:items-start xl:justify-between",
         className,
       )}
       {...props}
@@ -230,7 +230,10 @@ function DataTableToolbarActions({
   return (
     <div
       data-slot="data-table-toolbar-actions"
-      className={cn("flex flex-wrap items-center gap-2", className)}
+      className={cn(
+        "flex min-w-0 w-full items-center xl:w-auto xl:flex-1 xl:justify-end",
+        className,
+      )}
       {...props}
     />
   );
@@ -248,7 +251,7 @@ function DataTableSearch({
   return (
     <div
       data-slot="data-table-search"
-      className="relative w-full lg:max-w-md"
+      className="relative w-full xl:max-w-sm xl:shrink-0"
     >
       {/* Biểu tượng nhận diện chức năng tìm kiếm. */}
       <SearchIcon
@@ -319,7 +322,10 @@ function DataTableFilter({ filterId, className }: DataTableFilterProps) {
       <SelectTrigger
         data-slot="data-table-filter"
         aria-label={t(filter.label)}
-        className={cn("min-w-40 bg-background", className)}
+        className={cn(
+          "w-full min-w-0 bg-background xl:w-auto xl:min-w-36",
+          className,
+        )}
       >
         <SelectValue placeholder={t(filter.label)} />
       </SelectTrigger>
@@ -425,7 +431,7 @@ function DataTableSearchableFilter({
             type="button"
             variant="outline"
             className={cn(
-              "min-w-72 justify-between bg-background font-normal",
+              "w-full min-w-0 justify-between bg-background font-normal xl:w-auto xl:min-w-64",
               className,
             )}
           />
@@ -464,7 +470,10 @@ function DataTableFilters({
   return (
     <div
       data-slot="data-table-filters"
-      className={cn("flex flex-wrap items-center gap-2", className)}
+      className={cn(
+        "grid min-w-0 w-full grid-cols-1 items-center gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:flex xl:flex-wrap xl:justify-end",
+        className,
+      )}
       {...props}
     >
       {table.filters.map(function renderFilter(filter) {
@@ -478,7 +487,7 @@ function DataTableFilters({
         onClick={table.resetFilters}
         aria-label={t("Reset filters")}
         title={t("Reset filters")}
-        className="bg-background"
+        className="justify-self-start bg-background sm:justify-self-end xl:justify-self-auto"
       >
         <RotateCcwIcon aria-hidden="true" />
       </Button>

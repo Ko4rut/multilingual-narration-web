@@ -17,8 +17,6 @@ import type {
   DataTableFilter,
 } from "@/types/shared/data-table.types";
 import { CONTENT_STATUS_OPTIONS } from "../constants/poi-content.constants";
-import { MOCK_LANGUAGES } from "../mocks/languages.mock";
-import { MOCK_POIS } from "../mocks/poi.mock";
 import type {
   PoiContent,
   PoiContentTableProps,
@@ -34,17 +32,18 @@ import { PoiContentWorkflowAction } from "./PoiContentWorkflowAction";
 
 export function PoiContentTable({
   contents,
+  pois,
+  languages,
   onViewContent,
   onEditContent,
   onCopyContent,
-  onDeleteContent,
   onSubmitContent,
   onReviewContent,
   onPublishContent,
 }: PoiContentTableProps) {
   const { t } = usePreferences();
-  const languageOptions = createLanguageFilterOptions(MOCK_LANGUAGES);
-  const poiOptions = createPoiFilterOptions(MOCK_POIS);
+  const languageOptions = createLanguageFilterOptions(languages);
+  const poiOptions = createPoiFilterOptions(pois);
   const columns: readonly DataTableColumn<PoiContent>[] = [
     // Column Narration Content
     {
@@ -76,17 +75,17 @@ export function PoiContentTable({
       searchValue: function getReferenceSearchValue(content) {
         const language = findPoiContentLanguage(
           content.language_id,
-          MOCK_LANGUAGES,
+          languages,
         );
-        const poi = findPoiContentPoi(content.poi_id, MOCK_POIS);
+        const poi = findPoiContentPoi(content.poi_id, pois);
         return `${content.poi_id} ${poi?.poi_name ?? ""} ${content.language_id} ${language?.language_code ?? ""} ${language?.language_name ?? ""}`;
       },
       cell: function renderReferences(content) {
         const language = findPoiContentLanguage(
           content.language_id,
-          MOCK_LANGUAGES,
+          languages,
         );
-        const poi = findPoiContentPoi(content.poi_id, MOCK_POIS);
+        const poi = findPoiContentPoi(content.poi_id, pois);
         return (
           <div className="flex min-w-52 flex-col gap-1 font-mono text-xs">
             <span>
@@ -150,9 +149,6 @@ export function PoiContentTable({
             }}
             onEdit={function handleEdit() {
               onEditContent(content);
-            }}
-            onDelete={function handleDelete() {
-              onDeleteContent(content);
             }}
           />
         );

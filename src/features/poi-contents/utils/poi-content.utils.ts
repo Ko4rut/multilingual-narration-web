@@ -1,13 +1,10 @@
-import { AUDIO_SOURCE_TYPE } from "@/features/audios/constants/audio.constants";
 import type { ContentAudio } from "@/features/audios/types/audio.types";
-import { canActivatePoi } from "@/features/pois/utils/poi.utils";
 import type { Locale } from "@/i18n/types";
 import type { DataTableFilterOption } from "@/types/shared/data-table.types";
 import {
   CONTENT_STATUS,
   CONTENT_WORKFLOW_ACTION,
 } from "../constants/poi-content.constants";
-import { POI_STATUS } from "../constants/poi.constants";
 import type { Language } from "../types/language.types";
 import type {
   ContentWorkflowAction,
@@ -151,24 +148,6 @@ export function createPoiFilterOptions(
   });
 }
 
-/** Kiểm tra content có thể xóa mà không làm POI đang active mất điều kiện hay không. */
-export function canDeletePoiContent(
-  content: PoiContent,
-  contents: readonly PoiContent[],
-  pois: readonly PointOfInterest[],
-  audios: readonly ContentAudio[],
-) {
-  const linkedPoi = findPoiContentPoi(content.poi_id, pois);
-  if (linkedPoi?.poi_status !== POI_STATUS.ACTIVE) {
-    return true;
-  }
-
-  const remainingContents = contents.filter(function keepContent(candidate) {
-    return candidate.id !== content.id;
-  });
-  return canActivatePoi(linkedPoi.id, remainingContents, audios);
-}
-
 /** Xác định hành động tiếp theo được phép hiển thị từ trạng thái content hiện tại. */
 export function getPoiContentWorkflowAction(
   status: PoiContent["content_status"],
@@ -228,31 +207,4 @@ export function findPublishedPoiContentVersion(
       );
     }) ?? null
   );
-}
-
-/** Tạo audio TTS mẫu với metadata hợp lệ cho bước kiểm tra trước khi xuất bản. */
-export function createMockPoiContentTtsAudio(
-  content: PoiContent,
-  audios: readonly ContentAudio[],
-  creationDate: Date,
-): ContentAudio {
-  const day = String(creationDate.getDate()).padStart(2, "0");
-  const month = String(creationDate.getMonth() + 1).padStart(2, "0");
-  const year = String(creationDate.getFullYear()).slice(-2);
-  const sequence = String(audios.length + 1).padStart(4, "0");
-  const duration = Math.max(10, Math.ceil(content.narration_script.length / 13));
-
-  return {
-    id: `audio-${day}${month}${year}-${sequence}`,
-    poi_content_id: content.id,
-    audio_url: `https://cdn.mans.example/audio/generated/${content.id}.mp3`,
-    audio_size: duration * 16000,
-    audio_source_type: AUDIO_SOURCE_TYPE.TTS,
-    audio_duration_sec: duration,
-    audio_mime_type: "audio/mpeg",
-    audio_checksum_sha256:
-      "a3f1c9e72b4d68105f3a8c2e91d74b60a5e8f137c2d9460b1a7e5c3f8d2b6490",
-    created_at: creationDate.toISOString(),
-    last_updated_at: null,
-  };
 }

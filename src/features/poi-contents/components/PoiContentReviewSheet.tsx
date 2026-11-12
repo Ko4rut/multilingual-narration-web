@@ -1,6 +1,5 @@
 "use client";
 
-import type { ChangeEvent } from "react";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,10 +10,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Textarea } from "@/components/ui/textarea";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
-import { MOCK_LANGUAGES } from "../mocks/languages.mock";
-import { MOCK_POIS } from "../mocks/poi.mock";
 import type { PoiContentReviewSheetProps } from "../types/poi-content.types";
 import {
   findPoiContentLanguage,
@@ -26,10 +22,10 @@ import { PoiContentStatusBadge } from "./PoiContentStatusBadge";
 export function PoiContentReviewSheet({
   open,
   content,
-  reviewNote,
   errorMessage,
+  pois,
+  languages,
   onOpenChange,
-  onReviewNoteChange,
   onApprove,
   onReject,
 }: PoiContentReviewSheetProps) {
@@ -37,14 +33,8 @@ export function PoiContentReviewSheet({
   let poi = null;
   let language = null;
   if (content) {
-    poi = findPoiContentPoi(content.poi_id, MOCK_POIS);
-    language = findPoiContentLanguage(content.language_id, MOCK_LANGUAGES);
-  }
-
-  function handleReviewNoteChange(
-    event: ChangeEvent<HTMLTextAreaElement>,
-  ) {
-    onReviewNoteChange(event.target.value);
+    poi = findPoiContentPoi(content.poi_id, pois);
+    language = findPoiContentLanguage(content.language_id, languages);
   }
 
   function handleClose() {
@@ -113,25 +103,6 @@ export function PoiContentReviewSheet({
               <div className="max-h-64 overflow-y-auto whitespace-pre-wrap rounded-lg border bg-background p-3 text-sm leading-6 text-foreground">
                 {content.narration_script}
               </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label
-                htmlFor="content-review-note"
-                className="text-xs font-medium text-foreground"
-              >
-                {t("Review note")}
-              </label>
-              <Textarea
-                id="content-review-note"
-                value={reviewNote}
-                onChange={handleReviewNoteChange}
-                placeholder={t("Explain what must be revised when rejecting content.")}
-                rows={4}
-              />
-              <p className="text-[10px] text-muted-foreground">
-                {t("A review note is required when rejecting content.")}
-              </p>
             </div>
 
             {errorMessage && (

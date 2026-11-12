@@ -17,8 +17,6 @@ import type {
   DataTableFilter,
 } from "@/types/shared/data-table.types";
 import { POI_STATUS_OPTIONS } from "../constants/poi.constants";
-import { MOCK_POI_CATEGORIES } from "../mocks/poi-categories.mock";
-import { MOCK_REGIONS } from "../mocks/regions.mock";
 import type { PointOfInterest, PoisTableProps } from "../types/poi.types";
 import {
   createPoiCategoryFilterOptions,
@@ -36,7 +34,8 @@ export function PoisTable({
   onViewPoi,
   onEditPoi,
   onCopyPoi,
-  onDeletePoi,
+  regions,
+  categories,
 }: PoisTableProps) {
   const { t, locale } = usePreferences();
   const columns: readonly DataTableColumn<PointOfInterest>[] = [
@@ -73,11 +72,11 @@ export function PoisTable({
       id: "region_id",
       header: t("Region"),
       searchValue: function getRegionSearchValue(poi) {
-        const region = findPoiRegion(poi.region_id, MOCK_REGIONS);
+        const region = findPoiRegion(poi.region_id, regions);
         return `${poi.region_id} ${region?.region_name ?? ""} ${region?.region_code ?? ""}`;
       },
       cell: function renderRegion(poi) {
-        const region = findPoiRegion(poi.region_id, MOCK_REGIONS);
+        const region = findPoiRegion(poi.region_id, regions);
         if (!region) {
           return <span className="font-mono text-xs">{poi.region_id}</span>;
         }
@@ -162,16 +161,13 @@ export function PoisTable({
             onCopy={function handleCopy() {
               onCopyPoi(poi);
             }}
-            onDelete={function handleDelete() {
-              onDeletePoi(poi);
-            }}
           />
         );
       },
     },
   ];
-  const regionOptions = createRegionFilterOptions(MOCK_REGIONS);
-  const categoryOptions = createPoiCategoryFilterOptions(MOCK_POI_CATEGORIES);
+  const regionOptions = createRegionFilterOptions(regions);
+  const categoryOptions = createPoiCategoryFilterOptions(categories);
   const filters: readonly DataTableFilter<PointOfInterest>[] = [
     {
       id: "poi_status",

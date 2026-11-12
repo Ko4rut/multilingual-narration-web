@@ -1,90 +1,114 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { MOCK_MANAGER_USERS } from "@/features/users/mocks/users.mock";
+import { useEffect, useMemo, useState } from "react";
+import type { ManagerUser } from "@/features/users/types/user.types";
+import {
+  createRoleAction,
+  loadRoleManagement,
+  updateRolePermissionsAction,
+} from "../actions";
 import { MOCK_ACTIONS } from "../mocks/actions.mock";
 import { MOCK_MANAGEMENT_FUNCTIONS } from "../mocks/management-functions.mock";
-import { MOCK_PERMISSIONS } from "../mocks/permissions.mock";
-import { MOCK_ROLE_PERMISSIONS } from "../mocks/role-permissions.mock";
-import { MOCK_ROLES } from "../mocks/roles.mock";
-import type { Role, RolePermission } from "../types/role.types";
+import type { Permission, Role, RolePermission } from "../types/role.types";
 import {
   createPermissionMatrixRows,
   createRoleDirectoryItems,
-  createRoleId,
   getRoleFormValue,
-  hasRoleName,
 } from "../utils/role.utils";
 
 export function useRoles() {
-  const [roles, setRoles] = useState<Role[]>(function initializeRoles() {
-    return [...MOCK_ROLES];
-  });
-  const [rolePermissions, setRolePermissions] = useState<RolePermission[]>(
-    function initializeRolePermissions() {
-      return [...MOCK_ROLE_PERMISSIONS];
-    },
-  );
-  const [selectedRoleId, setSelectedRoleId] = useState(MOCK_ROLES[0].id);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [rolePermissions, setRolePermissions] = useState<RolePermission[]>([]);
+  const [users, setUsers] = useState<ManagerUser[]>([]);
+  const [selectedRoleId, setSelectedRoleId] = useState("");
+  const [isLoading, setLoading] = useState(true);
+  const [pageError, setPageError] = useState<string | null>(null);
   const [isCreateSheetOpen, setCreateSheetOpen] = useState(false);
   const [roleFormError, setRoleFormError] = useState<string | null>(null);
 
   const selectedRole =
     roles.find(function findSelectedRole(role) {
       return role.id === selectedRoleId;
-    }) ?? roles[0];
+    }) ?? null;
+
+  useEffect(function loadRolesFromApi() {
+    let isActive = true;
+
+    async function loadData() {
+      const result = await loadRoleManagement();
+      if (!isActive) return;
+      if (!result.data) {
+        setPageError(result.error);
+        setLoading(false);
+        return;
+      }
+      setRoles(result.data.roles);
+      setPermissions(result.data.permissions);
+      setRolePermissions(result.data.rolePermissions);
+      setUsers(result.data.users);
+      setSelectedRoleId(result.data.roles[0]?.id ?? "");
+      setPageError(null);
+      setLoading(false);
+    }
+
+    void loadData();
+    return function cancelLoad() {
+      isActive = false;
+    };
+  }, []);
 
   const directoryItems = useMemo(
     function createDirectoryItems() {
-      return createRoleDirectoryItems(roles, MOCK_MANAGER_USERS);
+      return createRoleDirectoryItems(roles, users);
     },
-    [roles],
+    [roles, users],
   );
 
   const matrixRows = useMemo(
     function createMatrixRows() {
+      if (!selectedRole) return [];
       return createPermissionMatrixRows(
         selectedRole.id,
         rolePermissions,
         MOCK_MANAGEMENT_FUNCTIONS,
         MOCK_ACTIONS,
-        MOCK_PERMISSIONS,
+        permissions,
       );
     },
-    [rolePermissions, selectedRole.id],
+    [permissions, rolePermissions, selectedRole],
   );
 
   function handleSelectRole(roleId: string) {
     setSelectedRoleId(roleId);
   }
 
-  function handlePermissionChange(permissionId: string, checked: boolean) {
-    setRolePermissions(function updateRolePermissions(currentMappings) {
-      const mappingExists = currentMappings.some(function findMapping(mapping) {
-        return (
-          mapping.role_id === selectedRole.id &&
-          mapping.permission_id === permissionId
-        );
-      });
-
-      if (checked && !mappingExists) {
-        return [
-          ...currentMappings,
-          { role_id: selectedRole.id, permission_id: permissionId },
-        ];
-      }
-
-      if (!checked && mappingExists) {
-        return currentMappings.filter(function keepMapping(mapping) {
-          return !(
-            mapping.role_id === selectedRole.id &&
-            mapping.permission_id === permissionId
-          );
-        });
-      }
-
-      return currentMappings;
+  async function handlePermissionChange(permissionId: string, checked: boolean) {
+    if (!selectedRole) return;
+    const currentIds = rolePermissions.flatMap(function getPermissionId(mapping) {
+      if (mapping.role_id !== selectedRole.id) return [];
+      return [mapping.permission_id];
     });
+    let nextIds = currentIds.filter(function removeChangedPermission(id) {
+      return id !== permissionId;
+    });
+    if (checked) nextIds = [...nextIds, permissionId];
+
+    const result = await updateRolePermissionsAction(selectedRole.id, nextIds);
+    if (!result.data) {
+      setPageError(result.error);
+      return;
+    }
+    setRolePermissions(function replaceSelectedRoleMappings(currentMappings) {
+      const otherRoleMappings = currentMappings.filter(function keepOtherRole(mapping) {
+        return mapping.role_id !== selectedRole.id;
+      });
+      const updatedMappings = result.data.map(function createMapping(permission) {
+        return { role_id: selectedRole.id, permission_id: permission.id };
+      });
+      return [...otherRoleMappings, ...updatedMappings];
+    });
+    setPageError(null);
   }
 
   function openCreateSheet() {
@@ -94,34 +118,26 @@ export function useRoles() {
 
   function handleCreateSheetOpenChange(open: boolean) {
     setCreateSheetOpen(open);
-    if (!open) {
-      setRoleFormError(null);
-    }
+    if (!open) setRoleFormError(null);
   }
 
-  function handleCreateRole(formData: FormData) {
+  async function handleCreateRole(formData: FormData) {
     const name = getRoleFormValue(formData, "name");
-    if (!name) {
-      return;
-    }
-    if (hasRoleName(roles, name)) {
-      setRoleFormError("A role with this name already exists.");
-      return;
-    }
-
-    const id = createRoleId(roles);
-    const timestamp = new Date().toISOString();
-    const role: Role = {
-      id,
+    if (!name) return;
+    const result = await createRoleAction({
       name,
-      created_at: timestamp,
-      last_updated_at: null,
-    };
+      description: null,
+      permission_ids: [],
+    });
+    if (!result.data) {
+      setRoleFormError(result.error);
+      return;
+    }
 
     setRoles(function addRole(currentRoles) {
-      return [...currentRoles, role];
+      return [...currentRoles, result.data];
     });
-    setSelectedRoleId(id);
+    setSelectedRoleId(result.data.id);
     setRoleFormError(null);
     setCreateSheetOpen(false);
   }
@@ -132,6 +148,8 @@ export function useRoles() {
     selectedRoleId,
     directoryItems,
     matrixRows,
+    isLoading,
+    pageError,
     isCreateSheetOpen,
     roleFormError,
     openCreateSheet,

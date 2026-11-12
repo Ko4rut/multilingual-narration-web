@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock3, ShieldCheck, UserCheck, UserPlus, UsersRound } from "lucide-react";
+import { Clock3, ShieldCheck, UserCheck, UsersRound } from "lucide-react";
 import {
   PageLayout,
   PageLayoutContent,
@@ -48,7 +48,6 @@ export function UsersOverview() {
           onClick={openCreateSheet}
           disabled={isLoading || roles.length === 0}
         >
-          <UserPlus aria-hidden="true" />
           {t("Add User")}
         </Button>
       </PageLayoutHeader>
