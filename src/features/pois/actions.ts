@@ -2,7 +2,7 @@
 
 import { getAccessToken } from "@/features/auth/session";
 import { getApiErrorMessage } from "@/service/api";
-import { createPoi, getPoiOptions, getPoiQrCode, getPois, updatePoi } from "./api/pois.api";
+import { createPoi, getPoiOptions, getPoiQrCode, getPois, updatePoi, uploadPoiImage } from "./api/pois.api";
 import type { PoiCreatePayload, PoiUpdatePayload } from "./types/poi.types";
 
 export async function loadPoiManagement() {
@@ -33,6 +33,20 @@ export async function updatePoiAction(poiId: string, payload: PoiUpdatePayload) 
     return { data: await updatePoi(token, poiId, payload), error: null };
   } catch (error) {
     return { data: null, error: getApiErrorMessage(error, "Unable to update POI.") };
+  }
+}
+
+export async function uploadPoiImageAction(formData: FormData) {
+  try {
+    const token = await getAccessToken();
+    if (!token) return { data: null, error: "Your API session has expired. Please sign in again." };
+    const image = formData.get("image");
+    if (!(image instanceof File) || image.size === 0) {
+      return { data: null, error: "Select an image to upload." };
+    }
+    return { data: await uploadPoiImage(token, image), error: null };
+  } catch (error) {
+    return { data: null, error: getApiErrorMessage(error, "Unable to upload the POI image.") };
   }
 }
 

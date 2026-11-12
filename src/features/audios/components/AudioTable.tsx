@@ -230,10 +230,7 @@ export function AudioTable({
           emptyMessage="No audio records match your filters."
           className="min-w-[1000px]"
         />
-        <DataTablePagination
-          itemLabel="audio records"
-          pageSizeOptions={[10]}
-        />
+        <DataTablePagination itemLabel="audio records" />
       </DataTablePanel>
     </DataTable>
   );

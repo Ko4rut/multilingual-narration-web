@@ -594,7 +594,7 @@ function DataTableContent({
 /** Hiển thị thống kê kết quả, chọn kích thước trang và điều hướng giữa các trang. */
 function DataTablePagination({
   itemLabel = "items",
-  pageSizeOptions = [10, 20, 50],
+  pageSizeOptions = [5, 10, 20, 50],
   className,
   ...props
 }: DataTablePaginationProps) {

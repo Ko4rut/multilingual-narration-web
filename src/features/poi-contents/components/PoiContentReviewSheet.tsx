@@ -52,7 +52,7 @@ export function PoiContentReviewSheet({
         </SheetHeader>
 
         {content && (
-          <div className="flex-1 space-y-5 overflow-y-auto p-4">
+          <div className="scrollbar-hidden flex-1 space-y-5 overflow-y-auto p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="font-medium text-foreground">
@@ -100,7 +100,7 @@ export function PoiContentReviewSheet({
               <p className="text-xs font-medium text-foreground">
                 {t("Narration script")}
               </p>
-              <div className="max-h-64 overflow-y-auto whitespace-pre-wrap rounded-lg border bg-background p-3 text-sm leading-6 text-foreground">
+              <div className="scrollbar-hidden max-h-64 overflow-y-auto whitespace-pre-wrap rounded-lg border bg-background p-3 text-sm leading-6 text-foreground">
                 {content.narration_script}
               </div>
             </div>

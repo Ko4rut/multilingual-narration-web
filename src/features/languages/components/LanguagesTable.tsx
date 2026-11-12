@@ -164,10 +164,7 @@ export function LanguagesTable({
           emptyMessage="No languages match your filters."
           className="min-w-[900px]"
         />
-        <DataTablePagination
-          itemLabel="language records"
-          pageSizeOptions={[10]}
-        />
+        <DataTablePagination itemLabel="language records" />
       </DataTablePanel>
     </DataTable>
   );

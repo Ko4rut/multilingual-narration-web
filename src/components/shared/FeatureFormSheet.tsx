@@ -113,7 +113,7 @@ export function FeatureFormSheet({
           className="flex min-h-0 flex-1 flex-col"
         >
           {/* Nội dung field được feature truyền vào qua children. */}
-          <div className="flex-1 space-y-4 overflow-y-auto p-4">
+          <div className="scrollbar-hidden flex-1 space-y-4 overflow-y-auto p-4">
             {children}
           </div>
           {/* Các hành động đóng, chỉnh sửa hoặc gửi form theo mode. */}

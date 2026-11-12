@@ -63,7 +63,7 @@ export function PoiContentPublishSheet({
         </SheetHeader>
 
         {content && (
-          <div className="flex-1 space-y-5 overflow-y-auto p-4">
+          <div className="scrollbar-hidden flex-1 space-y-5 overflow-y-auto p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="font-medium text-foreground">

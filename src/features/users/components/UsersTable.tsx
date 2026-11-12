@@ -164,10 +164,7 @@ export function UsersTable({ users, roles, onViewUser, onEditUser }: UsersTableP
           className="min-w-[1040px]"
         />
 
-        <DataTablePagination
-          itemLabel="administrator users"
-          pageSizeOptions={[10]}
-        />
+        <DataTablePagination itemLabel="administrator users" />
       </DataTablePanel>
     </DataTable>
   );

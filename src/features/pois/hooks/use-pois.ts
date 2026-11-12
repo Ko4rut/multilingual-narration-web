@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { FeatureFormMode } from "@/types/shared/feature-form.types";
-import { createPoiAction, loadPoiManagement, loadPoiQrCodeAction, updatePoiAction } from "../actions";
-import { POI_STATUS } from "../constants/poi.constants";
+import { createPoiAction, loadPoiManagement, loadPoiQrCodeAction, updatePoiAction, uploadPoiImageAction } from "../actions";
+import { MAX_POI_IMAGE_BYTES, POI_STATUS } from "../constants/poi.constants";
 import type { PoiCategoryMapping } from "../types/poi-category-mapping.types";
 import type { PoiCategory } from "../types/poi-category.types";
 import type { PointOfInterest, PoiCreatePayload } from "../types/poi.types";
@@ -53,8 +53,21 @@ export function usePois() {
 
   function resetQrCode() { setQrCodeDataUrl(null); setQrLoading(false); }
   function openCreateSheet() { setSelectedPoiId(null); setSheetMode("create"); setSheetOpen(true); setFeedback(null); resetQrCode(); }
-  function openViewSheet(poi: PointOfInterest) { setSelectedPoiId(poi.id); setSheetMode("view"); setSheetOpen(true); resetQrCode(); }
-  function openEditSheet(poi: PointOfInterest) { setSelectedPoiId(poi.id); setSheetMode("edit"); setSheetOpen(true); setFeedback(null); resetQrCode(); }
+  function openViewSheet(poi: PointOfInterest) {
+    setSelectedPoiId(poi.id);
+    setSheetMode("view");
+    setSheetOpen(true);
+    resetQrCode();
+    void loadQrCode(poi.id);
+  }
+  function openEditSheet(poi: PointOfInterest) {
+    setSelectedPoiId(poi.id);
+    setSheetMode("edit");
+    setSheetOpen(true);
+    setFeedback(null);
+    resetQrCode();
+    void loadQrCode(poi.id);
+  }
   function editSelectedPoi() { if (selectedPoi) setSheetMode("edit"); }
   function handleSheetOpenChange(open: boolean) { setSheetOpen(open); if (!open) { setSelectedPoiId(null); resetQrCode(); } }
 
@@ -63,10 +76,9 @@ export function usePois() {
     catch { setFeedback("Unable to copy the POI ID."); }
   }
 
-  async function handleLoadQrCode() {
-    if (!selectedPoi) return;
+  async function loadQrCode(poiId: string) {
     setQrLoading(true);
-    const result = await loadPoiQrCodeAction(selectedPoi.id);
+    const result = await loadPoiQrCodeAction(poiId);
     setQrLoading(false);
     if (!result.data) { setFeedback(result.error); return; }
     setQrCodeDataUrl(result.data);
@@ -90,11 +102,31 @@ export function usePois() {
   }
 
   async function handleSubmit(formData: FormData) {
+    const image = formData.get("poi_image");
+    let imageUrl = selectedPoi?.poi_image_url ?? "";
+    if (image instanceof File && image.size > 0) {
+      if (image.size > MAX_POI_IMAGE_BYTES) {
+        setFeedback("POI image must not exceed 10 MB.");
+        return;
+      }
+      const uploadFormData = new FormData();
+      uploadFormData.append("image", image);
+      const uploadResult = await uploadPoiImageAction(uploadFormData);
+      if (!uploadResult.data) {
+        setFeedback(uploadResult.error);
+        return;
+      }
+      imageUrl = uploadResult.data.url;
+    }
+    if (!imageUrl) {
+      setFeedback("Select an image to upload.");
+      return;
+    }
     const payload: PoiCreatePayload = {
       poi_name: getPoiFormValue(formData, "poi_name"),
       region_id: getPoiFormValue(formData, "region_id"),
       poi_location: getPoiFormValue(formData, "poi_location"),
-      poi_image_url: getPoiFormValue(formData, "poi_image_url"),
+      poi_image_url: imageUrl,
       category_ids: getUniquePoiFormValues(formData, "poi_category_ids"),
       latitude: Number(getPoiFormValue(formData, "latitude")),
       longitude: Number(getPoiFormValue(formData, "longitude")),
@@ -125,5 +157,5 @@ export function usePois() {
     setFeedback(successMessage);
   }
 
-  return { pois, regions, categories, overviewSummary, poiCategoryMappings, selectedPoi, selectedCategoryIds, sheetMode, isSheetOpen, feedback, isLoading, canActivateSelectedPoi, qrCodeDataUrl, isQrLoading, openCreateSheet, openViewSheet, openEditSheet, editSelectedPoi, handleSheetOpenChange, handleCopyPoi, handleLoadQrCode, handleDownloadQrCode, handleSubmit };
+  return { pois, regions, categories, overviewSummary, poiCategoryMappings, selectedPoi, selectedCategoryIds, sheetMode, isSheetOpen, feedback, isLoading, canActivateSelectedPoi, qrCodeDataUrl, isQrLoading, openCreateSheet, openViewSheet, openEditSheet, editSelectedPoi, handleSheetOpenChange, handleCopyPoi, handleDownloadQrCode, handleSubmit };
 }

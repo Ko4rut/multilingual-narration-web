@@ -62,7 +62,7 @@ export function PoiCategoriesTable({ categories }: PoiCategoriesTableProps) {
           <DataTableSearch placeholder="Search category name, code or ID..." />
         </DataTableToolbar>
         <DataTableContent emptyMessage="No POI categories match your search." />
-        <DataTablePagination itemLabel="category records" pageSizeOptions={[10]} />
+        <DataTablePagination itemLabel="category records" />
       </DataTablePanel>
     </DataTable>
   );

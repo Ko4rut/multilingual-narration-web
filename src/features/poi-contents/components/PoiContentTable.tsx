@@ -210,10 +210,7 @@ export function PoiContentTable({
           emptyMessage="No POI content matches your filters."
           className="min-w-[1000px]"
         />
-        <DataTablePagination
-          itemLabel="content records"
-          pageSizeOptions={[10]}
-        />
+        <DataTablePagination itemLabel="content records" />
       </DataTablePanel>
     </DataTable>
   );
