@@ -1,5 +1,5 @@
 import { api, bearerAuthorization, getAllApiPages } from "@/service/api";
-import type { PointOfInterest, PoiCreatePayload, PoiFormOptions, PoiUpdatePayload } from "../types/poi.types";
+import type { PointOfInterest, PoiCreatePayload, PoiFormOptions, PoiImageUpload, PoiUpdatePayload } from "../types/poi.types";
 
 type PoiApiRecord = Omit<PointOfInterest, "latitude" | "longitude" | "trigger_radius_meter"> & {
   latitude: number | string;
@@ -34,6 +34,18 @@ export async function createPoi(accessToken: string, payload: PoiCreatePayload) 
 export async function updatePoi(accessToken: string, poiId: string, payload: PoiUpdatePayload) {
   const response = await api.patch<PoiApiRecord>(`/admin/pois/${encodeURIComponent(poiId)}`, payload, { headers: bearerAuthorization(accessToken) });
   return normalizePoi(response.data);
+}
+
+export async function uploadPoiImage(accessToken: string, image: File) {
+  const formData = new FormData();
+  formData.append("image", image);
+  const response = await api.post<PoiImageUpload>("/admin/pois/images", formData, {
+    headers: {
+      ...bearerAuthorization(accessToken),
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
 }
 
 export async function getPoiQrCode(accessToken: string, poiId: string) {

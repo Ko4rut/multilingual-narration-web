@@ -41,6 +41,13 @@ export interface PoiFormOptions {
   categories: PoiCategory[];
 }
 
+export interface PoiImageUpload {
+  url: string;
+  checksum_sha256: string;
+  size: number;
+  mime_type: string;
+}
+
 export interface PoiCreatePayload {
   region_id: string;
   poi_name: string;
@@ -93,6 +100,5 @@ export interface PoiFormSheetProps {
   onEdit: () => void;
   qrCodeDataUrl: string | null;
   isQrLoading: boolean;
-  onLoadQrCode: () => void;
   onDownloadQrCode: () => void;
 }

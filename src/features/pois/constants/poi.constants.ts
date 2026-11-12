@@ -21,3 +21,4 @@ export const POI_STATUS_OPTIONS = [
 
 export const DEFAULT_POI_IMAGE_URL = "/icon.svg";
 export const DEFAULT_MANAGEMENT_USER_ID = "user-010126-0001";
+export const MAX_POI_IMAGE_BYTES = 10 * 1024 * 1024;

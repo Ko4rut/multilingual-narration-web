@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type { FeatureFormMode, FormComboboxOption } from "@/types/shared/feature-form.types";
 import { POI_STATUS, POI_STATUS_OPTIONS } from "../constants/poi.constants";
@@ -12,8 +12,24 @@ export function usePoiFormSheet(
   canActivate: boolean,
   regions: readonly Region[],
   categories: readonly PoiCategory[],
+  currentImageUrl?: string,
 ) {
   const { t } = usePreferences();
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(currentImageUrl ?? "");
+  useEffect(function releaseImagePreview() {
+    return function cleanup() {
+      if (imagePreviewUrl.startsWith("blob:")) URL.revokeObjectURL(imagePreviewUrl);
+    };
+  }, [imagePreviewUrl]);
+
+  function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    const image = event.target.files?.[0];
+    if (!image) {
+      setImagePreviewUrl(currentImageUrl ?? "");
+      return;
+    }
+    setImagePreviewUrl(URL.createObjectURL(image));
+  }
   const regionOptions = useMemo<FormComboboxOption[]>(
     function createRegionOptions() {
       return regions.map(function createRegionOption(region) {
@@ -58,5 +74,7 @@ export function usePoiFormSheet(
     categoryOptions,
     statusOptions,
     description,
+    imagePreviewUrl,
+    handleImageChange,
   };
 }

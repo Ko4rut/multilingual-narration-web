@@ -37,7 +37,6 @@ export function PoisOverview() {
     editSelectedPoi,
     handleSheetOpenChange,
     handleCopyPoi,
-    handleLoadQrCode,
     handleDownloadQrCode,
     handleSubmit,
   } = usePois();
@@ -122,7 +121,6 @@ export function PoisOverview() {
         onEdit={editSelectedPoi}
         qrCodeDataUrl={qrCodeDataUrl}
         isQrLoading={isQrLoading}
-        onLoadQrCode={handleLoadQrCode}
         onDownloadQrCode={handleDownloadQrCode}
       />
     </PageLayout>

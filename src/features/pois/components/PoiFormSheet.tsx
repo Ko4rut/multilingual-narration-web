@@ -6,8 +6,7 @@ import {
   FormField,
   FormMultiCombobox,
 } from "@/components/shared/FeatureFormSheet";
-import Image from "next/image";
-import { Download, QrCode } from "lucide-react";
+import { Download, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,7 +27,6 @@ export function PoiFormSheet({
   onEdit,
   qrCodeDataUrl,
   isQrLoading,
-  onLoadQrCode,
   onDownloadQrCode,
 }: PoiFormSheetProps) {
   const {
@@ -37,7 +35,9 @@ export function PoiFormSheet({
     categoryOptions,
     statusOptions,
     description,
-  } = usePoiFormSheet(mode, canActivate, regions, categories);
+    imagePreviewUrl,
+    handleImageChange,
+  } = usePoiFormSheet(mode, canActivate, regions, categories, poi?.poi_image_url);
   const isViewMode = mode === "view";
   const isCreateMode = mode === "create";
 
@@ -52,6 +52,37 @@ export function PoiFormSheet({
       canEdit={isViewMode}
       onEdit={onEdit}
     >
+      <FormField
+        label={t("POI image")}
+        htmlFor="poi-image"
+        hint={t("JPEG, PNG or WebP. Maximum file size: 10 MB.")}
+        required={isCreateMode}
+      >
+        {imagePreviewUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={imagePreviewUrl}
+            alt={t("POI image preview")}
+            className="aspect-video w-full rounded-lg border border-border bg-muted object-cover"
+          />
+        )}
+        {!imagePreviewUrl && (
+          <div className="flex aspect-video w-full items-center justify-center rounded-lg border border-dashed border-border bg-muted/40 px-6 text-center text-xs text-muted-foreground">
+            {t("Select an image to preview it here.")}
+          </div>
+        )}
+        {!isViewMode && (
+          <Input
+            id="poi-image"
+            name="poi_image"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleImageChange}
+            required={isCreateMode}
+          />
+        )}
+      </FormField>
+
       <FormField label={t("POI name")} htmlFor="poi-name" required>
         <Input
           id="poi-name"
@@ -64,43 +95,44 @@ export function PoiFormSheet({
       </FormField>
 
       {poi && (
-        <div className="space-y-3 rounded-lg border p-3">
-          <FormField
-            label={t("QR code payload")}
-            htmlFor="poi-qr-code"
-            hint={t("This value is generated automatically by the backend.")}
-          >
-            <Input
-              id="poi-qr-code"
-              value={poi.poi_qr_code}
-              className="font-mono"
-              disabled
-              readOnly
-            />
-          </FormField>
-          {qrCodeDataUrl && (
-            <Image
-              src={qrCodeDataUrl}
-              alt={t("POI QR code")}
-              width={220}
-              height={220}
-              unoptimized
-              className="mx-auto rounded-md border bg-white p-2"
-            />
-          )}
-          <div className="flex flex-wrap justify-end gap-2">
-            {!qrCodeDataUrl && (
-              <Button type="button" variant="outline" onClick={onLoadQrCode} disabled={isQrLoading}>
-                <QrCode aria-hidden="true" />
-                {isQrLoading ? t("Loading QR code…") : t("View QR code")}
-              </Button>
+        <section className="overflow-hidden rounded-xl border border-border bg-muted/20">
+          <div className="border-b border-border px-4 py-3">
+            <h3 className="text-sm font-medium text-foreground">
+              {t("POI QR code")}
+            </h3>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {t("Visitors scan this code to open the POI narration.")}
+            </p>
+          </div>
+          <div className="flex min-h-64 items-center justify-center bg-white p-5">
+            {qrCodeDataUrl && (
+              // QR được trả dưới dạng data URL, không cần pipeline tối ưu ảnh của Next.js.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={qrCodeDataUrl}
+                alt={t("POI QR code")}
+                className="size-56 object-contain"
+              />
             )}
-            <Button type="button" variant="outline" onClick={onDownloadQrCode} disabled={isQrLoading}>
+            {isQrLoading && !qrCodeDataUrl && (
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
+                {t("Loading QR code…")}
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end border-t border-border px-4 py-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onDownloadQrCode}
+              disabled={isQrLoading || !qrCodeDataUrl}
+            >
               <Download aria-hidden="true" />
               {t("Download QR code")}
             </Button>
           </div>
-        </div>
+        </section>
       )}
 
       {isCreateMode && (
@@ -189,18 +221,6 @@ export function PoiFormSheet({
           min={1}
           step="any"
           defaultValue={poi?.trigger_radius_meter ?? 100}
-          disabled={isViewMode}
-          required
-        />
-      </FormField>
-
-      <FormField label={t("Image URL")} htmlFor="poi-image-url" required>
-        <Input
-          id="poi-image-url"
-          name="poi_image_url"
-          type="url"
-          defaultValue={poi?.poi_image_url ?? ""}
-          placeholder="https://example.com/poi.jpg"
           disabled={isViewMode}
           required
         />
