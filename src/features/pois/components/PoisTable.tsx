@@ -131,24 +131,21 @@ export function PoisTable({
         );
       },
     },
-    // Column Audit
+    // Column Timestamps
     {
-      id: "audit",
-      header: t("Audit details"),
-      searchValue: function getAuditSearchValue(poi) {
-        return `${poi.created_by} ${poi.last_updated_by} ${poi.created_at} ${poi.last_updated_at}`;
+      id: "timestamps",
+      header: t("Timestamps"),
+      searchValue: function getTimestampSearchValue(poi) {
+        return `${poi.created_at} ${poi.last_updated_at}`;
       },
-      cell: function renderAudit(poi) {
+      cell: function renderTimestamps(poi) {
         return (
           <div className="flex min-w-52 flex-col gap-1 text-xs">
             <span>
-              {t("Created by")}: {poi.created_by}
+              {t("Created at")}: {formatPoiTimestamp(poi.created_at, locale)}
             </span>
             <span>
-              {t("Updated by")}: {poi.last_updated_by}
-            </span>
-            <span className="text-muted-foreground">
-              {formatPoiTimestamp(poi.last_updated_at, locale)}
+              {t("Last updated at")}: {formatPoiTimestamp(poi.last_updated_at, locale)}
             </span>
           </div>
         );
@@ -229,7 +226,7 @@ export function PoisTable({
           emptyMessage="No POIs match your filters."
           className="min-w-[1120px]"
         />
-        <DataTablePagination itemLabel="POIs" pageSizeOptions={[10]} />
+        <DataTablePagination itemLabel="POIs" />
       </DataTablePanel>
     </DataTable>
   );
