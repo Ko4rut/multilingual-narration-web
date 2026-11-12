@@ -1,9 +1,22 @@
+import "server-only";
+
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import {
+  ACCESS_TOKEN_COOKIE,
+  requireSession,
+} from "@/features/auth/session";
+import { getListeningDashboardSummary } from "../api/dashboard.api";
 import { createDashboardMock } from "../mocks/dashboard.mock";
-import { requireSession } from "@/features/auth/session";
 import type { DashboardData, Period } from "../types";
 
-// Replace this adapter with a server-side API call when the backend is ready.
 export async function getDashboard(period: Period): Promise<DashboardData> {
   await requireSession();
-  return createDashboardMock(period);
+  const accessToken = (await cookies()).get(ACCESS_TOKEN_COOKIE)?.value;
+  if (!accessToken) {
+    redirect("/login");
+  }
+
+  const summary = await getListeningDashboardSummary(accessToken);
+  return createDashboardMock(period, summary.total_listening_sessions);
 }

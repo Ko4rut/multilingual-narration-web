@@ -4,9 +4,13 @@ export type Period = "7" | "30" | "90";
 
 export type DashboardStat = {
   label: string;
-  value: string;
-  change: string;
-  positive: boolean;
+  value: number | string;
+  change?: string;
+  positive?: boolean;
+};
+
+export type ListeningDashboardSummary = {
+  total_listening_sessions: number;
 };
 
 export type PopularPoi = {

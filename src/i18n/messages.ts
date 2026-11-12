@@ -72,6 +72,8 @@ export const vi: Record<string, string> = {
   "Manage workspace members and accounts.": "Quản lý thành viên và tài khoản.",
   "Dashboard Overview": "Tổng quan dashboard", "System health and global visitor activities": "Tình trạng hệ thống và hoạt động của khách tham quan",
   "Overview": "Tổng quan", "Dashboard": "Dashboard", "Content": "Nội dung", "Catalog": "Danh mục", "System": "Hệ thống", "Settings": "Cài đặt",
+  "Dashboard Overview": "Tổng quan dashboard", "System health and global visitor activities": "Tình trạng hệ thống và hoạt động của khách tham quan", "Listening total is live · Other metrics are sample data": "Tổng lượt nghe là dữ liệu thật · Các số liệu khác là dữ liệu mẫu",
+  "Overview": "Tổng quan", "Dashboard": "Dashboard", "Content": "Nội dung", "System": "Hệ thống", "Settings": "Cài đặt",
   "POI Management": "Quản lý địa điểm", "POIs Content Management": "Quản lý nội dung địa điểm", "Audio Management": "Quản lý âm thanh", "User Management": "Quản lý người dùng", "Role-Based Access": "Phân quyền", "Language Management": "Quản lý ngôn ngữ", "General Settings": "Cài đặt chung",
   "Demo workspace": "Không gian demo", "Sample data": "Dữ liệu mẫu", "Profile": "Hồ sơ", "Sign out": "Đăng xuất", "Toggle sidebar": "Bật/tắt thanh bên",
   "Theme": "Giao diện", "Dark": "Tối", "Light": "Sáng", "Language": "Ngôn ngữ",

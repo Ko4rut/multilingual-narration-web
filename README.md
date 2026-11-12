@@ -4,6 +4,8 @@ MANS Admin là giao diện quản trị cho hệ thống thuyết minh tự đ�
 
 > Trạng thái hiện tại: đăng nhập, User Management, Role, POI, POI Content và
 > Audio Management đã kết nối MNR Backend; các feature còn lại vẫn dùng mock.
+> Trạng thái hiện tại: Dashboard, User Management và đăng nhập đã kết nối MNR Backend;
+> các feature còn lại vẫn sử dụng dữ liệu mock trong phiên hiện tại.
 
 ## Chức năng hiện có
 
@@ -13,6 +15,11 @@ MANS Admin là giao diện quản trị cho hệ thống thuyết minh tự đ�
 - Quản lý nội dung POI qua API: tạo/sửa phiên bản, submit, review và publish; backend tự sinh TTS khi publish nếu chưa có audio hợp lệ.
 - Quản lý và nghe thử metadata audio từ API. Asset audio đã lưu là bất biến; giao diện không cho thay URL khi chưa có quy trình upload/import xác minh file mới.
 - Quản lý người dùng, vai trò và ma trận phân quyền bằng API thật. Tên hiển thị Action và Management Function vẫn được ánh xạ cục bộ vì backend chưa có API danh mục tương ứng.
+- Dashboard giữ giao diện thống kê 7/30/90 ngày; tổng lượt nghe lấy từ API `GET /api/v1/listening/dashboard`, còn các metric và biểu đồ khác tạm dùng dữ liệu mẫu.
+- Quản lý POI bằng DataTable: tìm kiếm, lọc trạng thái/khu vực/category, phân trang, thêm, xem, sửa, sao chép ID và xóa.
+- Quản lý nội dung POI đa ngôn ngữ: lọc theo POI/ngôn ngữ/trạng thái, quản lý phiên bản content và bảo vệ content đang duy trì điều kiện active của POI.
+- Quản lý audio với dữ liệu và trạng thái tuân theo thiết kế cơ sở dữ liệu.
+- Quản lý người dùng bằng API thật; màn hình vai trò và ma trận phân quyền vẫn dùng dữ liệu mock.
 - Quản lý ngôn ngữ, hồ sơ cá nhân và các nhóm thiết lập hệ thống.
 - Giao diện responsive, hỗ trợ light/dark theme và tiếng Anh/tiếng Việt.
 
