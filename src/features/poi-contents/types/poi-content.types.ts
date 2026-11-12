@@ -70,6 +70,7 @@ export interface PoiContentTableProps {
   onSubmitContent: (content: PoiContent) => void;
   onReviewContent: (content: PoiContent) => void;
   onPublishContent: (content: PoiContent) => void;
+  disabledWorkflowContentId: string | null;
 }
 
 /** Thuộc tính điều khiển sheet tạo mới, xem và chỉnh sửa POI content. */
@@ -97,6 +98,7 @@ export interface PoiContentPoiComboboxProps {
 /** Thuộc tính của nút hành động quy trình được hiển thị theo trạng thái content. */
 export interface PoiContentWorkflowActionProps {
   content: PoiContent;
+  disabled: boolean;
   onSubmit: (content: PoiContent) => void;
   onReview: (content: PoiContent) => void;
   onPublish: (content: PoiContent) => void;
@@ -119,6 +121,7 @@ export interface PoiContentPublishSheetProps {
   open: boolean;
   content: PoiContent | null;
   hasValidAudio: boolean;
+  isPublishing: boolean;
   audioDurationSeconds: number | null;
   audioMimeType: string | null;
   archivedContent: PoiContent | null;
@@ -126,5 +129,5 @@ export interface PoiContentPublishSheetProps {
   pois: readonly PointOfInterest[];
   languages: readonly Language[];
   onOpenChange: (open: boolean) => void;
-  onPublish: () => void;
+  onPublish: () => void | Promise<void>;
 }

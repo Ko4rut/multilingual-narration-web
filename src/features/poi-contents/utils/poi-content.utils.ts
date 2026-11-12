@@ -161,7 +161,10 @@ export function getPoiContentWorkflowAction(
   if (status === CONTENT_STATUS.WAITING_APPROVAL) {
     return CONTENT_WORKFLOW_ACTION.REVIEW;
   }
-  if (status === CONTENT_STATUS.APPROVED) {
+  if (
+    status === CONTENT_STATUS.APPROVED ||
+    status === CONTENT_STATUS.PUBLISHED
+  ) {
     return CONTENT_WORKFLOW_ACTION.PUBLISH;
   }
   return null;
@@ -169,11 +172,20 @@ export function getPoiContentWorkflowAction(
 
 /** Kiểm tra audio có đủ metadata tối thiểu để content được xuất bản hay không. */
 export function isValidPoiContentAudio(audio: ContentAudio) {
+  const supportedMimeTypes = new Set([
+    "audio/mpeg",
+    "audio/aac",
+    "audio/ogg",
+    "audio/wav",
+    "audio/mp4",
+    "audio/webm",
+  ]);
   return (
-    audio.audio_url.startsWith("https://") &&
+    /^https?:\/\/[^/\s]+/.test(audio.audio_url) &&
     audio.audio_size > 0 &&
     audio.audio_duration_sec > 0 &&
-    audio.audio_mime_type.startsWith("audio/") &&
+    supportedMimeTypes.has(audio.audio_mime_type) &&
+    (audio.audio_source_type === "RECORD" || audio.audio_source_type === "TTS") &&
     /^[a-f0-9]{64}$/i.test(audio.audio_checksum_sha256)
   );
 }

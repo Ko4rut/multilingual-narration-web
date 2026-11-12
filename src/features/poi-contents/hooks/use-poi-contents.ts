@@ -14,7 +14,7 @@ import { CONTENT_STATUS } from "../constants/poi-content.constants";
 import type { Language } from "../types/language.types";
 import type { PoiContent } from "../types/poi-content.types";
 import type { PointOfInterest } from "../types/poi.types";
-import { createPoiContentsOverviewSummary, createPoiFilterOptions, findPublishedPoiContentVersion, getPoiContentFormValue } from "../utils/poi-content.utils";
+import { createPoiContentsOverviewSummary, createPoiFilterOptions, findPublishedPoiContentVersion, getPoiContentFormValue, isValidPoiContentAudio } from "../utils/poi-content.utils";
 
 export function usePoiContents() {
   const [contents, setContents] = useState<PoiContent[]>([]);
@@ -28,6 +28,7 @@ export function usePoiContents() {
   const [publishContentId, setPublishContentId] = useState<string | null>(null);
   const [isPublishSheetOpen, setPublishSheetOpen] = useState(false);
   const [workflowError, setWorkflowError] = useState<string | null>(null);
+  const [isPublishing, setPublishing] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isLoading, setLoading] = useState(true);
 
@@ -51,6 +52,7 @@ export function usePoiContents() {
   const reviewContent = contents.find(function find(item) { return item.id === reviewContentId; }) ?? null;
   const publishContent = contents.find(function find(item) { return item.id === publishContentId; }) ?? null;
   const publishAudio = publishContent?.audio ?? null;
+  const hasValidPublishAudio = publishAudio !== null && isValidPoiContentAudio(publishAudio);
   let archivedContent = null;
   if (publishContent) archivedContent = findPublishedPoiContentVersion(publishContent, contents);
   const poiOptions = createPoiFilterOptions(pois);
@@ -104,21 +106,38 @@ export function usePoiContents() {
   function handleApproveContent() { void review("APPROVE"); }
   function handleRejectContent() { void review("REJECT"); }
   function openPublishSheet(content: PoiContent) { setPublishContentId(content.id); setWorkflowError(null); setPublishSheetOpen(true); }
-  function handlePublishSheetOpenChange(open: boolean) { setPublishSheetOpen(open); if (!open) { setPublishContentId(null); setWorkflowError(null); } }
+  function handlePublishSheetOpenChange(open: boolean) {
+    if (isPublishing && !open) return;
+    setPublishSheetOpen(open);
+    if (!open) {
+      setPublishContentId(null);
+      setWorkflowError(null);
+    }
+  }
   async function handlePublishContent() {
-    if (!publishContent) return;
-    const result = await publishPoiContentAction(publishContent.id);
-    if (!result.data) { setWorkflowError(result.error); return; }
-    setContents(function publish(current) {
-      return current.map(function map(item) {
-        if (item.id === result.data.id) return result.data;
-        if (item.poi_id === result.data.poi_id && item.language_id === result.data.language_id && item.content_status === CONTENT_STATUS.PUBLISHED) return { ...item, content_status: CONTENT_STATUS.ARCHIVED };
-        return item;
+    if (!publishContent || isPublishing) return;
+    setPublishing(true);
+    setWorkflowError(null);
+    try {
+      const result = await publishPoiContentAction(publishContent.id);
+      if (!result.data) {
+        setWorkflowError(result.error);
+        return;
+      }
+      setContents(function publish(current) {
+        return current.map(function map(item) {
+          if (item.id === result.data.id) return result.data;
+          if (item.poi_id === result.data.poi_id && item.language_id === result.data.language_id && item.content_status === CONTENT_STATUS.PUBLISHED) return { ...item, content_status: CONTENT_STATUS.ARCHIVED };
+          return item;
+        });
       });
-    });
-    handlePublishSheetOpenChange(false);
-    setFeedback("Content published successfully. TTS audio was generated automatically when required.");
+      setPublishSheetOpen(false);
+      setPublishContentId(null);
+      setFeedback("Content published successfully. TTS audio was generated automatically when required.");
+    } finally {
+      setPublishing(false);
+    }
   }
 
-  return { contents, pois, languages, overviewSummary, poiOptions, selectedContent, sheetMode, isSheetOpen, reviewContent, isReviewSheetOpen, publishContent, isPublishSheetOpen, publishAudio, archivedContent, workflowError, feedback, isLoading, openCreateSheet, openViewSheet, openEditSheet, editSelectedContent, handleSheetOpenChange, handleCopyContent, handleSubmit, handleSubmitForApproval, openReviewSheet, handleReviewSheetOpenChange, handleApproveContent, handleRejectContent, openPublishSheet, handlePublishSheetOpenChange, handlePublishContent };
+  return { contents, pois, languages, overviewSummary, poiOptions, selectedContent, sheetMode, isSheetOpen, reviewContent, isReviewSheetOpen, publishContent, isPublishSheetOpen, publishAudio, hasValidPublishAudio, archivedContent, workflowError, feedback, isLoading, isPublishing, openCreateSheet, openViewSheet, openEditSheet, editSelectedContent, handleSheetOpenChange, handleCopyContent, handleSubmit, handleSubmitForApproval, openReviewSheet, handleReviewSheetOpenChange, handleApproveContent, handleRejectContent, openPublishSheet, handlePublishSheetOpenChange, handlePublishContent };
 }

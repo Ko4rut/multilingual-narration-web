@@ -40,6 +40,7 @@ export function PoiContentTable({
   onSubmitContent,
   onReviewContent,
   onPublishContent,
+  disabledWorkflowContentId,
 }: PoiContentTableProps) {
   const { t } = usePreferences();
   const languageOptions = createLanguageFilterOptions(languages);
@@ -125,6 +126,7 @@ export function PoiContentTable({
         return (
           <PoiContentWorkflowAction
             content={content}
+            disabled={content.id === disabledWorkflowContentId}
             onSubmit={onSubmitContent}
             onReview={onReviewContent}
             onPublish={onPublishContent}

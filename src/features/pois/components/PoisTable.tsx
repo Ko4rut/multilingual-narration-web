@@ -117,7 +117,18 @@ export function PoisTable({
       header: t("Status"),
       accessor: "poi_status",
       cell: function renderStatus(poi) {
-        return <PoisStatusBadge status={poi.poi_status} />;
+        let activationLabel = t("Cannot activate yet");
+        let activationClassName = "text-xs text-muted-foreground";
+        if (poi.can_activate) {
+          activationLabel = t("Ready to activate");
+          activationClassName = "text-xs text-success";
+        }
+        return (
+          <div className="flex min-w-32 flex-col items-start gap-1">
+            <PoisStatusBadge status={poi.poi_status} />
+            <span className={activationClassName}>{activationLabel}</span>
+          </div>
+        );
       },
     },
     // Column Audit

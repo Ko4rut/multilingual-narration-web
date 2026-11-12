@@ -28,4 +28,15 @@ async function postWorkflow(accessToken: string, id: string, action: string, bod
 
 export function submitPoiContent(accessToken: string, id: string) { return postWorkflow(accessToken, id, "submit"); }
 export function reviewPoiContent(accessToken: string, id: string, decision: ReviewDecision) { return postWorkflow(accessToken, id, "review", { decision }); }
-export function publishPoiContent(accessToken: string, id: string) { return postWorkflow(accessToken, id, "publish"); }
+export async function publishPoiContent(accessToken: string, id: string) {
+  const response = await api.post<PoiContent>(
+    `/admin/poi-contents/${encodeURIComponent(id)}/publish`,
+    undefined,
+    {
+      headers: bearerAuthorization(accessToken),
+      // Publish có thể phải chờ provider TTS sinh và lưu MP3 đồng bộ.
+      timeout: 120_000,
+    },
+  );
+  return response.data;
+}
