@@ -52,7 +52,6 @@ export function usePoiFormSheet(
   if (mode === "edit") {
     description = t("Update POI metadata and activation status.");
   }
-
   return {
     t,
     regionOptions,
