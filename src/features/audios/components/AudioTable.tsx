@@ -51,7 +51,7 @@ export function AudioTable({
       },
       cell: function renderAudio(audio) {
         return (
-          <div className="flex min-w-80 max-w-104 flex-col gap-1">
+          <div className="flex min-w-80 max-w-84 flex-col gap-1">
             <span className="font-mono text-xs font-medium text-foreground">
               {audio.id}
             </span>

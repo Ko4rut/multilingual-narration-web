@@ -51,6 +51,7 @@ export function FeatureFormSheet({
   onSubmit,
   canEdit,
   onEdit,
+  footer,
 }: FeatureFormSheetProps) {
   const { t } = usePreferences();
   let modeLabel = t("Add");
@@ -117,21 +118,25 @@ export function FeatureFormSheet({
             {children}
           </div>
           {/* Các hành động đóng, chỉnh sửa hoặc gửi form theo mode. */}
-          <SheetFooter className="border-t">
-            <div className="flex w-full justify-end gap-2">
-              <Button type="button" variant="outline" onClick={handleClose}>
-                {dismissLabel}
-              </Button>
-              {mode === "view" && canEdit && onEdit && (
-                <Button type="button" onClick={onEdit}>
-                  {t("Edit")}
-                </Button>
+          {footer !== false && (
+            <SheetFooter className="border-t">
+              {footer ?? (
+                <div className="flex w-full justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={handleClose}>
+                    {dismissLabel}
+                  </Button>
+                  {mode === "view" && canEdit && onEdit && (
+                    <Button type="button" onClick={onEdit}>
+                      {t("Edit")}
+                    </Button>
+                  )}
+                  {mode !== "view" && (
+                    <Button type="submit">{submitLabel}</Button>
+                  )}
+                </div>
               )}
-              {mode !== "view" && (
-                <Button type="submit">{submitLabel}</Button>
-              )}
-            </div>
-          </SheetFooter>
+            </SheetFooter>
+          )}
         </form>
       </SheetContent>
     </Sheet>
@@ -174,6 +179,7 @@ export function FormCombobox({
   disabled,
   required,
   placeholder = FORM_COMBOBOX_DEFAULT_PLACEHOLDER,
+  onValueChange,
 }: FormComboboxProps) {
   const { t } = usePreferences();
   const translatedPlaceholder = t(placeholder);
@@ -206,6 +212,7 @@ export function FormCombobox({
     <Combobox
       name={name}
       defaultValue={defaultValue ?? null}
+      onValueChange={onValueChange}
       disabled={disabled}
       required={required}
     >

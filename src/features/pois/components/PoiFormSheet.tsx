@@ -52,25 +52,30 @@ export function PoiFormSheet({
       canEdit={isViewMode}
       onEdit={onEdit}
     >
+
       <FormField
         label={t("POI image")}
         htmlFor="poi-image"
-        hint={t("JPEG, PNG or WebP. Maximum file size: 10 MB.")}
         required={isCreateMode}
       >
-        {imagePreviewUrl && (
+        {imagePreviewUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={imagePreviewUrl}
             alt={t("POI image preview")}
-            className="aspect-video w-full rounded-lg border border-border bg-muted object-cover"
+            className="aspect-video w-full rounded-lg border border-border bg-white object-cover"
           />
-        )}
-        {!imagePreviewUrl && (
-          <div className="flex aspect-video w-full items-center justify-center rounded-lg border border-dashed border-border bg-muted/40 px-6 text-center text-xs text-muted-foreground">
-            {t("Select an image to preview it here.")}
+        ) : (
+          <div className="flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-white px-6 text-center">
+            <p className="text-sm text-slate-600">
+              {t("Select an image to preview it here.")}
+            </p>
+            <p className="text-xs text-slate-400">
+              {t("JPEG, PNG or WebP. Maximum file size: 10 MB.")}
+            </p>
           </div>
         )}
+
         {!isViewMode && (
           <Input
             id="poi-image"
@@ -94,52 +99,112 @@ export function PoiFormSheet({
         />
       </FormField>
 
-      {poi && (
-        <section className="overflow-hidden rounded-xl border border-border bg-muted/20">
-          <div className="border-b border-border px-4 py-3">
-            <h3 className="text-sm font-medium text-foreground">
-              {t("POI QR code")}
-            </h3>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {t("Visitors scan this code to open the POI narration.")}
-            </p>
+      <div className="grid grid-cols-2 items-start gap-3">
+        {/* Left: QR Code */}
+        <div className="flex min-w-0 flex-col gap-2">
+          <div className="flex max-w-[180px] items-center justify-between gap-2">
+            <FormField label={t("POI QR code")}>
+              <></>
+            </FormField>
+
+            {poi && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={onDownloadQrCode}
+                disabled={isQrLoading || !qrCodeDataUrl}
+                className="size-7 shrink-0"
+                title={t("Download QR code")}
+                aria-label={t("Download QR code")}
+              >
+                <Download aria-hidden="true" className="size-4" />
+              </Button>
+            )}
           </div>
-          <div className="flex min-h-64 items-center justify-center bg-white p-5">
-            {qrCodeDataUrl && (
-              // QR được trả dưới dạng data URL, không cần pipeline tối ưu ảnh của Next.js.
+
+          <div className="flex aspect-square w-full max-w-[180px] items-center justify-center overflow-hidden rounded-md bg-white p-1.5">
+            {poi && qrCodeDataUrl && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={qrCodeDataUrl}
                 alt={t("POI QR code")}
-                className="size-56 object-contain"
+                className="block size-full object-contain"
               />
             )}
-            {isQrLoading && !qrCodeDataUrl && (
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
-                {t("Loading QR code…")}
-              </div>
+
+            {poi && isQrLoading && !qrCodeDataUrl && (
+              <LoaderCircle
+                aria-label={t("Loading QR code…")}
+                className="size-5 animate-spin text-slate-500"
+              />
+            )}
+
+            {isCreateMode && (
+              <p className="px-2 text-center text-xs text-slate-500">
+                {t("QR code will be generated after creation.")}
+              </p>
             )}
           </div>
-          <div className="flex justify-end border-t border-border px-4 py-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onDownloadQrCode}
-              disabled={isQrLoading || !qrCodeDataUrl}
-            >
-              <Download aria-hidden="true" />
-              {t("Download QR code")}
-            </Button>
-          </div>
-        </section>
-      )}
+        </div>
 
-      {isCreateMode && (
-        <p className="text-xs text-muted-foreground">
-          {t("The QR code will be generated automatically after the POI is created.")}
-        </p>
-      )}
+        {/* Right: Location & Trigger Radius */}
+        <div className="flex min-w-0 flex-col gap-3">
+          <FormField
+            label={t("Longitude")}
+            htmlFor="poi-longitude"
+            required
+          >
+            <Input
+              id="poi-longitude"
+              name="longitude"
+              type="number"
+              min={-180}
+              max={180}
+              step="any"
+              defaultValue={poi?.longitude ?? ""}
+              disabled={isViewMode}
+              required
+            />
+          </FormField>
+
+          <FormField
+            label={t("Latitude")}
+            htmlFor="poi-latitude"
+            required
+          >
+            <Input
+              id="poi-latitude"
+              name="latitude"
+              type="number"
+              min={-90}
+              max={90}
+              step="any"
+              defaultValue={poi?.latitude ?? ""}
+              disabled={isViewMode}
+              required
+            />
+          </FormField>
+
+          <FormField
+            label={t("Trigger radius (meters)")}
+            htmlFor="poi-trigger-radius"
+            required
+          >
+            <Input
+              id="poi-trigger-radius"
+              name="trigger_radius_meter"
+              type="number"
+              min={1}
+              step="any"
+              defaultValue={poi?.trigger_radius_meter ?? 100}
+              disabled={isViewMode}
+              required
+            />
+          </FormField>
+        </div>
+      </div>
+
 
       <FormField label={t("Region")} htmlFor="poi-region" required>
         <FormCombobox
@@ -175,52 +240,6 @@ export function PoiFormSheet({
           defaultValue={poi?.poi_location ?? ""}
           placeholder={t("Enter the full address")}
           rows={3}
-          disabled={isViewMode}
-          required
-        />
-      </FormField>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <FormField label={t("Latitude")} htmlFor="poi-latitude" required>
-          <Input
-            id="poi-latitude"
-            name="latitude"
-            type="number"
-            min={-90}
-            max={90}
-            step="any"
-            defaultValue={poi?.latitude ?? ""}
-            disabled={isViewMode}
-            required
-          />
-        </FormField>
-        <FormField label={t("Longitude")} htmlFor="poi-longitude" required>
-          <Input
-            id="poi-longitude"
-            name="longitude"
-            type="number"
-            min={-180}
-            max={180}
-            step="any"
-            defaultValue={poi?.longitude ?? ""}
-            disabled={isViewMode}
-            required
-          />
-        </FormField>
-      </div>
-
-      <FormField
-        label={t("Trigger radius (meters)")}
-        htmlFor="poi-trigger-radius"
-        required
-      >
-        <Input
-          id="poi-trigger-radius"
-          name="trigger_radius_meter"
-          type="number"
-          min={1}
-          step="any"
-          defaultValue={poi?.trigger_radius_meter ?? 100}
           disabled={isViewMode}
           required
         />

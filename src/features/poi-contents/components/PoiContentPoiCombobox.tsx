@@ -23,6 +23,7 @@ export function PoiContentPoiCombobox({
   defaultValue,
   disabled,
   required,
+  onValueChange,
 }: PoiContentPoiComboboxProps) {
   const { t } = usePreferences();
   const selectedOption =
@@ -68,6 +69,9 @@ export function PoiContentPoiCombobox({
       name={name}
       items={options}
       defaultValue={selectedOption}
+      onValueChange={function handleValueChange(option) {
+        onValueChange?.(option?.value ?? null);
+      }}
       disabled={disabled}
       required={required}
       itemToStringLabel={getOptionLabel}

@@ -92,13 +92,9 @@ export function createPoiContentsOverviewSummary(
 }
 
 /** Định dạng timestamp của content hoặc trả về dấu gạch khi chưa có dữ liệu. */
-export function formatPoiContentTimestamp(
-  value: string | null,
-  locale: Locale,
-) {
-  if (!value) {
+export function formatPoiContentTimestamp(value: string | null,locale: Locale) {
+  if (!value)
     return "—";
-  }
   return new Date(value).toLocaleString(locale);
 }
 
@@ -146,6 +142,16 @@ export function createPoiFilterOptions(
       description: poi.id,
     };
   });
+}
+
+/** Chỉ bản nháp hoặc nội dung bị từ chối mới được sửa trực tiếp. */
+export function isPoiContentEditable(
+  status: PoiContent["content_status"],
+) {
+  return (
+    status === CONTENT_STATUS.DRAFT ||
+    status === CONTENT_STATUS.REJECTED
+  );
 }
 
 /** Xác định hành động tiếp theo được phép hiển thị từ trạng thái content hiện tại. */

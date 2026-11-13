@@ -78,11 +78,22 @@ export interface PoiContentFormSheetProps {
   open: boolean;
   mode: FeatureFormMode;
   content: PoiContent | null;
+  contents: readonly PoiContent[];
   poiOptions: readonly DataTableFilterOption[];
   onOpenChange: (open: boolean) => void;
   languages: readonly Language[];
   onSubmit: (formData: FormData) => void | Promise<void>;
   onEdit: () => void;
+  hasValidAudio: boolean;
+  isPublishing: boolean;
+  audioDurationSeconds: number | null;
+  audioMimeType: string | null;
+  archivedContent: PoiContent | null;
+  workflowError: string | null;
+  onSubmitForApproval: () => void;
+  onApprove: () => void;
+  onReject: () => void;
+  onPublish: () => void | Promise<void>;
 }
 
 /** Thuộc tính của combobox tìm kiếm và chọn POI trong form content. */
@@ -93,6 +104,7 @@ export interface PoiContentPoiComboboxProps {
   defaultValue: string | null;
   disabled?: boolean;
   required?: boolean;
+  onValueChange?: (value: string | null) => void;
 }
 
 /** Thuộc tính của nút hành động quy trình được hiển thị theo trạng thái content. */
@@ -102,32 +114,4 @@ export interface PoiContentWorkflowActionProps {
   onSubmit: (content: PoiContent) => void;
   onReview: (content: PoiContent) => void;
   onPublish: (content: PoiContent) => void;
-}
-
-/** Thuộc tính điều khiển sheet phê duyệt hoặc từ chối nội dung. */
-export interface PoiContentReviewSheetProps {
-  open: boolean;
-  content: PoiContent | null;
-  errorMessage: string | null;
-  pois: readonly PointOfInterest[];
-  languages: readonly Language[];
-  onOpenChange: (open: boolean) => void;
-  onApprove: () => void;
-  onReject: () => void;
-}
-
-/** Thuộc tính điều khiển sheet kiểm tra audio và xuất bản nội dung. */
-export interface PoiContentPublishSheetProps {
-  open: boolean;
-  content: PoiContent | null;
-  hasValidAudio: boolean;
-  isPublishing: boolean;
-  audioDurationSeconds: number | null;
-  audioMimeType: string | null;
-  archivedContent: PoiContent | null;
-  errorMessage: string | null;
-  pois: readonly PointOfInterest[];
-  languages: readonly Language[];
-  onOpenChange: (open: boolean) => void;
-  onPublish: () => void | Promise<void>;
 }
