@@ -135,9 +135,6 @@ export function PoisTable({
     {
       id: "timestamps",
       header: t("Timestamps"),
-      searchValue: function getTimestampSearchValue(poi) {
-        return `${poi.created_at} ${poi.last_updated_at}`;
-      },
       cell: function renderTimestamps(poi) {
         return (
           <div className="flex min-w-52 flex-col gap-1 text-xs">
