@@ -14,6 +14,7 @@ export type FeatureFormSheetProps = {
   onSubmit?: (formData: FormData) => void;
   canEdit?: boolean;
   onEdit?: () => void;
+  footer?: ReactNode;
 };
 
 /** Thuộc tính cho một field gồm label, nội dung nhập và hướng dẫn. */
@@ -40,6 +41,7 @@ export type FormComboboxProps = {
   disabled?: boolean;
   required?: boolean;
   placeholder?: string;
+  onValueChange?: (value: string | null) => void;
 };
 
 /** Thuộc tính cấu hình combobox chọn nhiều giá trị trong feature form. */

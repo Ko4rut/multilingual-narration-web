@@ -18,8 +18,6 @@ import { Button } from "@/components/ui/button";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import { usePoiContents } from "../hooks/use-poi-contents";
 import { PoiContentFormSheet } from "./PoiContentFormSheet";
-import { PoiContentPublishSheet } from "./PoiContentPublishSheet";
-import { PoiContentReviewSheet } from "./PoiContentReviewSheet";
 import { PoiContentTable } from "./PoiContentTable";
 
 export function PoiContentOverview() {
@@ -33,10 +31,6 @@ export function PoiContentOverview() {
     selectedContent,
     sheetMode,
     isSheetOpen,
-    reviewContent,
-    isReviewSheetOpen,
-    publishContent,
-    isPublishSheetOpen,
     publishAudio,
     hasValidPublishAudio,
     archivedContent,
@@ -46,23 +40,20 @@ export function PoiContentOverview() {
     isPublishing,
     openCreateSheet,
     openViewSheet,
+    openWorkflowSheet,
     openEditSheet,
     editSelectedContent,
     handleSheetOpenChange,
     handleCopyContent,
     handleSubmit,
     handleSubmitForApproval,
-    openReviewSheet,
-    handleReviewSheetOpenChange,
     handleApproveContent,
     handleRejectContent,
-    openPublishSheet,
-    handlePublishSheetOpenChange,
     handlePublishContent,
   } = usePoiContents();
   let sheetKey = "create";
   if (selectedContent) {
-    sheetKey = `${sheetMode}-${selectedContent.id}`;
+    sheetKey = `${sheetMode}-${selectedContent.id}-${selectedContent.content_status}`;
   }
   const isCopySuccess = feedback === "Content ID copied.";
   let feedbackClassName = "text-xs text-muted-foreground";
@@ -124,11 +115,11 @@ export function PoiContentOverview() {
           onCopyContent={handleCopyContent}
           onViewContent={openViewSheet}
           onEditContent={openEditSheet}
-          onSubmitContent={handleSubmitForApproval}
-          onReviewContent={openReviewSheet}
-          onPublishContent={openPublishSheet}
+          onSubmitContent={openWorkflowSheet}
+          onReviewContent={openWorkflowSheet}
+          onPublishContent={openWorkflowSheet}
           disabledWorkflowContentId={
-            isPublishSheetOpen ? publishContent?.id ?? null : null
+            isPublishing ? selectedContent?.id ?? null : null
           }
         />
       </PageLayoutContent>
@@ -137,34 +128,21 @@ export function PoiContentOverview() {
         open={isSheetOpen}
         mode={sheetMode}
         content={selectedContent}
+        contents={contents}
         poiOptions={poiOptions}
         languages={languages}
         onOpenChange={handleSheetOpenChange}
         onSubmit={handleSubmit}
         onEdit={editSelectedContent}
-      />
-      <PoiContentReviewSheet
-        open={isReviewSheetOpen}
-        content={reviewContent}
-        errorMessage={workflowError}
-        pois={pois}
-        languages={languages}
-        onOpenChange={handleReviewSheetOpenChange}
-        onApprove={handleApproveContent}
-        onReject={handleRejectContent}
-      />
-      <PoiContentPublishSheet
-        open={isPublishSheetOpen}
-        content={publishContent}
         hasValidAudio={hasValidPublishAudio}
         isPublishing={isPublishing}
         audioDurationSeconds={publishAudio?.audio_duration_sec ?? null}
         audioMimeType={publishAudio?.audio_mime_type ?? null}
         archivedContent={archivedContent}
-        errorMessage={workflowError}
-        pois={pois}
-        languages={languages}
-        onOpenChange={handlePublishSheetOpenChange}
+        workflowError={workflowError}
+        onSubmitForApproval={handleSubmitForApproval}
+        onApprove={handleApproveContent}
+        onReject={handleRejectContent}
         onPublish={handlePublishContent}
       />
     </PageLayout>

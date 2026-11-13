@@ -26,6 +26,8 @@ import {
   createPoiFilterOptions,
   findPoiContentLanguage,
   findPoiContentPoi,
+  formatPoiContentTimestamp,
+  isPoiContentEditable,
 } from "../utils/poi-content.utils";
 import { PoiContentStatusBadge } from "./PoiContentStatusBadge";
 import { PoiContentWorkflowAction } from "./PoiContentWorkflowAction";
@@ -42,7 +44,7 @@ export function PoiContentTable({
   onPublishContent,
   disabledWorkflowContentId,
 }: PoiContentTableProps) {
-  const { t } = usePreferences();
+  const { t, locale } = usePreferences();
   const languageOptions = createLanguageFilterOptions(languages);
   const poiOptions = createPoiFilterOptions(pois);
   const columns: readonly DataTableColumn<PoiContent>[] = [
@@ -121,7 +123,7 @@ export function PoiContentTable({
     {
       id: "workflow",
       header: t("Workflow"),
-      className: "min-w-44",
+      className: "min-w-32",
       cell: function renderWorkflow(content) {
         return (
           <PoiContentWorkflowAction
@@ -131,6 +133,26 @@ export function PoiContentTable({
             onReview={onReviewContent}
             onPublish={onPublishContent}
           />
+        );
+      },
+    },
+    // Column Timestamps
+    {
+      id: "timestamps",
+      header: t("Timestamps"),
+      cell: function renderTimestamps(content) {
+        return (
+          <div className="flex min-w-52 flex-col gap-1 text-xs">
+            <span>
+              {t("Created at")}: {formatPoiContentTimestamp(content.created_at, locale)}
+            </span>
+            <span>
+              {t("Approved at")}: {formatPoiContentTimestamp(content.approved_at, locale)}
+            </span>
+            <span>
+              {t("Published at")}: {formatPoiContentTimestamp(content.published_at, locale)}
+            </span>
+          </div>
         );
       },
     },
@@ -149,9 +171,13 @@ export function PoiContentTable({
             onView={function handleView() {
               onViewContent(content);
             }}
-            onEdit={function handleEdit() {
-              onEditContent(content);
-            }}
+            onEdit={
+              isPoiContentEditable(content.content_status)
+                ? function handleEdit() {
+                    onEditContent(content);
+                  }
+                : undefined
+            }
           />
         );
       },

@@ -14,7 +14,7 @@ import { CONTENT_STATUS } from "../constants/poi-content.constants";
 import type { Language } from "../types/language.types";
 import type { PoiContent } from "../types/poi-content.types";
 import type { PointOfInterest } from "../types/poi.types";
-import { createPoiContentsOverviewSummary, createPoiFilterOptions, findPublishedPoiContentVersion, getPoiContentFormValue, isValidPoiContentAudio } from "../utils/poi-content.utils";
+import { createPoiContentsOverviewSummary, createPoiFilterOptions, findPublishedPoiContentVersion, getPoiContentFormValue, isPoiContentEditable, isValidPoiContentAudio } from "../utils/poi-content.utils";
 
 export function usePoiContents() {
   const [contents, setContents] = useState<PoiContent[]>([]);
@@ -23,10 +23,6 @@ export function usePoiContents() {
   const [sheetMode, setSheetMode] = useState<FeatureFormMode>("create");
   const [selectedContentId, setSelectedContentId] = useState<string | null>(null);
   const [isSheetOpen, setSheetOpen] = useState(false);
-  const [reviewContentId, setReviewContentId] = useState<string | null>(null);
-  const [isReviewSheetOpen, setReviewSheetOpen] = useState(false);
-  const [publishContentId, setPublishContentId] = useState<string | null>(null);
-  const [isPublishSheetOpen, setPublishSheetOpen] = useState(false);
   const [workflowError, setWorkflowError] = useState<string | null>(null);
   const [isPublishing, setPublishing] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -49,22 +45,30 @@ export function usePoiContents() {
 
   const overviewSummary = useMemo(function getSummary() { return createPoiContentsOverviewSummary(contents); }, [contents]);
   const selectedContent = contents.find(function find(item) { return item.id === selectedContentId; }) ?? null;
-  const reviewContent = contents.find(function find(item) { return item.id === reviewContentId; }) ?? null;
-  const publishContent = contents.find(function find(item) { return item.id === publishContentId; }) ?? null;
-  const publishAudio = publishContent?.audio ?? null;
+  const publishAudio = selectedContent?.audio ?? null;
   const hasValidPublishAudio = publishAudio !== null && isValidPoiContentAudio(publishAudio);
   let archivedContent = null;
-  if (publishContent) archivedContent = findPublishedPoiContentVersion(publishContent, contents);
+  if (selectedContent) archivedContent = findPublishedPoiContentVersion(selectedContent, contents);
   const poiOptions = createPoiFilterOptions(pois);
 
   function replaceContent(updated: PoiContent) {
     setContents(function replace(current) { return current.map(function map(item) { if (item.id === updated.id) return updated; return item; }); });
   }
-  function openCreateSheet() { setSelectedContentId(null); setSheetMode("create"); setSheetOpen(true); setFeedback(null); }
-  function openViewSheet(content: PoiContent) { setSelectedContentId(content.id); setSheetMode("view"); setSheetOpen(true); }
-  function openEditSheet(content: PoiContent) { setSelectedContentId(content.id); setSheetMode("edit"); setSheetOpen(true); setFeedback(null); }
-  function editSelectedContent() { if (selectedContent) setSheetMode("edit"); }
-  function handleSheetOpenChange(open: boolean) { setSheetOpen(open); if (!open) setSelectedContentId(null); }
+  function openCreateSheet() { setSelectedContentId(null); setSheetMode("create"); setSheetOpen(true); setFeedback(null); setWorkflowError(null); }
+  function openViewSheet(content: PoiContent) { setSelectedContentId(content.id); setSheetMode("view"); setSheetOpen(true); setWorkflowError(null); }
+  function openWorkflowSheet(content: PoiContent) { openViewSheet(content); }
+  function openEditSheet(content: PoiContent) {
+    if (!isPoiContentEditable(content.content_status)) return;
+    setSelectedContentId(content.id); setSheetMode("edit"); setSheetOpen(true); setFeedback(null);
+  }
+  function editSelectedContent() {
+    if (selectedContent && isPoiContentEditable(selectedContent.content_status)) setSheetMode("edit");
+  }
+  function handleSheetOpenChange(open: boolean) {
+    if (isPublishing && !open) return;
+    setSheetOpen(open);
+    if (!open) { setSelectedContentId(null); setWorkflowError(null); }
+  }
   async function handleCopyContent(content: PoiContent) { try { await navigator.clipboard.writeText(content.id); setFeedback("Content ID copied."); } catch { setFeedback("Unable to copy the content ID."); } }
 
   async function handleSubmit(formData: FormData) {
@@ -78,6 +82,10 @@ export function usePoiContents() {
       setSheetOpen(false);
       return;
     }
+    if (!isPoiContentEditable(selectedContent.content_status)) {
+      setFeedback("Approved or published content cannot be edited.");
+      return;
+    }
     const result = await updatePoiContentAction(selectedContent.id, { narration_title, narration_script });
     if (!result.data) { setFeedback(result.error); return; }
     replaceContent(result.data);
@@ -85,41 +93,32 @@ export function usePoiContents() {
     setSheetOpen(false);
   }
 
-  async function handleSubmitForApproval(content: PoiContent) {
-    const result = await submitPoiContentAction(content.id);
-    if (!result.data) { setFeedback(result.error); return; }
-    replaceContent(result.data);
-    setFeedback("Content submitted for approval.");
-  }
-  function openReviewSheet(content: PoiContent) { setReviewContentId(content.id); setWorkflowError(null); setReviewSheetOpen(true); }
-  function handleReviewSheetOpenChange(open: boolean) { setReviewSheetOpen(open); if (!open) { setReviewContentId(null); setWorkflowError(null); } }
-  async function review(decision: "APPROVE" | "REJECT") {
-    if (!reviewContent) return;
-    const result = await reviewPoiContentAction(reviewContent.id, decision);
+  async function handleSubmitForApproval() {
+    if (!selectedContent) return;
+    const result = await submitPoiContentAction(selectedContent.id);
     if (!result.data) { setWorkflowError(result.error); return; }
     replaceContent(result.data);
-    handleReviewSheetOpenChange(false);
+    setFeedback("Content submitted for approval.");
+    setWorkflowError(null);
+  }
+  async function review(decision: "APPROVE" | "REJECT") {
+    if (!selectedContent) return;
+    const result = await reviewPoiContentAction(selectedContent.id, decision);
+    if (!result.data) { setWorkflowError(result.error); return; }
+    replaceContent(result.data);
+    setWorkflowError(null);
     let successMessage = "Content rejected and returned for revision.";
     if (decision === "APPROVE") successMessage = "Content approved and ready for publishing.";
     setFeedback(successMessage);
   }
   function handleApproveContent() { void review("APPROVE"); }
   function handleRejectContent() { void review("REJECT"); }
-  function openPublishSheet(content: PoiContent) { setPublishContentId(content.id); setWorkflowError(null); setPublishSheetOpen(true); }
-  function handlePublishSheetOpenChange(open: boolean) {
-    if (isPublishing && !open) return;
-    setPublishSheetOpen(open);
-    if (!open) {
-      setPublishContentId(null);
-      setWorkflowError(null);
-    }
-  }
   async function handlePublishContent() {
-    if (!publishContent || isPublishing) return;
+    if (!selectedContent || isPublishing) return;
     setPublishing(true);
     setWorkflowError(null);
     try {
-      const result = await publishPoiContentAction(publishContent.id);
+      const result = await publishPoiContentAction(selectedContent.id);
       if (!result.data) {
         setWorkflowError(result.error);
         return;
@@ -131,13 +130,11 @@ export function usePoiContents() {
           return item;
         });
       });
-      setPublishSheetOpen(false);
-      setPublishContentId(null);
       setFeedback("Content published successfully. TTS audio was generated automatically when required.");
     } finally {
       setPublishing(false);
     }
   }
 
-  return { contents, pois, languages, overviewSummary, poiOptions, selectedContent, sheetMode, isSheetOpen, reviewContent, isReviewSheetOpen, publishContent, isPublishSheetOpen, publishAudio, hasValidPublishAudio, archivedContent, workflowError, feedback, isLoading, isPublishing, openCreateSheet, openViewSheet, openEditSheet, editSelectedContent, handleSheetOpenChange, handleCopyContent, handleSubmit, handleSubmitForApproval, openReviewSheet, handleReviewSheetOpenChange, handleApproveContent, handleRejectContent, openPublishSheet, handlePublishSheetOpenChange, handlePublishContent };
+  return { contents, pois, languages, overviewSummary, poiOptions, selectedContent, sheetMode, isSheetOpen, publishAudio, hasValidPublishAudio, archivedContent, workflowError, feedback, isLoading, isPublishing, openCreateSheet, openViewSheet, openWorkflowSheet, openEditSheet, editSelectedContent, handleSheetOpenChange, handleCopyContent, handleSubmit, handleSubmitForApproval, handleApproveContent, handleRejectContent, handlePublishContent };
 }
