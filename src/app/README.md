@@ -6,7 +6,7 @@ Thư mục `src/app` quản lý routing, layout và metadata bằng Next.js App 
 
 ```text
 app/
-├── (auth)/       # Route công khai: login, forgot-password
+├── (auth)/       # Route công khai: login
 ├── (admin)/      # Route quản trị yêu cầu phiên đăng nhập
 ├── layout.tsx    # Root layout, metadata và preferences provider
 ├── page.tsx      # Redirect route gốc

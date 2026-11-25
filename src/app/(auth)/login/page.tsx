@@ -6,7 +6,6 @@ export const metadata: Metadata = { title: "Sign In" };
 export default function LoginPage() {
   return (
     <AuthForm
-      mode="login"
       defaultEmail={process.env.LOCAL_LOGIN_EMAIL}
       defaultPassword={process.env.LOCAL_LOGIN_PASSWORD}
     />

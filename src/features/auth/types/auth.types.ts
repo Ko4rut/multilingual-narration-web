@@ -1,12 +1,27 @@
-export type AuthMode = "login" | "reset";
 export type AuthFormProps = {
-  mode: AuthMode;
   defaultEmail?: string;
   defaultPassword?: string;
 };
-export type AuthFormValues = { email: string; password: string };
-export type AuthCopy = { title: string; subtitle: string; action: string };
-export type LoginState = { error: string };
+
+export type AuthFormValues = {
+  email: string;
+  password: string;
+};
+
+export type AuthCopy = {
+  title: string;
+  subtitle: string;
+  action: string;
+};
+
+export type LoginState = {
+  error: string;
+};
+
+export type AuthNotification = {
+  message: string;
+  tone: "error" | "info";
+};
 
 export type AuthenticatedUser = {
   id: string;

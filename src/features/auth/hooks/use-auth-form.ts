@@ -1,35 +1,54 @@
 "use client";
-import { startTransition, useActionState, useState } from "react";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { login } from "../actions";
 import { authContent } from "../constants/auth.constants";
-import type { AuthFormValues, AuthMode } from "../types/auth.types";
+import type { AuthFormValues, AuthNotification } from "../types/auth.types";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 
+const NOTIFICATION_DURATION_MS = 1_000;
+
 export function useAuthForm(
-  mode: AuthMode,
   defaultEmail = "",
   defaultPassword = "",
 ) {
   const { t } = usePreferences();
   const [state, loginAction, pending] = useActionState(login, { error: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const [notice, setNotice] = useState("");
+  const [dismissedMessage, setDismissedMessage] = useState("");
   const form = useForm<AuthFormValues>({
     defaultValues: {
       email: defaultEmail,
       password: defaultPassword,
     },
   });
-  const copy = authContent[mode];
+  const copy = authContent;
+  let notification: AuthNotification | null = null;
+  const activeMessage = state.error;
 
-  function handleSubmit(values: AuthFormValues) {
-    setNotice("");
+  if (!pending && activeMessage && activeMessage !== dismissedMessage) {
+    notification = {
+      message: activeMessage,
+      tone: "error",
+    };
+  }
 
-    if (mode === "reset") {
-      setNotice("Password recovery is not connected yet. No email has been sent.");
+  useEffect(function autoDismissNotification() {
+    if (pending || !activeMessage || activeMessage === dismissedMessage) {
       return;
     }
+
+    const timeoutId = window.setTimeout(function dismissAfterDelay() {
+      setDismissedMessage(activeMessage);
+    }, NOTIFICATION_DURATION_MS);
+
+    return function clearAutoDismissTimer() {
+      window.clearTimeout(timeoutId);
+    };
+  }, [activeMessage, dismissedMessage, pending]);
+
+  function handleSubmit(values: AuthFormValues) {
+    setDismissedMessage("");
 
     const formData = new FormData();
     formData.set("email", values.email);
@@ -52,8 +71,7 @@ export function useAuthForm(
     form,
     showPassword,
     pending,
-    error: state.error,
-    notice,
+    notification,
     togglePassword,
     onSubmit: form.handleSubmit(handleSubmit),
   };

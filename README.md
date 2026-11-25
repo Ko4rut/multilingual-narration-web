@@ -86,7 +86,6 @@ Next.js đọc route từ `src/app`. Route group trong ngoặc dùng để chia 
 | Route              | Chức năng                                |
 | ------------------ | ---------------------------------------- |
 | `/login`           | Đăng nhập nhân viên                      |
-| `/forgot-password` | Giao diện khôi phục mật khẩu dạng demo   |
 | `/dashboard`       | Dashboard quản trị                       |
 | `/pois`            | Quản lý điểm tham quan                   |
 | `/poi-content`     | Quản lý nội dung thuyết minh đa ngôn ngữ |
@@ -104,7 +103,7 @@ Các route quản trị được bảo vệ tại `src/proxy.ts` và layout admi
 ```text
 src/
 ├── app/                         # App Router, layout, metadata và route composition
-│   ├── (auth)/                  # Login và forgot-password
+│   ├── (auth)/                  # Login
 │   └── (admin)/                 # Các route quản trị được bảo vệ
 ├── components/
 │   ├── layout/                  # Khung ứng dụng và sidebar
@@ -176,7 +175,7 @@ Kiểm tra diff sau khi thêm để tránh công cụ ghi đè token hoặc conv
 ## Xác thực và giới hạn hiện tại
 
 Credential được kiểm tra bởi MNR Backend. Login thành công giữ Access Token trong
-cookie HttpOnly, SameSite=Lax; Forgot password chưa gửi email thật.
+cookie HttpOnly, SameSite=Lax.
 
 Trước khi nối dữ liệu thật cần:
 

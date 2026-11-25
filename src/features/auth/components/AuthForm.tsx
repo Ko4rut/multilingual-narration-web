@@ -1,7 +1,6 @@
 "use client";
 
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
-import Link from "next/link";
 import type { ControllerRenderProps } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,21 +18,21 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import styles from "./AuthForm.module.css";
+import { AuthNotification } from "./AuthNotification";
 import { useAuthForm } from "../hooks/use-auth-form";
 import type { AuthFormProps, AuthFormValues } from "../types/auth.types";
 
-export function AuthForm({ mode, defaultEmail, defaultPassword }: AuthFormProps) {
+export function AuthForm({ defaultEmail, defaultPassword }: AuthFormProps) {
   const {
     t,
     copy,
     form,
     showPassword,
     pending,
-    error,
-    notice,
+    notification,
     togglePassword,
     onSubmit,
-  } = useAuthForm(mode, defaultEmail, defaultPassword);
+  } = useAuthForm(defaultEmail, defaultPassword);
   let passwordType = "password";
   let passwordToggleLabel = t("Show password");
   let PasswordVisibilityGlyph = Eye;
@@ -129,40 +128,23 @@ export function AuthForm({ mode, defaultEmail, defaultPassword }: AuthFormProps)
             render={renderEmailField}
           />
 
-          {mode !== "reset" && (
-            <FormField
-              control={form.control}
-              name="password"
-              render={renderPasswordField}
-            />
-          )}
-
-          {mode === "login" && (
-            <Link className={styles.forgot} href="/forgot-password">
-              {t("Forgot password?")}
-            </Link>
-          )}
+          <FormField
+            control={form.control}
+            name="password"
+            render={renderPasswordField}
+          />
           <Button type="submit" disabled={pending} className={styles.submit}>
             {submitLabel}
           </Button>
 
-          {error && (
-            <p className={styles.notice} role="alert">
-              {t(error)}
-            </p>
-          )}
-          {notice && (
-            <div className={styles.notice} role="status">
-              <p>{t(notice)}</p>
-            </div>
-          )}
         </form>
       </Form>
 
-      {mode === "reset" && (
-        <p className={styles.footer}>
-          <Link href="/login">{t("Sign In")}</Link>
-        </p>
+      {notification && (
+        <AuthNotification
+          message={notification.message}
+          tone={notification.tone}
+        />
       )}
     </section>
   );
