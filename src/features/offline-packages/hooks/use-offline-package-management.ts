@@ -54,8 +54,6 @@ export function useOfflinePackageManagement() {
 
   useEffect(function loadManagement() {
     let active = true;
-    setIsLoading(true);
-    setLoadError(null);
 
     void loadOfflinePackageManagementAction()
       .then(function applyManagement(result) {
@@ -85,6 +83,8 @@ export function useOfflinePackageManagement() {
   }, [version]);
 
   const refresh = useCallback(function refresh() {
+    setIsLoading(true);
+    setLoadError(null);
     setVersion(function nextVersion(current) {
       return current + 1;
     });
