@@ -5,7 +5,10 @@ import { getRegions } from "./api/region.api";
 
 export async function loadRegions() {
   try {
-    return { data: await getRegions(), error: null };
+    return {
+      data: await getRegions(),
+      error: null
+    };
   } catch (error) {
     return {
       data: null,

@@ -21,7 +21,6 @@ import type { PointOfInterest, PoisTableProps } from "../types/poi.types";
 import {
   createPoiCategoryFilterOptions,
   createRegionFilterOptions,
-  findPoiRegion,
   formatCoordinates,
   formatPoiTimestamp,
   getPoiCategoryIds,
@@ -63,31 +62,6 @@ export function PoisTable({
                 {poi.id}
               </p>
             </div>
-          </div>
-        );
-      },
-    },
-    // Column Region
-    {
-      id: "region_id",
-      header: t("Region"),
-      searchValue: function getRegionSearchValue(poi) {
-        const region = findPoiRegion(poi.region_id, regions);
-        return `${poi.region_id} ${region?.region_name ?? ""} ${region?.region_code ?? ""}`;
-      },
-      cell: function renderRegion(poi) {
-        const region = findPoiRegion(poi.region_id, regions);
-        if (!region) {
-          return <span className="font-mono text-xs">{poi.region_id}</span>;
-        }
-        return (
-          <div className="flex min-w-32 max-w-40 truncate flex-col gap-1">
-            <span className="text-sm text-foreground">
-              {t(region.region_name)}
-            </span>
-            <span className="font-mono text-xs text-muted-foreground">
-              {region.region_code}
-            </span>
           </div>
         );
       },
