@@ -3,7 +3,7 @@ import { PoiCategoryOverview } from "@/features/poi-categories/components/PoiCat
 
 export const metadata: Metadata = {
   title: "POI Categories | MANS Admin",
-  description: "View the categories used to classify points of interest.",
+  description: "Manage categories used to classify POIs and build offline packages.",
 };
 
 export default function PoiCategoriesPage() {
