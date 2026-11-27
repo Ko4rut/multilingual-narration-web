@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Map,
   MapPin,
+  Package,
   Settings,
   ShieldCheck,
   Tags,
@@ -19,6 +20,7 @@ export const navigation = [
     { href: "/pois", label: "POI Management", glyph: MapPin },
     { href: "/poi-content", label: "POIs Content Management", glyph: Files },
     { href: "/audio", label: "Audio Management", glyph: AudioLines },
+    { href: "/offline-packages", label: "Offline Packages", glyph: Package },
   ] },
   { label: "Catalog", items: [
     { href: "/languages", label: "Language Management", glyph: Languages },
