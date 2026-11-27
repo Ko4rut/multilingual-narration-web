@@ -1,0 +1,31 @@
+name: Check Offline Package Admin UI
+on:
+  push:
+    branches:
+      - feature/offline-package-management-ui
+  pull_request:
+    paths:
+      - "src/features/offline-packages/**"
+      - "src/app/(admin)/offline-packages/**"
+      - "src/constants/navigation.ts"
+      - "src/i18n/messages.ts"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/check-offline-package-admin.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
