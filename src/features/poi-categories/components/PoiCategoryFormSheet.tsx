@@ -20,6 +20,10 @@ export function PoiCategoryFormSheet({
   const { t } = usePreferences();
   const isView = mode === "view";
   const isCreate = mode === "create";
+  let dismissLabel = "Cancel";
+  if (isView) {
+    dismissLabel = "Close";
+  }
   let description = "Create a reusable category for classifying points of interest.";
   if (isView) {
     description = "View a category shared by POIs and offline packages.";
@@ -48,7 +52,7 @@ export function PoiCategoryFormSheet({
             disabled={isSaving}
             onClick={closeSheet}
           >
-            {t(isView ? "Close" : "Cancel")}
+            {t(dismissLabel)}
           </Button>
           {isView && (
             <Button type="button" onClick={onEdit}>

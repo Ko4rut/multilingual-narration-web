@@ -4,10 +4,15 @@ export const CATEGORY_CODE_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export function parseCategoryForm(formData: FormData): PoiCategoryCreatePayload {
   const name = formData.get("category_name");
   const code = formData.get("category_code");
-  return {
-    category_name: typeof name === "string" ? name.trim() : "",
-    category_code: typeof code === "string" ? code.trim() : "",
-  };
+  let categoryName = "";
+  let categoryCode = "";
+  if (typeof name === "string") {
+    categoryName = name.trim();
+  }
+  if (typeof code === "string") {
+    categoryCode = code.trim();
+  }
+  return { category_name: categoryName, category_code: categoryCode };
 }
 export function getCategoryFormError(payload: PoiCategoryCreatePayload): string | null {
   if (!payload.category_name || !payload.category_code) {
