@@ -8,14 +8,19 @@ import {
   DataTableSearch,
   DataTableToolbar,
 } from "@/components/shared/DataTable";
+import { MoreMenu } from "@/components/shared/MoreMenu";
 import { usePreferences } from "@/features/settings/hooks/use-preferences";
 import type { DataTableColumn } from "@/types/shared/data-table.types";
-import type {
-  PoiCategoriesTableProps,
-  PoiCategory,
-} from "../types/poi-category.types";
+import type { PoiCategoriesTableProps, PoiCategory } from "../types/poi-category.types";
 
-export function PoiCategoriesTable({ categories }: PoiCategoriesTableProps) {
+/** Searchable master-data directory with explicit view/edit/delete actions. */
+export function PoiCategoriesTable({
+  categories,
+  selectedCategoryId,
+  onViewCategory,
+  onEditCategory,
+  onDeleteCategory,
+}: PoiCategoriesTableProps) {
   const { t } = usePreferences();
   const columns: readonly DataTableColumn<PoiCategory>[] = [
     {
@@ -47,15 +52,30 @@ export function PoiCategoriesTable({ categories }: PoiCategoriesTableProps) {
         );
       },
     },
+    {
+      id: "actions",
+      header: <span className="sr-only">{t("Actions")}</span>,
+      headerClassName: "w-12 text-right",
+      className: "w-12 text-right",
+      cell: function renderActions(category) {
+        return (
+          <MoreMenu
+            onView={function viewCategory() { onViewCategory(category); }}
+            onEdit={function editCategory() { onEditCategory(category); }}
+            onDelete={function deleteCategory() { onDeleteCategory(category); }}
+          />
+        );
+      },
+    },
   ];
 
   return (
     <DataTable
       data={categories}
       columns={columns}
-      getRowId={function getId(category) {
-        return category.id;
-      }}
+      getRowId={function getId(category) { return category.id; }}
+      selectedRowId={selectedCategoryId ?? undefined}
+      onRowClick={onViewCategory}
     >
       <DataTablePanel>
         <DataTableToolbar>
